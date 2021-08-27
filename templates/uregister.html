@@ -1,0 +1,121 @@
+{% include "html/homeheader.html" %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+			<meta charset="UTF-8">
+			<meta http-equiv="X-UA-Compatible" content="IE=edge">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<link rel="stylesheet" href="../static/signupstyle.css">
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+			<title>Sign Up</title>
+	</head>
+	<body>
+		<div class="signup">
+
+			<div class="signup-logo">
+				<p>Sign Up</p>
+
+			</div>
+
+			<form class ="form" method="post" action="">
+				{{ form.hidden_tag() }}
+				<br>
+
+				<div class="form-group">
+					{{ form.email.label(id="left")}}
+
+					{% if form.email.errors %}
+							{{ form.email(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.email.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.email(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<br>
+
+				<div class="form-group">
+				  {{ form.firstname.label(id="left")}}
+
+				  {% if form.firstname.errors %}
+				      {{ form.firstname(class="form-control form-control-lg is-invalid") }}
+				      <div class="invalid-feedback">
+				          {% for error in form.firstname.errors %}
+				              <span>{{ error }}</span>
+				          {% endfor %}
+				      </div>
+				  {% else %}
+				      {{ form.firstname(class="form-control form-control-lg") }}
+				  {% endif %}
+				</div>
+
+				<br>
+
+				<div class="form-group">
+				  {{ form.lastname.label(id="left")}}
+
+				  {% if form.lastname.errors %}
+				      {{ form.lastname(class="form-control form-control-lg is-invalid") }}
+				      <div class="invalid-feedback">
+				          {% for error in form.lastname.errors %}
+				              <span>{{ error }}</span>
+				          {% endfor %}
+				      </div>
+				  {% else %}
+				      {{ form.lastname(class="form-control form-control-lg") }}
+				  {% endif %}
+				</div>
+
+				<br>
+
+				<div class="form-group">
+					{{ form.password.label(id="left")}}
+
+					{% if form.password.errors %}
+							{{ form.password(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.password.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.password(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<br>
+
+				<div class="form-group">
+					{{ form.confirm_password.label(id="left")}}
+
+					{% if form.confirm_password.errors %}
+							{{ form.confirm_password(class="is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.confirm_password.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.confirm_password(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<br>
+
+				<div class="form-group">
+						{{ form.submit(class="signup-button")}}
+				</div>
+
+				<br>
+
+			</form>
+			<div>
+				Already have an account? <a href="{{ url_for('udash') }}">Sign In</a>
+			</div>
+		</div>
+	</body>
+</html>

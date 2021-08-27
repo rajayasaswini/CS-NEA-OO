@@ -1,0 +1,58 @@
+{% include "html/homeheader.html" %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+			<meta charset="UTF-8">
+			<meta http-equiv="X-UA-Compatible" content="IE=edge">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<link rel="stylesheet" href="../static/signupstyle.css">
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+			<title>Sign Up</title>
+	</head>
+	<body>
+		<div class="signup">
+			{% with messages = get_flashed_messages(with_categories=true) %}
+	      {% if messages %}
+	        {% for category, message in messages %}
+	          <div class="alert alert-{{ category }}">
+	            {{ message }}
+	          </div>
+	        {% endfor %}
+	      {% endif %}
+	    {% endwith %}
+			<div class="signup-logo">
+				<p>Sign Up</p>
+
+			</div>
+
+			<form class ="form" method="post" action="">
+				{{ form.hidden_tag() }}
+				<br>
+
+				<div class="form-group">
+					{{ form.classcode.label(id="left")}}
+
+					{% if form.classcode.errors %}
+							{{ form.classcode(class="is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.classcode.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.classcode(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<br>
+
+				<div class="form-group">
+						{{form.submit(class="signup-button")}}
+				</div>
+
+				<br>
+
+			</form>
+		</div>
+	</body>
+</html>
