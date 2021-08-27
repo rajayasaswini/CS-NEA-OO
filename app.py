@@ -24,7 +24,7 @@ def aregister():
     if form.validate_on_submit():
         flash(f'Account created for {form.firstname.data}!','success')
         return redirect(url_for('login'))
-    return render_template("aregister.html", title="Register", form=form)
+    return render_template("admin/aregister.html", title="Register", form=form)
 
 @app.route('/uregister', methods=['GET', 'POST'])
 def uregister():
@@ -32,7 +32,7 @@ def uregister():
     if form.validate_on_submit():
         flash(f'Account created for {form.firstname.data}!','success')
         return redirect(url_for('entercode'))
-    return render_template("uregister.html", title="Register", form=form)
+    return render_template("user/uregister.html", title="Register", form=form)
 
 @app.route('/choice', methods=['GET', 'POST'])
 def choice():
@@ -47,11 +47,11 @@ def entercode():
 
 @app.route('/admindash', methods=['GET', 'POST'])
 def adash():
-    return render_template("admindash.html")
+    return render_template("admin/admindash.html")
 
 @app.route('/userdash', methods=['GET', 'POST'])
 def udash():
-    return render_template("userdash.html")
+    return render_template("user/userdash.html")
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -66,7 +66,7 @@ def login():
 
 @app.route('/admindashboard', methods=['GET', 'POST'])
 def admindash():
-    return render_template("admindash.html")
+    return render_template("admin/admindash.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
