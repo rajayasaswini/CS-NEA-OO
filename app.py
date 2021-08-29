@@ -22,10 +22,6 @@ def index():
 def aregister():
     form = aRegistrationForm()
     if form.validate_on_submit():
-        hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=1)
-        db.session.add(user)
-        db.session.commit()
         flash(f'Account created for {form.firstname.data}!','success')
         return redirect(url_for('login'))
     return render_template("admin/aregister.html", title="Register", form=form)
@@ -34,10 +30,6 @@ def aregister():
 def uregister():
     form = uRegistrationForm()
     if form.validate_on_submit():
-        hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=0)
-        db.session.add(user)
-        db.session.commit()
         flash(f'Account created for {form.firstname.data}!','success')
         return redirect(url_for('login'))
     return render_template("user/uregister.html", title="Register", form=form)
