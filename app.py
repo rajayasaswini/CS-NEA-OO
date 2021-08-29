@@ -1,14 +1,9 @@
-from flask import Flask, flash, redirect, render_template, url_for
 from flask import Flask, render_template, url_for, flash, redirect
 from forms import *
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from sqlalchemy.sql import text
 from sqlalchemy import *
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.ext.declarative import declarative_base
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)

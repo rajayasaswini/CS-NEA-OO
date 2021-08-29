@@ -3,7 +3,6 @@ from datetime import datetime
 from sqlalchemy.sql import text
 from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.ext.declarative import declarative_base
 from app import db
 
 class Users(db.Model):
