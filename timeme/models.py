@@ -3,9 +3,14 @@ from datetime import datetime
 from sqlalchemy.sql import text
 from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
-from timeme import db
+from timeme import db, login_man
+from flask_login import UserMixin
 
-class Users(db.Model):
+@login_man.user_loader
+def getuser(user_id):
+    return Users.query.get(int(user_id))
+
+class Users(db.Model, UserMixin):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(4096),nullable=False, unique=True)

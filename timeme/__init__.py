@@ -12,5 +12,6 @@ app.config['SECRET_KEY'] = 'cb1414668bb6f2a30c99cfb0e9c1441b'
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+login_man = LoginManager(app)
 
 from timeme import routes

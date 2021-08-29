@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy import *
 from flask_bcrypt import Bcrypt
+from flask_login import login_user
 
 @app.route('/')
 def index():
@@ -59,9 +60,14 @@ def udash():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'admin@timeme.com' and form.password.data == 'password':
-            flash('You have been logged in!', 'success')
-            return redirect(url_for('index'))
+        if form.validate_on_submit():
+            user1 = Users.query.filter_by(email=form.email.data).first()
+            if user1 and bcrypt.check_password_hash(user1.password, form.password.data):
+                login_user(user1, remember=form.remember.data)
+                if user1.isAdmin == 1:
+                    return redirect(url_for('adash'))
+                else:
+                    return redirect(url_for('udash'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title="Login", form=form)
