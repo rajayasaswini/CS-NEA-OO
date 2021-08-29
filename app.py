@@ -1,8 +1,8 @@
+from flask import Flask, flash, redirect, render_template, url_for
 from flask import Flask, render_template, url_for, flash, redirect
 from forms import *
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import text
@@ -10,7 +10,6 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from flask_bcrypt import Bcrypt
-from models import *
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///TimeMe.db'
@@ -28,6 +27,10 @@ def index():
 def aregister():
     form = aRegistrationForm()
     if form.validate_on_submit():
+        hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=1)
+        db.session.add(user)
+        db.session.commit()
         flash(f'Account created for {form.firstname.data}!','success')
         return redirect(url_for('login'))
     return render_template("admin/aregister.html", title="Register", form=form)
@@ -36,6 +39,10 @@ def aregister():
 def uregister():
     form = uRegistrationForm()
     if form.validate_on_submit():
+        hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=0)
+        db.session.add(user)
+        db.session.commit()
         flash(f'Account created for {form.firstname.data}!','success')
         return redirect(url_for('login'))
     return render_template("user/uregister.html", title="Register", form=form)
@@ -63,18 +70,13 @@ def udash():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = Users.query.filter_by(email=form.email.data).first()
-        if user and Bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('admindash'))
+        if form.email.data == 'admin@timeme.com' and form.password.data == 'password':
+            flash('You have been logged in!', 'success')
+            return redirect(url_for('index'))
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title="Login", form=form)
 
 @app.route('/admindashboard', methods=['GET', 'POST'])
 def admindash():
     return render_template("admin/admindash.html")
-
-if __name__ == "__main__":
-    app.run(debug=True)
