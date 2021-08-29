@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from app import *
 
 
 class RegistrationForm(FlaskForm):

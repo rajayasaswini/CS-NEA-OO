@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, render_template, url_for
+from flask import Flask, render_template, url_for, flash, redirect
 from forms import *
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
@@ -6,9 +6,13 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import text
+from sqlalchemy import *
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.declarative import declarative_base
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///TimeMe.db'
 app.config['SECRET_KEY'] = 'cb1414668bb6f2a30c99cfb0e9c1441b'
 
 # this variable, db, will be used for all SQLAlchemy commands
@@ -57,11 +61,13 @@ def udash():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'admin@mail.com' and form.password.data == 'password':
-            flash('logged in', 'success')
-            return redirect(url_for('admindash'))
+        user = Users.query.filter_by(email=form.email.data).first()
+        if user and Bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user, remember=form.remember.data)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('admindash'))
         else:
-            flash('login unsuccessful', 'danger')
+            flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template("login.html", title="Login", form=form)
 
 @app.route('/admindashboard', methods=['GET', 'POST'])

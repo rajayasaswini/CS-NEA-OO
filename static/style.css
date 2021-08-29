@@ -75,7 +75,7 @@ ul {
 }
 
 .dropdown-content a {
-    float: none;
+    /*float: none;*/
     color: white;
     padding: 12px 12px;
     text-decoration: none;
