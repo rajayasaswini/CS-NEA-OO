@@ -10,6 +10,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from flask_bcrypt import Bcrypt
+from models import *
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///TimeMe.db'
@@ -17,6 +18,7 @@ app.config['SECRET_KEY'] = 'cb1414668bb6f2a30c99cfb0e9c1441b'
 
 # this variable, db, will be used for all SQLAlchemy commands
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 
 @app.route('/')
 def index():
@@ -24,7 +26,7 @@ def index():
 
 @app.route('/aregister', methods=['GET', 'POST'])
 def aregister():
-    form = RegistrationForm()
+    form = aRegistrationForm()
     if form.validate_on_submit():
         flash(f'Account created for {form.firstname.data}!','success')
         return redirect(url_for('login'))
@@ -32,10 +34,10 @@ def aregister():
 
 @app.route('/uregister', methods=['GET', 'POST'])
 def uregister():
-    form = RegistrationForm()
+    form = uRegistrationForm()
     if form.validate_on_submit():
         flash(f'Account created for {form.firstname.data}!','success')
-        return redirect(url_for('entercode'))
+        return redirect(url_for('login'))
     return render_template("user/uregister.html", title="Register", form=form)
 
 @app.route('/choice', methods=['GET', 'POST'])

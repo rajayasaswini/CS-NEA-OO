@@ -18,7 +18,7 @@ class Users(db.Model):
     isAdmin = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return f"User('{self.id}', '{self.email}', '{self.firstname}', '{self.lastname}')"
+        return f"User('{self.id}', '{self.email}', '{self.firstname}', '{self.lastname}', '{self.password}')"
 
 class Classes(db.Model):
     __tablename__ = "classes"
