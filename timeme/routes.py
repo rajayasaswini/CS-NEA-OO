@@ -7,13 +7,13 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy import *
 from flask_bcrypt import Bcrypt
-from flask_login import login_user, current_user
+from flask_login import login_user, current_user, logout_user
 
 @app.route('/')
 def index():
     if current_user.is_authenticated:
         if current_user.isAdmin == 1:
-            return redirect(url_for('adash'))
+            return redirect(url_for('viewclasses'))
         else:
             return redirect(url_for('udash'))
     return render_template("index.html")
@@ -21,7 +21,7 @@ def index():
 @app.route('/aregister', methods=['GET', 'POST'])
 def aregister():
     if current_user.is_authenticated and current_user.isAdmin == 1:
-        return redirect(url_for('adash'))
+        return redirect(url_for('viewclasses'))
     form = aRegistrationForm()
     if form.validate_on_submit():
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -69,7 +69,7 @@ def udash():
 def login():
     if current_user.is_authenticated:
         if current_user.isAdmin == 1:
-            return redirect(url_for('adash'))
+            return redirect(url_for('viewclasses'))
         else:
             return redirect(url_for('udash'))
     form = LoginForm()
@@ -79,9 +79,18 @@ def login():
             if user1 and bcrypt.check_password_hash(user1.password, form.password.data):
                 login_user(user1, remember=form.remember.data)
                 if user1.isAdmin == 1:
-                    return redirect(url_for('adash'))
+                    return redirect(url_for('viewclasses'))
                 else:
                     return redirect(url_for('udash'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title="Login", form=form)
+
+@app.route('/viewclass', methods=['GET', 'POST'])
+def viewclasses():
+    return render_template("admin/viewclasses.html")
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
