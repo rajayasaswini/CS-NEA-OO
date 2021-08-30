@@ -7,14 +7,21 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy import *
 from flask_bcrypt import Bcrypt
-from flask_login import login_user
+from flask_login import login_user, current_user
 
 @app.route('/')
 def index():
+    if current_user.is_authenticated:
+        if current_user.isAdmin == 1:
+            return redirect(url_for('adash'))
+        else:
+            return redirect(url_for('udash'))
     return render_template("index.html")
 
 @app.route('/aregister', methods=['GET', 'POST'])
 def aregister():
+    if current_user.is_authenticated and current_user.isAdmin == 1:
+        return redirect(url_for('adash'))
     form = aRegistrationForm()
     if form.validate_on_submit():
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -27,6 +34,8 @@ def aregister():
 
 @app.route('/uregister', methods=['GET', 'POST'])
 def uregister():
+    if current_user.is_authenticated and current_user.isAdmin == 1:
+        return redirect(url_for('udash'))
     form = uRegistrationForm()
     if form.validate_on_submit():
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -58,6 +67,11 @@ def udash():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        if current_user.isAdmin == 1:
+            return redirect(url_for('adash'))
+        else:
+            return redirect(url_for('udash'))
     form = LoginForm()
     if form.validate_on_submit():
         if form.validate_on_submit():
