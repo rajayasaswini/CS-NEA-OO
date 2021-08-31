@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <a href="{{ url_for('viewclasses') }}">Back</a>
+    <div class="add-class">
+
+			<div class="add-logo">
+				<p>Add Class</p>
+
+			</div>
+
+			<form class ="form" method="post" action="">
+				{{ form.hidden_tag() }}
+
+				<div class="form-group">
+					{{ form.classcode.label(id="left")}}
+
+					{% if form.classcode.errors %}
+							{{ form.classcode(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.classcode.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.classcode(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<br>
+
+				<div class="form-group">
+						{{ form.submit(class="add-button") }}
+				</div>
+
+				<small class="text muted ml-2">
+					<a href="#">Forgot password?</a>
+				</small>
+
+				<br>
+
+			</form>
+		</div>
+  </body>
+</html>

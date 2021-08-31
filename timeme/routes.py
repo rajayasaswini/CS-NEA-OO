@@ -42,20 +42,14 @@ def uregister():
         user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=0)
         db.session.add(user)
         db.session.commit()
+        login_user(user)
         flash(f'Login now','success')
-        return redirect(url_for('login'))
+        return redirect(url_for('entercode'))
     return render_template("user/uregister.html", title="Register", form=form)
 
 @app.route('/choice', methods=['GET', 'POST'])
 def choice():
     return render_template("choice.html")
-
-@app.route('/enterclasscode', methods=['GET','POST'])
-def entercode():
-    form = ClassForm()
-    if form.validate_on_submit():
-        return redirect(url_for('udash'))
-    return render_template("entercode.html", title="Enter Code", form=form)
 
 @app.route('/admindash', methods=['GET', 'POST'])
 def adash():
@@ -81,14 +75,37 @@ def login():
                 if user1.isAdmin == 1:
                     return redirect(url_for('viewclasses'))
                 else:
-                    return redirect(url_for('udash'))
+                    return redirect(url_for('entercode'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title="Login", form=form)
 
 @app.route('/viewclass', methods=['GET', 'POST'])
 def viewclasses():
-    return render_template("admin/viewclasses.html")
+    data = Classes.query.all()
+    return render_template("admin/viewclasses.html", data=data)
+
+@app.route('/addclass', methods=['GET', 'POST'])
+def addclass():
+    form=AddClass()
+    if form.validate_on_submit():
+        class1 = Classes(classCode=form.classcode.data, classAdminID=current_user.id)
+        db.session.add(class1)
+        db.session.commit()
+        flash(f'Class Created','success')
+        return redirect(url_for('viewclasses'))
+    return render_template("admin/addclass.html", form=form)
+
+@app.route('/enterclasscode', methods=['GET','POST'])
+def entercode():
+    form = EnterCode()
+    if form.validate_on_submit():
+        classid = Classes.query.filter_by(classCode=form.classcode.data).first().classID
+        classc = ClassesUsers(classID=classid, usersID=current_user.id)
+        db.session.add(classc)
+        db.session.commit()
+        return redirect(url_for('udash'))
+    return render_template("entercode.html", title="Enter Code", form=form)
 
 @app.route('/logout')
 def logout():

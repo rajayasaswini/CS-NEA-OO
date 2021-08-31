@@ -5,12 +5,12 @@
 			<meta charset="UTF-8">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<link rel="stylesheet" href="../static/signupstyle.css">
+			<link rel="stylesheet" href="../static/style.css">
 			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-			<title>Sign Up</title>
+			<title>Enter Class Code</title>
 	</head>
 	<body>
-		<div class="signup">
+		<div class="classcode">
 			{% with messages = get_flashed_messages(with_categories=true) %}
 	      {% if messages %}
 	        {% for category, message in messages %}
@@ -20,8 +20,8 @@
 	        {% endfor %}
 	      {% endif %}
 	    {% endwith %}
-			<div class="signup-logo">
-				<p>Sign Up</p>
+			<div class="classcode-logo">
+				<p>Enter Class Code</p>
 
 			</div>
 
@@ -47,7 +47,7 @@
 				<br>
 
 				<div class="form-group">
-						{{form.submit(class="signup-button")}}
+						{{ form.submit(class="entercode-button") }}
 				</div>
 
 				<br>

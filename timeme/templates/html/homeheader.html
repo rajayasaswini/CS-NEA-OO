@@ -1,37 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../../static/style.css">
-        <title>Document</title>
-    </head>
-    <body>
-        <header class="header" id="header">
-					<nav class="navbar">
-                <div class="nav-menu" id="nav-menu">
-                    <ul class="nav-list">
-												<li class = "nav-logo">
-													<strong> TimeMe </strong>
-												</li>
-												<li class="nav-item">
-                            <div id="right">
-                                <div class="navbutton">
-                                    <button class="nav-button">
-																			<strong><a href="{{ url_for('login') }}">LOGIN</a></strong>
-																		</button>
-																		<button class="nav-button">
-																			<strong><a href="{{ url_for('choice') }}">SIGN UP</a></strong>
-																		</button>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
-				<div class="main">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link rel="preconnect" href="https://fonts.gstatic.com">
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="../../static/style.css">
+  </head>
+  <body>
+		<div class="navbar">
+			<div class = "nav-logo">
+				<strong> TimeMe </strong>
+			</div>
+      <div id="right">
+          <button class="home-button">
+						<strong><a href="{{ url_for('login') }}">LOGIN</a></strong>
+					</button>
+					<button class="home-button">
+						<strong><a href="{{ url_for('choice') }}">SIGN UP</a></strong>
+					</button>
+      </div>
+    </div>
+  </body>
+</html>
