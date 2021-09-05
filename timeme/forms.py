@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, TimeField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from timeme.models import *
 
@@ -65,3 +65,17 @@ class EnterCode(FlaskForm):
             print(0)
         else:
             raise ValidationError('There is no class with that code. Please enter a valid code.')
+
+class AdminEnterData(FlaskForm):
+    userName = SelectField("User Name", validators=[DataRequired()], choice=Users.query.filter_by(id=ClassesUsers.query.filter_by(classID=classID).UserID))
+    eventID = IntegerField('Event ID', validators=[DataRequired()])
+    userDistance = IntegerField('User Distance', validators=[DataRequired()])
+    userTime = TimeField('User Time', validators=[DataRequired()])
+
+class UserEnterData(FlaskForm):
+    eventID = IntegerField('Event ID', validators=[DataRequired()])
+    userDistance = IntegerField('User Distance', validators=[DataRequired()])
+    userTime = TimeField('User Time', validators=[DataRequired()])
+#get user time in minutes and seconds
+#in routes, use the data to get speed
+#add usertime as time in the database

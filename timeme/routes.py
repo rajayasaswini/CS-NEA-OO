@@ -107,6 +107,18 @@ def entercode():
         return redirect(url_for('udash'))
     return render_template("entercode.html", title="Enter Code", form=form)
 
+@app.route('/enterdata', method=['GET', 'POST'])
+def EnterData():
+    if current_user.is_authenticated and current_user.isAdmin == 1:
+        form = AdminEnterData()
+        #if form.validate_on_submit():
+    elif current_user.is_authenticated and current_user.isAdmin == 0:
+        form = UserEnterData()
+        if form.validate_on_submit():
+            userdst = UserDST(userID=current_user.userID, eventID=form.eventID.data, userDistance=form.userDistance.data, userTime=form.userTime.data, userSpeed=userspeed, isAssignment=0)
+    else:
+        return redirect(url_for('login'))
+    return render_template("enterdata.html")
 @app.route('/logout')
 def logout():
     logout_user()

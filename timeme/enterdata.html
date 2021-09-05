@@ -1,0 +1,75 @@
+{% extends "html/adminheader.html" %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Enter Data</title>
+  </head>
+  <body>
+    <div class="enterdata">
+
+			<div class="enterdata-logo">
+				<p>Enter Data</p>
+
+			</div>
+
+			<form class ="form" method="post" action="">
+				{{ form.hidden_tag() }}
+
+				<div class="form-group">
+					{{ form.userTime.label(id="left")}}
+
+					{% if form.userTime.errors %}
+							{{ form.userTime(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.userTime.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.userTime(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<br>
+
+        <form class ="form" method="post" action="">
+  				{{ form.hidden_tag() }}
+
+  				<div class="form-group">
+  					{{ form.userDistance.label(id="left")}}
+
+  					{% if form.userDistance.errors %}
+  							{{ form.userDistance(class="form-control form-control-lg is-invalid") }}
+  							<div class="invalid-feedback">
+  									{% for error in form.userDistance.errors %}
+  											<span>{{ error }}</span>
+  									{% endfor %}
+  							</div>
+  					{% else %}
+  							{{ form.userDistance(class="form-control form-control-lg") }}
+  					{% endif %}
+  				</div>
+
+          <form class ="form" method="post" action="">
+    				{{ form.hidden_tag() }}
+
+    				<div class="form-group">
+    					{{ form.userName.label(id="left")}}
+
+    					{% if form.userName.errors %}
+    							{{ form.userName(class="form-control form-control-lg is-invalid") }}
+    							<div class="invalid-feedback">
+    									{% for error in form.userName.errors %}
+    											<span>{{ error }}</span>
+    									{% endfor %}
+    							</div>
+    					{% else %}
+    							{{ form.userName(class="form-control form-control-lg") }}
+    					{% endif %}
+    				</div>
+
+			</form>
+		</div>
+  </body>
+</html>
