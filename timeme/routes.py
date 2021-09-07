@@ -111,9 +111,7 @@ from python.getspeed import *
 
 @app.route('/enterdata', methods=['GET', 'POST'])
 def enterdata():
-    #if current_user.is_authenticated and current_user.isAdmin == 1:
-    #    form = AdminEnterData()
-        #if form.validate_on_submit():
+    form = AdminEnterData()
     if current_user.is_authenticated and current_user.isAdmin == 0:
         userSpeed = 0
         form = UserEnterData()
