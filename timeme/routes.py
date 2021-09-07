@@ -75,7 +75,7 @@ def login():
                 if user1.isAdmin == 1:
                     return redirect(url_for('viewclasses'))
                 else:
-                    return redirect(url_for('entercode'))
+                    return redirect(url_for('udash'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title="Login", form=form)
@@ -107,18 +107,23 @@ def entercode():
         return redirect(url_for('udash'))
     return render_template("entercode.html", title="Enter Code", form=form)
 
-@app.route('/enterdata', method=['GET', 'POST'])
-def EnterData():
-    if current_user.is_authenticated and current_user.isAdmin == 1:
-        form = AdminEnterData()
+from python.getspeed import *
+
+@app.route('/enterdata', methods=['GET', 'POST'])
+def enterdata():
+    #if current_user.is_authenticated and current_user.isAdmin == 1:
+    #    form = AdminEnterData()
         #if form.validate_on_submit():
-    elif current_user.is_authenticated and current_user.isAdmin == 0:
+    if current_user.is_authenticated and current_user.isAdmin == 0:
+        userSpeed = 0
         form = UserEnterData()
         if form.validate_on_submit():
-            userdst = UserDST(userID=current_user.userID, eventID=form.eventID.data, userDistance=form.userDistance.data, userTime=form.userTime.data, userSpeed=userspeed, isAssignment=0)
+            getspeed(form.userTime.data, form.userDistance.data, userSpeed)
+            #userdst = UserDST(userID=current_user.userID, eventID=form.eventID.data, userDistance=form.userDistance.data, userTime=form.userTime.data, userSpeed=userspeed, isAssignment=0)
     else:
         return redirect(url_for('login'))
-    return render_template("enterdata.html")
+    return render_template("enterdata.html", form=form)
+
 @app.route('/logout')
 def logout():
     logout_user()

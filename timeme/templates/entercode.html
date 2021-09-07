@@ -10,17 +10,6 @@
 			<title>Enter Class Code</title>
 	</head>
 	<body>
-		<div class="classcode">
-			{% with messages = get_flashed_messages(with_categories=true) %}
-	      {% if messages %}
-	        {% for category, message in messages %}
-	          <div class="alert alert-{{ category }}">
-	            {{ message }}
-	          </div>
-	        {% endfor %}
-	      {% endif %}
-	    {% endwith %}
-			<div class="classcode-logo">
 				<p>Enter Class Code</p>
 
 			</div>

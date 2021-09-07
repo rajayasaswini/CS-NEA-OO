@@ -66,11 +66,11 @@ class EnterCode(FlaskForm):
         else:
             raise ValidationError('There is no class with that code. Please enter a valid code.')
 
-class AdminEnterData(FlaskForm):
-    userName = SelectField("User Name", validators=[DataRequired()], choice=Users.query.filter_by(id=ClassesUsers.query.filter_by(classID=classID).UserID))
-    eventID = IntegerField('Event ID', validators=[DataRequired()])
-    userDistance = IntegerField('User Distance', validators=[DataRequired()])
-    userTime = TimeField('User Time', validators=[DataRequired()])
+#class AdminEnterData(FlaskForm):
+#    userName = SelectField("User Name", validators=[DataRequired()], choice=Users.query.filter_by(id=ClassesUsers.query.filter_by(classID=classID).UserID))
+#    eventID = IntegerField('Event ID', validators=[DataRequired()])
+#    userDistance = IntegerField('User Distance', validators=[DataRequired()])
+#    userTime = TimeField('User Time', validators=[DataRequired()])
 
 class UserEnterData(FlaskForm):
     eventID = IntegerField('Event ID', validators=[DataRequired()])
