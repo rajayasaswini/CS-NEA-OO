@@ -20,6 +20,40 @@
 			<form class ="form" method="post" action="">
 				{{ form.hidden_tag() }}
 
+        <div class="form-group">
+					{{ form.eventID.label(id="left")}}
+
+					{% if form.eventID.errors %}
+							{{ form.eventID(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.eventID.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.eventID(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+        <br>
+
+        <div class="form-group">
+          {{ form.userDistance.label(id="left")}}
+
+          {% if form.userDistance.errors %}
+              {{ form.userDistance(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.userDistance.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.userDistance(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+
+        <br>
+
 				<div class="form-group">
 					{{ form.userTime.label(id="left")}}
 
@@ -35,21 +69,10 @@
 					{% endif %}
 				</div>
 
-				<br>
+        <br>
 
-				<div class="form-group">
-					{{ form.userDistance.label(id="left")}}
-
-					{% if form.userDistance.errors %}
-							{{ form.userDistance(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.userDistance.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.userDistance(class="form-control form-control-lg") }}
-					{% endif %}
+        <div class="form-group">
+						{{ form.submit(class="enterdata-button") }}
 				</div>
 
 			</form>
