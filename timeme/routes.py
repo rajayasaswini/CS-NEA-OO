@@ -112,14 +112,14 @@ from python.getspeed import *
 @app.route('/enterdata', methods=['GET', 'POST'])
 def enterdata():
     form = UserEnterData()
-    if current_user.is_authenticated and current_user.isAdmin == 0:
-        userSpeed = 0
-        form = UserEnterData()
-        if form.validate_on_submit():
-            getspeed(form.userTime.data, form.userDistance.data, userSpeed)
-            #userdst = UserDST(userID=current_user.userID, eventID=form.eventID.data, userDistance=form.userDistance.data, userTime=form.userTime.data, userSpeed=userspeed, isAssignment=0)
-    else:
-        return redirect(url_for('login'))
+    userSpeed = 0
+    if form.validate_on_submit():
+        print(form.eventName.data, form.userDistance.data, form.userTime.data)
+        getspeed(form.userTime.data, form.userDistance.data, userSpeed)
+        print(userSpeed)
+        #print(form.userTime.data)
+        ##else:
+        #return redirect(url_for('login'))
     return render_template("enterdata.html", form=form)
 
 @app.route('/logout')

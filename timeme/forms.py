@@ -73,9 +73,10 @@ class EnterCode(FlaskForm):
 #    userTime = TimeField('User Time', validators=[DataRequired()])
 
 class UserEnterData(FlaskForm):
-    eventID = IntegerField('Event ID', validators=[DataRequired()])
+    eventName = SelectField("Event Name", validators=[DataRequired()], choices=['500m sprint', '200m sprint'])
     userDistance = IntegerField('User Distance', validators=[DataRequired()])
-    userTime = TimeField('User Time', validators=[DataRequired()])
+    userTime = StringField('User Time', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 #get user time in minutes and seconds
 #in routes, use the data to get speed
 #add usertime as time in the database
