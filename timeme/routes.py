@@ -115,8 +115,8 @@ def enterdata():
     userSpeed = 0
     if form.validate_on_submit():
         print(form.eventName.data, form.userDistance.data, form.userTime.data)
-        getspeed(form.userTime.data, form.userDistance.data, userSpeed)
-        print(userSpeed)
+        userSpeed = getspeed(form.userTime.data, form.userDistance.data, userSpeed)
+                
         #print(form.userTime.data)
         ##else:
         #return redirect(url_for('login'))
