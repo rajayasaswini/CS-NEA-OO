@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, TimeField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from timeme.models import *
+from wtforms_sqlalchemy.fields import QuerySelectField
+
 
 class uRegistrationForm(FlaskForm):
     email = StringField('Email',
@@ -72,8 +74,12 @@ class EnterCode(FlaskForm):
 #    userDistance = IntegerField('User Distance', validators=[DataRequired()])
 #    userTime = TimeField('User Time', validators=[DataRequired()])
 
+def event_query():
+    return Events.query
+
 class UserEnterData(FlaskForm):
-    eventName = SelectField("Event Name", validators=[DataRequired()], choices=['500m sprint', '200m sprint'])
+    eventType = QuerySelectField(query_factory=event_query)
+    eventDistance = QuerySelectField(query_factory=event_query)
     userDistance = IntegerField('User Distance', validators=[DataRequired()])
     userTime = StringField('User Time', validators=[DataRequired()])
     submit = SubmitField('Submit')

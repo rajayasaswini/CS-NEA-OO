@@ -42,13 +42,25 @@ class ClassesUsers(db.Model):
     class_r = db.relationship('Classes', lazy=True, foreign_keys=[classID])
     user_r = db.relationship('Users', lazy=True, foreign_keys=[usersID])
 
+class EventTypes(db.Model):
+    __tablename__="eventtypes"
+    eventTypeID=db.Column(db.Integer, primary_key=True)
+    eventType = db.Column(db.String(100), nullable=False)
+
 
 class Events(db.Model):
     __tablename__ = "events"
     eventID = db.Column(db.Integer, primary_key=True, nullable=False)
-    eventType = db.Column(db.String(100), nullable=False)
+    eventTypeID = db.Column(db.Integer, nullable=False)
     eventDistance = db.Column(db.Integer, nullable=True)
     eventTime = db.Column(db.Time, nullable=True)
+    eventT_r = db.relationship('EventTypes', lazy=True, foreign_keys=[eventTypeID])
+
+
+    def __repr__(self):
+        return '{}'.format(str(self.eventType))
+        #return '{}'.format(str(self.eventDistance))
+
 
 class Logs(db.Model):
     __tablename__ = "logs"

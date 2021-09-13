@@ -12,18 +12,18 @@
     <div class="nav-logo">
       <strong>TimeMe</strong>
     </div>
-    <a href="#">Dashboard</a>
-    <a href="#">Class Posts</a>
-    <a href="#">Gallery</a>
+    <a href="{{ url_for('adash') }}">Dashboard</a>
+    <a href="{{ url_for('classposts') }}">Class Posts</a>
+    <a href="{{ url_for('gallery') }}">Gallery</a>
     <div class="dropdown">
       <button class="dropbtn">Personal
         <i class="fa fa-caret-down"></i>
       </button>
       <div class="dropdown-content">
-        <a href="#">ASSIGNMENTS</a>
-        <a href="#">POSTS</a>
-        <a href="#">DATA</a>
-        <a href="#">JOURNAL</a>
+        <a href="{{ url_for('assignments') }}">ASSIGNMENTS</a>
+        <a href="{{ url_for('posts') }}">POSTS</a>
+        <a href="{{ url_for('data') }}">DATA</a>
+        <a href="{{ url_for('journal') }}">JOURNAL</a>
       </div>
     </div>
     <div class="dropdown">
@@ -32,7 +32,7 @@
       </button>
       <div class="dropdown-content">
         <a href="{{ url_for('enterdata') }}">DATA</a>
-        <a href="#">TIMER</a>
+        <a href="{{ url_for('timer') }}">TIMER</a>
       </div>
     </div>
     <div class="dropdown" id="right">
@@ -40,8 +40,8 @@
         <i class="fa fa-caret-down"></i>
       </button>
       <div class="dropdown-content">
-        <a href="#">PROFILE</a>
-        <a href="{{ url_for('entercode') }}">LOGOUT</a>
+        <a href="{{ url_for('profile') }}">PROFILE</a>
+        <a href="{{ url_for('logout') }}">LOGOUT</a>
       </div>
     </div>
   </div>

@@ -113,10 +113,16 @@ from python.getspeed import *
 def enterdata():
     form = UserEnterData()
     userSpeed = 0
+    #form.eventType.choices = [(Events.eventType) for Events in get_all_Events()]
+    #form.eventDistance.choices = [(Events.eventDistance) for Events in get_all_Events()]
+
     if form.validate_on_submit():
-        print(form.eventName.data, form.userDistance.data, form.userTime.data)
-        userSpeed = getspeed(form.userTime.data, form.userDistance.data, userSpeed)
-                
+        print(form.eventType.data)
+        #print(form.eventName.data, form.userDistance.data, form.userTime.data)
+        #userSpeed = getspeed(form.userTime.data, form.userDistance.data, userSpeed)
+        #event = Events.query.filter_by(eventType=form.eventtype.data, eventDistance=form.eventDistance.data).first().classID
+        #userdst1 = UserDST(userID=current_user.id, eventID=event)
+
         #print(form.userTime.data)
         ##else:
         #return redirect(url_for('login'))
@@ -126,3 +132,35 @@ def enterdata():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.route('/classposts')
+def classposts():
+    return render_template("temp.html")
+
+@app.route('/gallery')
+def gallery():
+    return render_template("temp.html")
+
+@app.route('/assignments')
+def assignments():
+    return render_template("temp.html")
+
+@app.route('/posts')
+def posts():
+    return render_template("temp.html")
+
+@app.route('/data')
+def data():
+    return render_template("temp.html")
+
+@app.route('/journal')
+def journal():
+    return render_template("temp.html")
+
+@app.route('/timer')
+def timer():
+    return render_template("temp.html")
+
+@app.route('/profile')
+def profile():
+    return render_template("temp.html")

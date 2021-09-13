@@ -16,17 +16,34 @@
 				{{ form.hidden_tag() }}
 
         <div class="form-group">
-					{{ form.eventName.label(id="left")}}
+					{{ form.eventType.label(id="left")}}
 
-					{% if form.eventName.errors %}
-							{{ form.eventName(class="form-control form-control-lg is-invalid") }}
+					{% if form.eventType.errors %}
+							{{ form.eventType(class="form-control form-control-lg is-invalid") }}
 							<div class="invalid-feedback">
-									{% for error in form.eventName.errors %}
+									{% for error in form.eventType.errors %}
 											<span>{{ error }}</span>
 									{% endfor %}
 							</div>
 					{% else %}
-							{{ form.eventName(class="form-control form-control-lg") }}
+							{{ form.eventType(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+        <br>
+
+        <div class="form-group">
+					{{ form.eventDistance.label(id="left")}}
+
+					{% if form.eventDistance.errors %}
+							{{ form.eventDistance(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.eventDistance.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.eventDistance(class="form-control form-control-lg") }}
 					{% endif %}
 				</div>
 
