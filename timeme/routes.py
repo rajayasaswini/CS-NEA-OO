@@ -116,27 +116,20 @@ def enterdata():
         form = UserEnterData()
         if form.validate_on_submit():
             eventid = int(EventTypes.query.filter_by(type=form.eventType.data).first().id)
-            userSpeed = getspeed(form.userTime.data, int(form.eventDistance.data), userSpeed)
-            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=int(form.eventDistance.data), userTime=form.userTime.data, userSpeed=userSpeed, isAssignment=0)
+            userSpeed = getspeed(str(form.userTime.data), str(form.eventDistance.data), userSpeed)
             db.session.add(userdst)
             db.session.commit
         return render_template("userenterdata.html", form=form)
     elif current_user.isAdmin == 1:
         form = AdminEnterData()
         if form.validate_on_submit():
-            name = form.user.data
-            #name = name.split(' ')
-            #fname = name[0]
-            #lname = name[1]
-            #userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+            name = str(form.user.data)
+            name = name.split(' ')
+            fname,lname = name[0], name[1]
+            lname = name[1]
+            userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
-            userSpeed = getspeed(form.userTime.data, int(form.eventDistance.data), userSpeed)
-            print("Name List: ", name)
-            #print("Fisrt:", fname)
-            #print("Last: ", lname)
-            #print("UserID: ", userid)
-            print("EventID: ", eventid)
-            print("User Speed: ", userSpeed)
+            userSpeed = getspeed(str(form.userTime.data), str(form.eventDistance.data), userSpeed)
         return render_template("adminenterdata.html", form=form)
 
 
@@ -146,9 +139,6 @@ def enterdata():
     else:
         return render_template("login.html")
     #return render_template("enterdata.html", form=form)
-
-
-
 
 @app.route('/logout')
 def logout():
