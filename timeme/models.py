@@ -22,7 +22,7 @@ class Users(db.Model, UserMixin):
     isAdmin = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return f"User('{self.id}', '{self.email}', '{self.firstname}', '{self.lastname}', '{self.password}')"
+        return '{} {}'.format(str(self.firstname), str(self.lastname))
 
 class Classes(db.Model):
     __tablename__ = "classes"
@@ -44,21 +44,24 @@ class ClassesUsers(db.Model):
 
 class EventTypes(db.Model):
     __tablename__="eventtypes"
-    eventTypeID=db.Column(db.Integer, primary_key=True)
-    eventType = db.Column(db.String(100), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        return '{}'.format(str(self.type))
 
 
 class Events(db.Model):
     __tablename__ = "events"
     eventID = db.Column(db.Integer, primary_key=True, nullable=False)
-    eventTypeID = db.Column(db.Integer, nullable=False)
+    eventTypeID = db.Column(db.Integer,db.ForeignKey("eventtypes.id"), nullable=False)
     eventDistance = db.Column(db.Integer, nullable=True)
     eventTime = db.Column(db.Time, nullable=True)
     eventT_r = db.relationship('EventTypes', lazy=True, foreign_keys=[eventTypeID])
 
 
     def __repr__(self):
-        return '{}'.format(str(self.eventType))
+        return '{}'.format(str(self.eventDistance))
         #return '{}'.format(str(self.eventDistance))
 
 

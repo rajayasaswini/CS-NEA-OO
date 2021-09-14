@@ -20,23 +20,23 @@
           <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content">
-          <a href="#">GALLERY</a>
+          <a href="{{ url_for('gallery') }}">GALLERY</a>
           <a href="#">VIEW AND FILTER</a>
-          <a href="#">ENTER DATA</a>
+          <a href="{{ url_for('enterdata') }}">ENTER DATA</a>
           <a href="#">REGISTER DATA</a>
         </div>
       </div>
       <div class="dropdown">
         <button class="dropbtn">Personal</button>
         <div class="dropdown-content">
-          <a href="#">POSTS</a>
-          <a href="#">JOURNAL</a>
+          <a href="{{ url_for('posts') }}">POSTS</a>
+          <a href="{{ url_for('journal') }}">JOURNAL</a>
         </div>
       </div>
       <div class="dropdown" id="right">
         <button class="dropbtn">SETTINGS</button>
         <div class="dropdown-content">
-          <a href="#">PROFILE</a>
+          <a href="{{ url_for('profile') }}">PROFILE</a>
           <a href="{{ url_for('logout') }}">LOGOUT</a>
         </div>
       </div>

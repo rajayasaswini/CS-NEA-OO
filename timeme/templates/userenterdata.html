@@ -39,28 +39,11 @@
 							{{ form.eventDistance(class="form-control form-control-lg is-invalid") }}
 							<div class="invalid-feedback">
 									{% for error in form.eventDistance.errors %}
-											<span>{{ error }}</span>
+											<span>{{ error }}</span><p>m</p>
 									{% endfor %}
 							</div>
 					{% else %}
 							{{ form.eventDistance(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
-
-        <br>
-
-				<div class="form-group">
-					{{ form.userDistance.label(id="left")}}
-
-					{% if form.userDistance.errors %}
-							{{ form.userDistance(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.userDistance.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.userDistance(class="form-control form-control-lg") }}
 					{% endif %}
 				</div>
 

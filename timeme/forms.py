@@ -68,19 +68,25 @@ class EnterCode(FlaskForm):
         else:
             raise ValidationError('There is no class with that code. Please enter a valid code.')
 
-#class AdminEnterData(FlaskForm):
-#    userName = SelectField("User Name", validators=[DataRequired()], choice=Users.query.filter_by(id=ClassesUsers.query.filter_by(classID=classID).UserID))
-#    eventID = IntegerField('Event ID', validators=[DataRequired()])
-#    userDistance = IntegerField('User Distance', validators=[DataRequired()])
-#    userTime = TimeField('User Time', validators=[DataRequired()])
-
 def event_query():
     return Events.query
 
+def eventtype_query():
+    return EventTypes.query
+
+def user_query():
+    return Users.query
+
 class UserEnterData(FlaskForm):
-    eventType = QuerySelectField(query_factory=event_query)
-    eventDistance = QuerySelectField(query_factory=event_query)
-    userDistance = IntegerField('User Distance', validators=[DataRequired()])
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)
+    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True)
+    userTime = StringField('User Time', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class AdminEnterData(FlaskForm):
+    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True)
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)
+    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True)
     userTime = StringField('User Time', validators=[DataRequired()])
     submit = SubmitField('Submit')
 #get user time in minutes and seconds

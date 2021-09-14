@@ -111,22 +111,44 @@ from python.getspeed import *
 
 @app.route('/enterdata', methods=['GET', 'POST'])
 def enterdata():
-    form = UserEnterData()
     userSpeed = 0
-    #form.eventType.choices = [(Events.eventType) for Events in get_all_Events()]
-    #form.eventDistance.choices = [(Events.eventDistance) for Events in get_all_Events()]
+    if current_user.isAdmin == 0:
+        form = UserEnterData()
+        if form.validate_on_submit():
+            eventid = int(EventTypes.query.filter_by(type=form.eventType.data).first().id)
+            userSpeed = getspeed(form.userTime.data, int(form.eventDistance.data), userSpeed)
+            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=int(form.eventDistance.data), userTime=form.userTime.data, userSpeed=userSpeed, isAssignment=0)
+            db.session.add(userdst)
+            db.session.commit
+        return render_template("userenterdata.html", form=form)
+    elif current_user.isAdmin == 1:
+        form = AdminEnterData()
+        if form.validate_on_submit():
+            name = form.user.data
+            #name = name.split(' ')
+            #fname = name[0]
+            #lname = name[1]
+            #userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+            eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            userSpeed = getspeed(form.userTime.data, int(form.eventDistance.data), userSpeed)
+            print("Name List: ", name)
+            #print("Fisrt:", fname)
+            #print("Last: ", lname)
+            #print("UserID: ", userid)
+            print("EventID: ", eventid)
+            print("User Speed: ", userSpeed)
+        return render_template("adminenterdata.html", form=form)
 
-    if form.validate_on_submit():
-        print(form.eventType.data)
-        #print(form.eventName.data, form.userDistance.data, form.userTime.data)
-        #userSpeed = getspeed(form.userTime.data, form.userDistance.data, userSpeed)
-        #event = Events.query.filter_by(eventType=form.eventtype.data, eventDistance=form.eventDistance.data).first().classID
-        #userdst1 = UserDST(userID=current_user.id, eventID=event)
 
-        #print(form.userTime.data)
-        ##else:
-        #return redirect(url_for('login'))
-    return render_template("enterdata.html", form=form)
+            #userdst = UserDST(userID=userid, eventID=eventid, userDistance=int(form.eventDistance.data), userTime=form.userTime.data, userSpeed=userSpeed, isAssignment=0)
+            #db.session.add(userdst)
+            #db.session.commit()
+    else:
+        return render_template("login.html")
+    #return render_template("enterdata.html", form=form)
+
+
+
 
 @app.route('/logout')
 def logout():
