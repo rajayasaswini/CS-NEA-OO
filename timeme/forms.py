@@ -100,7 +100,7 @@ class CreateEvent(FlaskForm):
         eD = eventDistance.data
         eT = eventTime.data
         if eD is None and eT is None:
-            raise ValidationError("Please enter either the event distance or the event time")
+            raise ValidationError("Please enter either the distance or the time")
         elif eD is not None and eT is not None:
             raise ValidationError("Please choose only an event distance or time")
         else:
