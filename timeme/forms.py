@@ -84,11 +84,52 @@ class UserEnterData(FlaskForm):
     submit = SubmitField('Submit')
 
 class AdminEnterData(FlaskForm):
-    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True)
-    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)
-    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True)
+    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True,validators=[DataRequired()])
+    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
     userTime = StringField('User Time', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+class CreateEvent(FlaskForm):
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
+    eventDistance = IntegerField('Event Distance')
+    eventTime = TimeField('Event Time')
+    submit = SubmitField('Submit')
+
+    def validate_form(self, eventDistance, eventTime):
+        if eventDistance.data == None and eventTime.data == None:
+            raise ValidationError("Please enter either the event distance or the event time")
+        elif eventDistance.data != None and eventTime.data != None:
+            raise ValidationError("Please choose only an event distance or time")
+        else:
+            eventid = EventTypes.query.filter_by(type=eventType.data).first().id
+            eventD = Events.query.filter_by(eventDistance=eventDistance.data, eventID=eventid).first()
+            eventT = Events.query.filter_by(eventTime=eventTime.data, eventID=eventid).first()
+            if eventD is None:
+                print(1)
+            elif eventT is None:
+                print(1)
+            else:
+                raise ValidationError('There is already an event like that.')
+
+
+#    def validate_event(self, eventType, eventDistance, eventTime):
+#        eventid = EventTypes.query.filter_by(type=eventType.data).first().id
+#        event = Events.query.filter_by(eventDistance=eventDistance.data, eventID=eventid).first()
+#        if event is None:
+#            print(' ')
+#        else:
+#            raise ValidationError('There is already an event like that.')
+
+class CreateEventType(FlaskForm):
+    eventType = StringField('Event Type', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+    def validate_ET(self, event):
+        event = EventTypes.query.filter_by(type=eventType.data).first()
+        if event or eventType.data.upper() == event.eventType.upper():
+            raise ValidationError('This event already exists. Please enter another one.')
+
 #get user time in minutes and seconds
 #in routes, use the data to get speed
 #add usertime as time in the database

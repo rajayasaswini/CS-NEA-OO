@@ -4,10 +4,12 @@ from timeme.forms import *
 from timeme.models import *
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+import datetime
 from sqlalchemy import *
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, current_user, logout_user
+
+now = datetime.datetime.now()
 
 @app.route('/')
 def index():
@@ -53,11 +55,17 @@ def choice():
 
 @app.route('/admindash', methods=['GET', 'POST'])
 def adash():
-    return render_template("admin/admindash.html")
+    if current_user.isAdmin == 0:
+        return render_template("user/userdash.html")
+    else:
+        return render_template("admin/admindash.html")
 
 @app.route('/userdash', methods=['GET', 'POST'])
 def udash():
-    return render_template("user/userdash.html")
+    if current_user.isAdmin == 1:
+        return render_template("admin/admindash.html")
+    else:
+        return render_template("user/userdash.html")
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -115,8 +123,9 @@ def enterdata():
     if current_user.isAdmin == 0:
         form = UserEnterData()
         if form.validate_on_submit():
-            eventid = int(EventTypes.query.filter_by(type=form.eventType.data).first().id)
+            eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             userSpeed = getspeed(str(form.userTime.data), str(form.eventDistance.data), userSpeed)
+            userdst = UserDST(userID=current_user.id, eventID=eventid, dstDateTime=datetime.datetime.now, userDistance=form.eventDistance.data, userTime=form.userTime.data, userSpeed=userSpeed, isAssignment="0")
             db.session.add(userdst)
             db.session.commit
         return render_template("userenterdata.html", form=form)
@@ -130,6 +139,10 @@ def enterdata():
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             userSpeed = getspeed(str(form.userTime.data), str(form.eventDistance.data), userSpeed)
+            datetime = now.strftime('%Y-%m-%d %H:%M:%S')
+            userdst = UserDST(userID=userid, eventID=eventid, dstDateTime=datetime, userDistance=form.eventDistance.data, userTime=form.userTime.data, userSpeed=userSpeed, isAssignment="0")
+            db.session.add(userdst)
+            db.session.commit()
         return render_template("adminenterdata.html", form=form)
 
 
@@ -176,3 +189,19 @@ def timer():
 @app.route('/profile')
 def profile():
     return render_template("temp.html")
+
+@app.route('/createE', methods=['GET', 'POST'])
+def createevent():
+    form = CreateEvent()
+    if form.validate_on_submit():
+        print(0)
+    return render_template("createevent.html", form=form)
+
+@app.route('/createET', methods=['GET', 'POST'])
+def createET():
+    form = CreateEventType()
+    if form.validate_on_submit():
+        newET = EventTypes(type=form.eventType.data)
+        db.session.add(newET)
+        #db.session.commit()
+    return render_template("createeventtype.html", form=form)

@@ -5,6 +5,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
 from timeme import db, login_man
 from flask_login import UserMixin
+import datetime
 
 @login_man.user_loader
 def getuser(user_id):
@@ -110,7 +111,7 @@ class UserDST(db.Model):
     userID = db.Column(db.Integer, db.ForeignKey("users.id"))
     eventID = db.Column(db.Integer, db.ForeignKey("events.eventID"))
     userDSTID = db.Column(db.Integer, primary_key=True)
-    dstDateTime = db.Column(db.DateTime, nullable=False,default=datetime.utcnow)
+    dstDateTime = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     userDistance = db.Column(db.Integer, nullable=False)
     userTime = db.Column(db.Time, nullable=False)
     userSpeed = db.Column(db.Integer, nullable=False)

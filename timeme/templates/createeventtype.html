@@ -1,4 +1,4 @@
-{% include "html/studentheader.html" %}
+{% include "html/adminheader.html" %}
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -7,12 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../static/enterdata.css">    <title>Enter Data</title>
+    <link rel="stylesheet" href="../../static/enterdata.css">    <title>Create Event</title>
   </head>
   <body>
     <div class="enterdata">
       <div class="enterdata-logo">
-        <p>Enter Data</p>
+        <p>Create Event</p>
       </div>
       <form class ="form" method="post" action="">
 				{{ form.hidden_tag() }}
@@ -33,38 +33,6 @@
 				</div>
 
         <br>
-
-        <div class="form-group">
-					{{ form.eventDistance.label(id="left")}}
-
-					{% if form.eventDistance.errors %}
-							{{ form.eventDistance(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.eventDistance.errors %}
-											<span>{{ error }}</span><p>m</p>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.eventDistance(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
-
-        <br>
-
-        <div class="form-group">
-					{{ form.userTime.label(id="left")}}
-
-					{% if form.userTime.errors %}
-							{{ form.userTime(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.userTime.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.userTime(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
 
         <div class="form-group">
 						{{ form.submit(class="login-button") }}
