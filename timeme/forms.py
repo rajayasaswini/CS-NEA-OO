@@ -96,15 +96,17 @@ class CreateEvent(FlaskForm):
     eventTime = TimeField('Event Time')
     submit = SubmitField('Submit')
 
-    def validate_form(self, eventDistance, eventTime):
-        if eventDistance.data == None and eventTime.data == None:
+    def validate_form(self, eventDistance, eventTime, eventType):
+        eD = eventDistance.data
+        eT = eventTime.data
+        if eD is None and eT is None:
             raise ValidationError("Please enter either the event distance or the event time")
-        elif eventDistance.data != None and eventTime.data != None:
+        elif eD is not None and eT is not None:
             raise ValidationError("Please choose only an event distance or time")
         else:
             eventid = EventTypes.query.filter_by(type=eventType.data).first().id
-            eventD = Events.query.filter_by(eventDistance=eventDistance.data, eventID=eventid).first()
-            eventT = Events.query.filter_by(eventTime=eventTime.data, eventID=eventid).first()
+            eventD = Events.query.filter_by(eventDistance=eD, eventID=eventid).first()
+            eventT = Events.query.filter_by(eventTime=eT, eventID=eventid).first()
             if eventD is None:
                 print(1)
             elif eventT is None:
