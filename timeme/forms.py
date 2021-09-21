@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, TimeField, SelectField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
+import wtforms.validators as validators
 from timeme.models import *
 from wtforms_sqlalchemy.fields import QuerySelectField
 
@@ -92,28 +93,31 @@ class AdminEnterData(FlaskForm):
 
 class CreateEvent(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
-    eventDistance = IntegerField('Event Distance')
-    eventTime = TimeField('Event Time')
+    eventDistance = IntegerField('Event Distance', validators=[validators.Optional()])
+    eventTime = TimeField('Event Time', validators=[validators.Optional()])
     submit = SubmitField('Submit')
 
     def validate_form(self, eventDistance, eventTime, eventType):
         eD = eventDistance.data
         eT = eventTime.data
         if eD is None and eT is None:
-            raise ValidationError("Please enter either the distance or the time")
-        elif eD is not None and eT is not None:
-            raise ValidationError("Please choose only an event distance or time")
+            #raise ValidationError("Please enter either the distance or the time")
+            print("Please enter either the distance or the time")
+        elif eD and eT:
+            #raise ValidationError("Please choose only the distance or time")
+            print("Please choose only the distance or time")
         else:
             eventid = EventTypes.query.filter_by(type=eventType.data).first().id
-            eventD = Events.query.filter_by(eventDistance=eD, eventID=eventid).first()
-            eventT = Events.query.filter_by(eventTime=eT, eventID=eventid).first()
-            if eventD is None:
-                print(1)
-            elif eventT is None:
-                print(1)
-            else:
-                raise ValidationError('There is already an event like that.')
-
+            if eD:
+                event = Events.query.filter_by(eventDistance=eD, eventID=eventid).first()
+                if event is not None:
+                    #raise ValidationError('There is already an event like that.')
+                    print('There is already an event like that.')
+            elif eT:
+                event = Events.query.filter_by(eventTime=eT, eventID=eventid).first()
+                if event:
+                    #raise ValidationError('There is already an event like that.')
+                    print('There is already an event like that.')
 
 #    def validate_event(self, eventType, eventDistance, eventTime):
 #        eventid = EventTypes.query.filter_by(type=eventType.data).first().id
