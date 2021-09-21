@@ -108,12 +108,12 @@ class CreateEvent(FlaskForm):
             print("Please choose only the distance or time")
         else:
             eventid = EventTypes.query.filter_by(type=eventType.data).first().id
-            if eD:
+            if eD is not None:
                 event = Events.query.filter_by(eventDistance=eD, eventID=eventid).first()
                 if event is not None:
                     #raise ValidationError('There is already an event like that.')
                     print('There is already an event like that.')
-            elif eT:
+            elif eT is not None:
                 event = Events.query.filter_by(eventTime=eT, eventID=eventid).first()
                 if event:
                     #raise ValidationError('There is already an event like that.')
