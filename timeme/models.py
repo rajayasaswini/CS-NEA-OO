@@ -118,3 +118,10 @@ class UserDST(db.Model):
     isAssignment = db.Column(db.Integer, nullable=False)
     dst_user = db.relationship('Users', lazy=True, foreign_keys=[userID])
     dst_event = db.relationship('Events', lazy=True, foreign_keys=[eventID])
+
+class Register(db.Model):
+    __tablename__ = "register"
+    registerid = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(db.Integer, db.ForeignKey("classusers.cuid"))
+    datetime = db.Column(db.DateTime, nullable=False)
+    user_reg = db.relationship('ClassesUsers', lazy=True, foreign_keys=[userid])
