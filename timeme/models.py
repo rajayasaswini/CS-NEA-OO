@@ -57,14 +57,12 @@ class Events(db.Model):
     eventID = db.Column(db.Integer, primary_key=True, nullable=False)
     eventTypeID = db.Column(db.Integer,db.ForeignKey("eventtypes.id"), nullable=False)
     eventDistance = db.Column(db.Integer, nullable=True)
-    eventTime = db.Column(db.Interval, nullable=True)
+    eventTime = db.Column(db.Integer, nullable=True)
     eventT_r = db.relationship('EventTypes', lazy=True, foreign_keys=[eventTypeID])
 
 
     def __repr__(self):
         return '{}'.format(str(self.eventDistance))
-        #return '{}'.format(str(self.eventDistance))
-
 
 class Logs(db.Model):
     __tablename__ = "logs"
@@ -113,7 +111,7 @@ class UserDST(db.Model):
     userDSTID = db.Column(db.Integer, primary_key=True)
     dstDateTime = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     userDistance = db.Column(db.Integer, nullable=False)
-    userTime = db.Column(db.Interval, nullable=False)
+    userTime = db.Column(db.Integer, nullable=False)
     userSpeed = db.Column(db.Integer, nullable=False)
     isAssignment = db.Column(db.Integer, nullable=False)
     dst_user = db.relationship('Users', lazy=True, foreign_keys=[userID])
