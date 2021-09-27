@@ -144,7 +144,6 @@ def enterdata():
             print("id", userid)
             print("eventid", eventid)
             print("speed", userSpeed)
-            print("dst", userdst)
             print("datetime:", dt)
             userdst = UserDST(userID=userid, eventID=eventid, userDistance=form.eventDistance.data, isAssignment="0")
             db.session.add(userdst)
