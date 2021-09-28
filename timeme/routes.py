@@ -123,7 +123,13 @@ def enterdata():
         form = UserEnterData()
         if form.validate_on_submit():
             eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
-        return render_template("userenterdata.html", form=form)
+            time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+            userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
+            dist = str(form.eventDistance.data)
+            dist = int(dist)
+            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
+            db.session.add(userdst)
+            db.session.commit()        return render_template("userenterdata.html", form=form)
     elif current_user.isAdmin == 1:
         form = AdminEnterData()
         if form.validate_on_submit():
