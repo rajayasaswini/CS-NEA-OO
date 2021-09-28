@@ -31,42 +31,56 @@ def aregister():
         flash(f'Login now','success')
         return redirect(url_for('login'))
     return render_template("admin/aregister.html", title="Register", form=form)
-
+#done
 @app.route('/uregister', methods=['GET', 'POST'])
 def uregister():
-    if current_user.is_authenticated and current_user.isAdmin == 1:
-        return redirect(url_for('adash'))
-    form = uRegistrationForm()
-    if form.validate_on_submit():
-        hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=0)
-        db.session.add(user)
-        db.session.commit()
-        login_user(user)
-        flash(f'Login now','success')
-        return redirect(url_for('entercode'))
-    return render_template("user/uregister.html", title="Register", form=form)
-
+    if current_user.is_authenticated:
+        if current_user.isAdmin == 1:
+            return redirect(url_for('adash'))
+        else:
+            form = uRegistrationForm()
+            if form.validate_on_submit():
+                hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+                user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=0)
+                db.session.add(user)
+                db.session.commit()
+                login_user(user)
+                flash(f'Login now','success')
+                return redirect(url_for('entercode'))
+            return render_template("user/uregister.html", title="Register", form=form)
+    else:
+        return redirect(url_for('login'))
+#done
 @app.route('/choice', methods=['GET', 'POST'])
 def choice():
-    return render_template("choice.html")
+    if current_user.is_authenticated:
+        if current_user.isAdmin == 0:
+            return redirect(url_for('udash'))
+        else:
+            return redirect(url_for('adash'))
+    else:
+        return render_template("choice.html")
 #done
 @app.route('/admindash', methods=['GET', 'POST'])
 def adash():
-    if current_user.is_authenticated and current_user.isAdmin == 0:
-        return redirect(url_for('udash'))
-    elif current_user.is_authenticated and current_user.isAdmin == 1:
-        return render_template("admin/admindash.html")
+    if current_user.is_authenticated:
+        if current_user.isAdmin == 0:
+            return redirect(url_for('udash'))
+        elif current_user.isAdmin == 1:
+            return render_template("admin/admindash.html")
     else:
         return redirect(url_for('login'))
-
+#done
 @app.route('/userdash', methods=['GET', 'POST'])
 def udash():
-    if current_user.isAdmin == 1:
-        return render_template("admin/admindash.html")
+    if current_user.is_authenticated:
+        if current_user.isAdmin == 1:
+            return render_template("admin/admindash.html")
+        else:
+            return render_template("user/userdash.html")
     else:
-        return render_template("user/userdash.html")
-
+        return redirect(url_for('login'))
+#done
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -133,7 +147,7 @@ def enterdata():
             userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
             db.session.add(userdst)
             db.session.commit()
-        return render_template("userenterdata.html", form=form)
+        return render_template("user/userenterdata.html", form=form)
     elif current_user.isAdmin == 1:
         form = AdminEnterData()
         if form.validate_on_submit():
@@ -150,7 +164,7 @@ def enterdata():
             userdst = UserDST(userID=userid, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
             db.session.add(userdst)
             db.session.commit()
-        return render_template("adminenterdata.html", form=form)
+        return render_template("admin/adminenterdata.html", form=form)
     else:
         return render_template("login.html")
 
