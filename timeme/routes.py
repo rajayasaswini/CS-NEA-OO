@@ -123,10 +123,6 @@ def enterdata():
         form = UserEnterData()
         if form.validate_on_submit():
             eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
-            #userSpeed = getspeed(str(form.userTime.data), str(form.eventDistance.data), userSpeed)
-            #userdst = UserDST(userID=current_user.id, eventID=eventid, dstDateTime=now.strftime('%Y-%m-%d %H:%M:%S'), userDistance=form.eventDistance.data, userTime=form.userTime.data, userSpeed=userSpeed, isAssignment="0")
-            #db.session.add(userdst)
-            #db.session.commit
         return render_template("userenterdata.html", form=form)
     elif current_user.isAdmin == 1:
         form = AdminEnterData()
@@ -151,6 +147,43 @@ def enterdata():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+#done
+@app.route('/createE', methods=['GET', 'POST'])
+def createevent():
+    if current_user.isAdmin == 1:
+        form = CreateEvent()
+        if form.validate_on_submit():
+            eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            dist = form.eventDistance.data
+            if form.eventDistance.data is None:
+                time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+                neweve = Events(eventTypeID=eventid, eventDistance=0, eventTime=time)
+                db.session.add(neweve)
+            else:
+                neweve = Events(eventTypeID=eventid, eventDistance=int(str(form.eventDistance.data)), eventTime=0)
+                db.session.add(neweve)
+            db.session.commit()
+        return render_template("createevent.html", form=form)
+    elif current_user.isAdmin == 0:
+        return redirect(url_for('udash'))
+    else:
+        form = LoginForm()
+        return redirect(url_for('login'))
+#done
+@app.route('/createET', methods=['GET', 'POST'])
+def createET():
+    if current_user.isAdmin == 1:
+        form = CreateEventType()
+        if form.validate_on_submit():
+            newET = EventTypes(type=form.eventType.data)
+            db.session.add(newET)
+            db.session.commit()
+        return render_template("createeventtype.html", form=form)
+    elif current_user.isAdmin == 0:
+        return redirect(url_for('udash'))
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/classposts')
 def classposts():
@@ -183,28 +216,3 @@ def timer():
 @app.route('/profile')
 def profile():
     return render_template("temp.html")
-
-@app.route('/createE', methods=['GET', 'POST'])
-def createevent():
-    form = CreateEvent()
-    if form.validate_on_submit():
-        eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
-        dist = form.eventDistance.data
-        if form.eventDistance.data is None:
-            time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
-            neweve = Events(eventTypeID=eventid, eventDistance=0, eventTime=time)
-            db.session.add(neweve)
-        else:
-            neweve = Events(eventTypeID=eventid, eventDistance=int(str(form.eventDistance.data)), eventTime=0)
-            db.session.add(neweve)
-        db.session.commit()
-    return render_template("createevent.html", form=form)
-
-@app.route('/createET', methods=['GET', 'POST'])
-def createET():
-    form = CreateEventType()
-    if form.validate_on_submit():
-        newET = EventTypes(type=form.eventType.data)
-        db.session.add(newET)
-        db.session.commit()
-    return render_template("createeventtype.html", form=form)
