@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, TimeField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 import wtforms.validators as validators
 from timeme.models import *
@@ -88,18 +88,20 @@ class AdminEnterData(FlaskForm):
     user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True,validators=[DataRequired()])
     eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
-    userTime = TimeField('User Time', validators=[DataRequired()])
+    userTimeM = IntegerField('User Time', validators=[validators.InputRequired()])
+    userTimeS = IntegerField('User Time', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
 
 class CreateEvent(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
     eventDistance = IntegerField('Event Distance', validators=[validators.Optional()])
-    eventTime = TimeField('Event Time', validators=[validators.Optional()], format='%H:%M:%S')
+    eventTimeM = IntegerField('Minutes', validators=[validators.Optional()])
+    eventTimeS = IntegerField('Seconds', validators=[validators.Optional()])
     submit = SubmitField('Submit')
 
     def validate_createE(self, eventDistance, eventTime, eventType):
         eD = eventDistance.data
-        eT = eventTime.data
+        eT = str(eventTimeM.data) + str(eventTimeS.data)
         if eD is None and eT is None:
             raise ValidationError("Please enter either the distance or the time")
             print("Please enter either the distance or the time")

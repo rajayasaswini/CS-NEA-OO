@@ -50,18 +50,37 @@
 					{% endif %}
 				</div>
 
-        <div class="form-group">
-					{{ form.eventTime.label(id="left")}}
+        <br>
 
-					{% if form.eventTime.errors %}
-							{{ form.eventTime(class="form-control form-control-lg is-invalid") }}
+        <div class="form-group">
+					{{ form.eventTimeM.label(id="left")}}
+
+					{% if form.eventTimeM.errors %}
+							{{ form.eventTimeM(class="form-control form-control-lg is-invalid") }}
 							<div class="invalid-feedback">
-									{% for error in form.eventTime.errors %}
-											<span>{{ error }}</span><p>m</p>
+									{% for error in form.eventTimeM.errors %}
+											<span>{{ error }}</span>
 									{% endfor %}
 							</div>
 					{% else %}
-							{{ form.eventTime(class="form-control form-control-lg") }}
+							{{ form.eventTimeM(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+        <br>
+
+        <div class="form-group">
+					{{ form.eventTimeS.label(id="left")}}
+
+					{% if form.eventTimeS.errors %}
+							{{ form.eventTimeS(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.eventTimeS.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.eventTimeS(class="form-control form-control-lg") }}
 					{% endif %}
 				</div>
 

@@ -134,18 +134,13 @@ def enterdata():
             name = str(form.user.data)
             name = name.split(' ')
             fname,lname = name[0], name[1]
-            lname = name[1]
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
-            userSpeed = getspeed(str(form.userTime.data), str(form.eventDistance.data), userSpeed)
-            dt = now.strftime('%Y-%m-%d %H:%M:%S')
-            print("fname:", fname)
-            print("lname:", lname)
-            print("id", userid)
-            print("eventid", eventid)
-            print("speed", userSpeed)
-            print("datetime:", dt)
-            userdst = UserDST(userID=userid, eventID=eventid, userDistance=form.eventDistance.data, isAssignment="0")
+            time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+            userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
+            dist = str(form.eventDistance.data)
+            dist = int(dist)
+            userdst = UserDST(userID=userid, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
             db.session.add(userdst)
             db.session.commit()
         return render_template("adminenterdata.html", form=form)
@@ -193,7 +188,16 @@ def profile():
 def createevent():
     form = CreateEvent()
     if form.validate_on_submit():
-        print(0)
+        eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+        dist = form.eventDistance.data
+        if form.eventDistance.data is None:
+            time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+            neweve = Events(eventTypeID=eventid, eventDistance=0, eventTime=time)
+            db.session.add(neweve)
+        else:
+            neweve = Events(eventTypeID=eventid, eventDistance=int(str(form.eventDistance.data)), eventTime=0)
+            db.session.add(neweve)
+        db.session.commit()
     return render_template("createevent.html", form=form)
 
 @app.route('/createET', methods=['GET', 'POST'])
