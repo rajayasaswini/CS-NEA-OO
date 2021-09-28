@@ -130,7 +130,3 @@ class CreateEventType(FlaskForm):
         event = EventTypes.query.filter_by(type=eventType.data).first()
         if event or eventType.data.upper() == event.eventType.upper():
             raise ValidationError('This event already exists. Please enter another one.')
-
-#get user time in minutes and seconds
-#in routes, use the data to get speed
-#add usertime as time in the database
