@@ -8,7 +8,7 @@ from datetime import datetime
 from sqlalchemy import *
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, current_user, logout_user
-
+#done
 @app.route('/')
 def index():
     if current_user.is_authenticated:
@@ -17,7 +17,7 @@ def index():
         else:
             return redirect(url_for('udash'))
     return render_template("index.html")
-
+#done
 @app.route('/aregister', methods=['GET', 'POST'])
 def aregister():
     if current_user.is_authenticated and current_user.isAdmin == 1:
@@ -35,7 +35,7 @@ def aregister():
 @app.route('/uregister', methods=['GET', 'POST'])
 def uregister():
     if current_user.is_authenticated and current_user.isAdmin == 1:
-        return redirect(url_for('udash'))
+        return redirect(url_for('adash'))
     form = uRegistrationForm()
     if form.validate_on_submit():
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -50,13 +50,15 @@ def uregister():
 @app.route('/choice', methods=['GET', 'POST'])
 def choice():
     return render_template("choice.html")
-
+#done
 @app.route('/admindash', methods=['GET', 'POST'])
 def adash():
-    if current_user.isAdmin == 0:
-        return render_template("user/userdash.html")
-    else:
+    if current_user.is_authenticated and current_user.isAdmin == 0:
+        return redirect(url_for('udash'))
+    elif current_user.is_authenticated and current_user.isAdmin == 1:
         return render_template("admin/admindash.html")
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/userdash', methods=['GET', 'POST'])
 def udash():
@@ -122,14 +124,16 @@ def enterdata():
     if current_user.isAdmin == 0:
         form = UserEnterData()
         if form.validate_on_submit():
-            eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
             userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
             dist = str(form.eventDistance.data)
             dist = int(dist)
+            typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
             userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
             db.session.add(userdst)
-            db.session.commit()        return render_template("userenterdata.html", form=form)
+            db.session.commit()
+        return render_template("userenterdata.html", form=form)
     elif current_user.isAdmin == 1:
         form = AdminEnterData()
         if form.validate_on_submit():
@@ -137,11 +141,12 @@ def enterdata():
             name = name.split(' ')
             fname,lname = name[0], name[1]
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
-            eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
             userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
             dist = str(form.eventDistance.data)
             dist = int(dist)
+            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=dist).first().eventID)
             userdst = UserDST(userID=userid, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
             db.session.add(userdst)
             db.session.commit()

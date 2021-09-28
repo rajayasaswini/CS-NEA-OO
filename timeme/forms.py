@@ -81,15 +81,16 @@ def user_query():
 class UserEnterData(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)
     eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True)
-    userTime = StringField('User Time', validators=[DataRequired()])
+    userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
+    userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
 
 class AdminEnterData(FlaskForm):
     user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True,validators=[DataRequired()])
     eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
-    userTimeM = IntegerField('User Time', validators=[validators.InputRequired()])
-    userTimeS = IntegerField('User Time', validators=[validators.InputRequired()])
+    userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
+    userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
 
 class CreateEvent(FlaskForm):
