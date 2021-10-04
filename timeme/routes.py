@@ -104,7 +104,9 @@ def login():
 
 @app.route('/viewclass', methods=['GET', 'POST'])
 def viewclasses():
-    data = Classes.query.all()
+    if current_user.is_authenticated and current_user.isAdmin == 1:
+        classN = Classes.query.filter_by(classAdminID=current_user.id).all().classCode
+        print(className)
     return render_template("admin/viewclasses.html", data=data)
 
 @app.route('/addclass', methods=['GET', 'POST'])
@@ -157,7 +159,7 @@ def enterdata():
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
-            userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
+            userSpeed = getspeed(time, str(form.eventDistance.datfa), userSpeed)
             dist = str(form.eventDistance.data)
             dist = int(dist)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=dist).first().eventID)
