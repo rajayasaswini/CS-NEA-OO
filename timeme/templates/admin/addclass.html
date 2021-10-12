@@ -20,6 +20,25 @@
 				{{ form.hidden_tag() }}
 
 				<div class="form-group">
+					{{ form.classname.label(id="left")}}
+
+					{% if form.classname.errors %}
+							{{ form.classname(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.classname.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.classname(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<br>
+
+        {{ form.hidden_tag() }}
+
+				<div class="form-group">
 					{{ form.classcode.label(id="left")}}
 
 					{% if form.classcode.errors %}
@@ -39,10 +58,6 @@
 				<div class="form-group">
 						{{ form.submit(class="add-button") }}
 				</div>
-
-				<small class="text muted ml-2">
-					<a href="#">Forgot password?</a>
-				</small>
 
 				<br>
 

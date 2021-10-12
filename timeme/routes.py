@@ -37,19 +37,17 @@ def uregister():
     if current_user.is_authenticated:
         if current_user.isAdmin == 1:
             return redirect(url_for('adash'))
-        else:
-            form = uRegistrationForm()
-            if form.validate_on_submit():
-                hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-                user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=0)
-                db.session.add(user)
-                db.session.commit()
-                login_user(user)
-                flash(f'Login now','success')
-                return redirect(url_for('entercode'))
-            return render_template("user/uregister.html", title="Register", form=form)
     else:
-        return redirect(url_for('login'))
+        form = uRegistrationForm()
+        if form.validate_on_submit():
+            hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=0)
+            db.session.add(user)
+            db.session.commit()
+            login_user(user)
+            flash(f'Login now','success')
+            return redirect(url_for('entercode'))
+        return render_template("user/uregister.html", title="Register", form=form)
 #done
 @app.route('/choice', methods=['GET', 'POST'])
 def choice():
@@ -104,16 +102,27 @@ def login():
 
 @app.route('/viewclass', methods=['GET', 'POST'])
 def viewclasses():
+    headings = ('Class Name', 'Class Code')
+    data = ()
+    classdata = []
     if current_user.is_authenticated and current_user.isAdmin == 1:
-        classN = Classes.query.filter_by(classAdminID=current_user.id).all().classCode
-        print(className)
-    return render_template("admin/viewclasses.html", data=data)
+        classN = Classes.query.filter_by(classAdminID=current_user.id).all()
+        print("classN:", classN)
+        for i in classN:
+            classdata.append(i)
+            for i in classdata:
+                print(i)
+    elif current_user.is_authenticated and current_user.isAdmin == 0:
+        return redirect(url_for('udash'))
+    else:
+        return redirect(url_for('login'))
+    return render_template("admin/viewclasses.html")
 
 @app.route('/addclass', methods=['GET', 'POST'])
 def addclass():
     form=AddClass()
     if form.validate_on_submit():
-        class1 = Classes(classCode=form.classcode.data, classAdminID=current_user.id)
+        class1 = Classes(className=form.classname.data, classCode=form.classcode.data, classAdminID=current_user.id)
         db.session.add(class1)
         db.session.commit()
         flash(f'Class Created','success')

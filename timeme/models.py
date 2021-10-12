@@ -28,12 +28,13 @@ class Users(db.Model, UserMixin):
 class Classes(db.Model):
     __tablename__ = "classes"
     classID = db.Column(db.Integer, primary_key=True)
+    className = db.Column(db.String, nullable=False)
     classCode = db.Column(db.String(6),nullable=False)
     classAdminID = db.Column(db.Integer, db.ForeignKey("users.id"))
     classes_admin = db.relationship('Users', lazy=True, foreign_keys=[classAdminID])
 
     def __repr__(self):
-        return f"User('{self.classID}', '{self.classCode}', '{self.classAdminID}')"
+        return f"['{self.classID}', '{self.classCode}', '{self.classAdminID}']"
 
 class ClassesUsers(db.Model):
     __tablename__="classusers"
@@ -123,3 +124,11 @@ class Register(db.Model):
     userid = db.Column(db.Integer, db.ForeignKey("classusers.cuid"))
     datetime = db.Column(db.DateTime, nullable=False)
     user_reg = db.relationship('ClassesUsers', lazy=True, foreign_keys=[userid])
+
+class Intervals(db.Model):
+    __tablename__ = "interval"
+    intervalid = db.Column(db.Integer, primary_key=True)
+    userdstid = db.Column(db.Integer, db.ForeignKey("userdst.userDSTID"))
+    dist = db.Column(db.Integer, nullable=False)
+    time = db.Column(db.Integer, nullable=False)
+    dst_interval = db.relationship('UserDST', lazy=True, foreign_keys=[userdstid])

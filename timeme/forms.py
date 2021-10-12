@@ -50,6 +50,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class AddClass(FlaskForm):
+    classname = StringField('Class Name', validators=[DataRequired()])
     classcode = StringField('Class Code', validators=[DataRequired(), Length(min=6, max=6)])
     submit = SubmitField('Submit')
 
