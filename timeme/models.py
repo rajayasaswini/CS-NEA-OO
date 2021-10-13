@@ -108,6 +108,7 @@ class ReturnedAssignment(db.Model):
     __tablename__ = "returnedassignments"
     rassid = db.Column(db.Integer, primary_key=True)
     userdstid = db.Column(db.Integer, db.ForeignKey("userdst.userDSTID"))
+    isLate = db.Column(db.Integer)
     rass_dst = db.relationship('UserDST', lazy=True, foreign_keys=[userdstid])
 
 class UserDST(db.Model):
