@@ -104,6 +104,11 @@ class ScheduledAssignments(db.Model):
     returnDateTime = db.Column(db.DateTime, nullable=False)
     schass_event = db.relationship('Events', lazy=True, foreign_keys=[eventID])
 
+class ReturnedAssignment(db.Model):
+    __tablename__ = "returnedassignments"
+    rassid = db.Column(db.Integer, primary_key=True)
+    userdstid = db.Column(db.Integer, db.ForeignKey("userdst.userDSTID"))
+    rass_dst = db.relationship('UserDST', lazy=True, foreign_keys=[userdstid])
 
 class UserDST(db.Model):
     __tablename__ = "userdst"
