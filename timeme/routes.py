@@ -168,7 +168,7 @@ def enterdata():
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
-            userSpeed = getspeed(time, str(form.eventDistance.datfa), userSpeed)
+            userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
             dist = str(form.eventDistance.data)
             dist = int(dist)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=dist).first().eventID)

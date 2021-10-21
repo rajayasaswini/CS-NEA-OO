@@ -129,6 +129,7 @@ class Register(db.Model):
     registerid = db.Column(db.Integer, primary_key=True)
     userid = db.Column(db.Integer, db.ForeignKey("classusers.cuid"))
     datetime = db.Column(db.DateTime, nullable=False)
+    isPresent = db.Column(db.Integer)
     user_reg = db.relationship('ClassesUsers', lazy=True, foreign_keys=[userid])
 
 class Intervals(db.Model):
