@@ -8,6 +8,8 @@ from datetime import datetime
 from sqlalchemy import *
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, current_user, logout_user
+import json
+
 #done
 @app.route('/')
 def index():
@@ -65,7 +67,14 @@ def adash():
         if current_user.isAdmin == 0:
             return redirect(url_for('udash'))
         elif current_user.isAdmin == 1:
-            return render_template("admin/admindash.html")
+            #type = db.session.query()
+            #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
+            d_vs_t = db.session.query(db.func.sum(UserDST.userDistance), UserDST.userTime).group_by(UserDST.eventID).order_by(UserDST.dstDateTime).all()
+
+            dist_time = []
+            for total, _ in d_vs_t:
+                dist_time.append(total)
+            return render_template("admin/admindash.html", d_vs_t=json.dumps(dist_time))
     else:
         return redirect(url_for('login'))
 #done
