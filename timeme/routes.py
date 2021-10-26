@@ -69,12 +69,14 @@ def adash():
         elif current_user.isAdmin == 1:
             #type = db.session.query()
             #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
-            d_vs_t = db.session.query(db.func.sum(UserDST.userDistance), UserDST.userTime).group_by(UserDST.eventID).order_by(UserDST.dstDateTime).all()
+            #.group_by(UserDST.eventID).order_by(UserDST.eventID
+            d_vs_t = db.session.query(db.func.sum(UserDST.userDistance), UserDST.isAssignment).group_by(UserDST.isAssignment).order_by(UserDST.isAssignment).all()
+            print(d_vs_t)
 
-            dist_time = []
+            d_t = []
             for total, _ in d_vs_t:
-                dist_time.append(total)
-            return render_template("admin/admindash.html", d_vs_t=json.dumps(dist_time))
+                d_t.append(total)
+            return render_template("admin/admindash.html", d_vs_t=json.dumps(d_t))
     else:
         return redirect(url_for('login'))
 #done

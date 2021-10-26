@@ -5,15 +5,15 @@
         //min: 0
     //}
   //});
-  let d_t = JSON.parse ({{ d_vs_t | tojson }})
+  //let d_t = JSON.parse ({{ d_vs_t | tojson }})
   //var myChart = new Chart(ctx, {
-  let d_t_p_chart = new Chart(d_vs_t, {
+  let d_t_p_chart = new Chart(d_t_p_t, {
     type: 'pie',
     data: {
-    labels: ['Distance', 'Time'],
+    labels: ['Distance', 'Assignment'],
       datasets: [{
         label: "Distance-Time",
-        data: d_t,
+        data: [5000,6000],
         backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
             '#B276B2', '#E16851', '#FB8267'],
 
@@ -28,7 +28,7 @@
     options: {
       title: {
         display: true,
-        text: "Income Vs Expenses",
+        text: "Distance vs Time",
         fontSize: 20,
       },
       legend: {
@@ -46,7 +46,7 @@
   })
   let d_t = JSON.parse ({{ d_vs_t | tojson }})
   //var myChart = new Chart(ctx, {
-  let d_t_b_chart = new Chart(d_vs_t, {
+  let d_t_b_chart = new Chart(d_t_p, {
       type: 'bar',
       data: {
           labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
