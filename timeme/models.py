@@ -22,8 +22,8 @@ class Users(db.Model, UserMixin):
     photo = db.Column(db.String(20), default='default.jpg')
     isAdmin = db.Column(db.Integer, nullable=False)
 
-    def __repr__(self):
-        return '{} {}'.format(str(self.firstname), str(self.lastname))
+    #def __repr__(self):
+    #    return '{} {}'.format(str(self.firstname), str(self.lastname))
 
 class Classes(db.Model):
     __tablename__ = "classes"

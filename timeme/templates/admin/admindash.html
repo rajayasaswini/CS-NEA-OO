@@ -1,20 +1,19 @@
 {% include "html/adminheader.html" %}
 <p>Admin Dashboard</p>
-{% extends "chart_layout.html"%}
+{% extends "charts/chart_layout.html" %}
 
 {% block content %}
 <div class="col-xs-10 col-sm-6 col-md-6">
     <div class="card card-style mb-2">
         <div class="card-body">
             <div class="chart-container" style="position: relative;">
-                <canvas id="d_t_p"></canvas>
+                <canvas id="myChart"></canvas>
             </div>
         </div>
     </div>
 </div>
 
 {% block javascript%}
-{% include "chart.html" %}
+{% include "charts/chart.html" %}
 {% endblock %}
-
 {% endblock %}
