@@ -67,7 +67,8 @@ def adash():
         if current_user.isAdmin == 0:
             return redirect(url_for('udash'))
         elif current_user.isAdmin == 1:
-            d_vs_t = db.session.query(UserDST.userDistance, UserDST.userTime).filter_by(isAssignment = 0).all()
+            #get a sum of the distance run of a user
+            d_vs_t = db.session.query(UserDST.userID, UserDST.userDistance).filter_by(isAssignment = 0).all()
             labels = [row[0] for row in d_vs_t]
             values = [row[1] for row in d_vs_t]
             return render_template("admin/admindash.html", labels=labels, values=values)
