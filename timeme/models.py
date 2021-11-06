@@ -3,9 +3,11 @@ from datetime import datetime
 from sqlalchemy.sql import text
 from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
-from timeme import db, login_man
+from timeme import db, login_man, app
+#login.manager
 from flask_login import UserMixin
 import datetime
+from itsdangerous import TimedJSONWebSignatureSerializer as Ser
 
 @login_man.user_loader
 def getuser(user_id):
@@ -19,8 +21,22 @@ class Users(db.Model, UserMixin):
     firstname = db.Column(db.String(255), nullable=True)
     lastname = db.Column(db.String(255), nullable=True)
     about = db.Column(db.String(4096),nullable=True)
+    birthday = db.Column(db.Date, nullable = False)
     photo = db.Column(db.String(20), default='default.jpg')
     isAdmin = db.Column(db.Integer, nullable=False)
+
+    def get_token(self, expire_s = 1800):
+        s = Ser(app.config['SECRET_KEY'], expire_s)
+        return s.dumps({'users_id':self.id}).decode('utf-8')
+
+    @staticmethod
+    def verify_token(token):
+        s = Ser(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['users_id']
+        except:
+            return None
+        return Users.query.get(user_id)
 
     #def __repr__(self):
     #    return '{} {}'.format(str(self.firstname), str(self.lastname))

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, flash, redirect
-from timeme import app, db, bcrypt
+from timeme import app, db, bcrypt, mail
 from timeme.forms import *
 from timeme.models import *
 from flask_wtf import FlaskForm
@@ -8,26 +8,38 @@ from datetime import datetime
 from sqlalchemy import *
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, current_user, logout_user
+from flask_mail import Message
 import json
 
+def check_user():
+    if current_user.is_authenticated:
+        if current_user.isAdmin == 1:
+            return 1
+        elif current_user.isAdmin == 0:
+            return 0
+    else:
+        return 2
 #done
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        if current_user.isAdmin == 1:
-            return redirect(url_for('viewclasses'))
-        else:
+    check = check_user()
+    if check == 1:
+        return redirect(url_for('viewclasses'))
+    elif check == 0:
             return redirect(url_for('udash'))
     return render_template("index.html")
 #done
 @app.route('/aregister', methods=['GET', 'POST'])
 def aregister():
-    if current_user.is_authenticated and current_user.isAdmin == 1:
+    check = check_user()
+    if check == 1:
         return redirect(url_for('viewclasses'))
+    elif check == 0:
+        return redirect(url_for('udash'))
     form = aRegistrationForm()
     if form.validate_on_submit():
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=1)
+        user = Users(email=form.email.data, firstname=form.firstname.data, birthday=form.bday.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=1)
         db.session.add(user)
         db.session.commit()
         flash(f'Login now','success')
@@ -36,14 +48,16 @@ def aregister():
 #done
 @app.route('/uregister', methods=['GET', 'POST'])
 def uregister():
-    if current_user.is_authenticated:
-        if current_user.isAdmin == 1:
-            return redirect(url_for('adash'))
+    check = check_user()
+    if check == 1:
+        return redirect(url_for('viewclasses'))
+    elif check == 0:
+        return redirect(url_for('udash'))
     else:
         form = uRegistrationForm()
         if form.validate_on_submit():
             hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-            user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=0)
+            user = Users(email=form.email.data, firstname=form.firstname.data, lastname=form.lastname.data, birthday=form.bday.data, password=hashed_pass, isAdmin=0)
             db.session.add(user)
             db.session.commit()
             login_user(user)
@@ -53,57 +67,71 @@ def uregister():
 #done
 @app.route('/choice', methods=['GET', 'POST'])
 def choice():
-    if current_user.is_authenticated:
-        if current_user.isAdmin == 0:
-            return redirect(url_for('udash'))
-        else:
-            return redirect(url_for('adash'))
-    else:
-        return render_template("choice.html")
+    check = check_user()
+    if check == 0:
+        return redirect(url_for('udash'))
+    elif check == 1:
+        return redirect(url_for('adash'))
+    return render_template("choice.html")
 #done
 @app.route('/admindash', methods=['GET', 'POST'])
 def adash():
-    if current_user.is_authenticated:
-        if current_user.isAdmin == 0:
+    check = check_user()
+    if check == 0:
             return redirect(url_for('udash'))
-        elif current_user.isAdmin == 1:
-            #get a sum of the distance run of a user
-            d_vs_t = db.session.query(UserDST.userID, UserDST.userDistance).filter_by(isAssignment = 0).all()
-            labels = [row[0] for row in d_vs_t]
-            values = [row[1] for row in d_vs_t]
-            return render_template("admin/admindash.html", labels=labels, values=values)
+    elif check == 1:
+        #get a sum of the distance run of a user
+        labels = []
+        d_vs_t = db.session.query(UserDST.userID, UserDST.userDistance).filter_by(isAssignment = 0).all()
+        for row in d_vs_t:
+            name = db.session.query(Users.firstname).filter_by(id = row[0]).first()
+            labels.append(name)
+        labels = [row[0] for row in labels]
+        values = [row[1] for row in d_vs_t]
+        name = current_user.firstname
+        return render_template("admin/admindash.html", labels=labels, values=values, name=name)
     else:
         return redirect(url_for('login'))
 #done
 @app.route('/userdash', methods=['GET', 'POST'])
 def udash():
-    if current_user.is_authenticated:
-        if current_user.isAdmin == 1:
+    check = check_user()
+    if check == 1:
             return render_template("admin/admindash.html")
-        else:
-            return render_template("user/userdash.html")
+    elif check == 0:
+        d_vs_t = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance).filter_by(isAssignment = 0).all())
+        print(d_vs_t)
+        dates = []
+        for i in d_vs_t:
+            print("i", i)
+            for j in i:
+                print("j", j)
+        labels = [row[0] for row in d_vs_t]
+        values = [row[1] for row in d_vs_t]
+        name = current_user.firstname
+        return render_template("user/userdash.html", labels=labels, values=values, name=name)
     else:
         return redirect(url_for('login'))
 #done
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        if current_user.isAdmin == 1:
-            return redirect(url_for('viewclasses'))
-        else:
-            return redirect(url_for('udash'))
+    check = check_user()
+    if check == 1:
+        return redirect(url_for('viewclasses'))
+    elif check == 0:
+        return redirect(url_for('udash'))
     form = LoginForm()
     if form.validate_on_submit():
-        if form.validate_on_submit():
-            user1 = Users.query.filter_by(email=form.email.data).first()
-            if user1 and bcrypt.check_password_hash(user1.password, form.password.data):
-                login_user(user1, remember=form.remember.data)
-                if user1.isAdmin == 1:
-                    return redirect(url_for('viewclasses'))
-                else:
-                    return redirect(url_for('udash'))
-        else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
+        #if form.validate_on_submit():
+        user1 = Users.query.filter_by(email=form.email.data).first()
+        if user1 and bcrypt.check_password_hash(user1.password, form.password.data):
+            login_user(user1, remember=form.remember.data)
+            if user1.isAdmin == 1:
+                return redirect(url_for('viewclasses'))
+            else:
+                return redirect(url_for('udash'))
+    else:
+        flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title="Login", form=form)
 
 @app.route('/viewclass', methods=['GET', 'POST'])
@@ -111,14 +139,15 @@ def viewclasses():
     headings = ('Class Name', 'Class Code')
     data = ()
     classdata = []
-    if current_user.is_authenticated and current_user.isAdmin == 1:
+    check = check_user()
+    if check == 1:
         classN = Classes.query.filter_by(classAdminID=current_user.id).all()
         print("classN:", classN)
         for i in classN:
             classdata.append(i)
             for i in classdata:
                 print(i)
-    elif current_user.is_authenticated and current_user.isAdmin == 0:
+    elif check == 0:
         return redirect(url_for('udash'))
     else:
         return redirect(url_for('login'))
@@ -152,7 +181,8 @@ from python.getspeed import *
 def enterdata():
     userSpeed = 0
     now = datetime.now()
-    if current_user.isAdmin == 0:
+    check = check_user()
+    if check == 0:
         form = UserEnterData()
         if form.validate_on_submit():
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
@@ -165,7 +195,7 @@ def enterdata():
             db.session.add(userdst)
             db.session.commit()
         return render_template("user/userenterdata.html", form=form)
-    elif current_user.isAdmin == 1:
+    elif check == 1:
         form = AdminEnterData()
         if form.validate_on_submit():
             name = str(form.user.data)
@@ -183,7 +213,7 @@ def enterdata():
             db.session.commit()
         return render_template("admin/adminenterdata.html", form=form)
     else:
-        return render_template("login.html")
+        return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
@@ -193,7 +223,8 @@ def logout():
 #done
 @app.route('/createE', methods=['GET', 'POST'])
 def createevent():
-    if current_user.isAdmin == 1:
+    check = check_user()
+    if check == 1:
         form = CreateEvent()
         if form.validate_on_submit():
             eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
@@ -207,7 +238,7 @@ def createevent():
                 db.session.add(neweve)
             db.session.commit()
         return render_template("createevent.html", form=form)
-    elif current_user.isAdmin == 0:
+    elif check == 0:
         return redirect(url_for('udash'))
     else:
         form = LoginForm()
@@ -215,14 +246,15 @@ def createevent():
 #done
 @app.route('/createET', methods=['GET', 'POST'])
 def createET():
-    if current_user.isAdmin == 1:
+    check = check_user()
+    if check == 1:
         form = CreateEventType()
         if form.validate_on_submit():
             newET = EventTypes(type=form.eventType.data)
             db.session.add(newET)
             db.session.commit()
         return render_template("createeventtype.html", form=form)
-    elif current_user.isAdmin == 0:
+    elif check == 0:
         return redirect(url_for('udash'))
     else:
         return redirect(url_for('login'))
@@ -257,4 +289,46 @@ def timer():
 
 @app.route('/profile')
 def profile():
-    return render_template("temp.html")
+    form = Profile()
+    return render_template("profile.html", form=form)
+
+def send_rp_email(user):
+    token = user.get_token()
+    mess = Message('Password Reset Request', sender="raja8450@dubaicollege.org", recipients=[user.email])
+    mess.body = f'''This email has been sent since you want to reset your password.
+If you did not request to reset your password, please ignore this email.
+{url_for('reset_token', token=token, _external=True)}'''
+    mail.send(mess)
+
+@app.route('/requestpass', methods=['GET', 'POST'])
+def reset_request():
+    check = check_user()
+    if current_user.is_authenticated:
+        return redirect(url_for('adash'))
+    form = RequestResetPass()
+    if form.validate_on_submit():
+        email = Users.query.filter_by(email=form.email.data).first()
+        send_rp_email(email)
+        flash('An email has been sent to your email address.', 'info')
+        return redirect(url_for('login'))
+    return render_template('requestrp.html', form=form)
+
+@app.route('/resetpass/<token>', methods=['GET', 'POST'])
+def reset_token(token):
+    check = check_user()
+    if check == 1:
+        return redirect(url_for('adash'))
+    elif check == 0:
+        return redirect(url_for('udash'))
+    user = Users.verify_token(token)
+    if user is None:
+        flash('Invalid token', 'warning')
+        return redirect(url_for('reest_request'))
+    form = ResetPass()
+    if form.validate_on_submit():
+        hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user.password = hashed_pass
+        db.session.commit()
+        flash(f'Login now','success')
+        return redirect(url_for('login'))
+    return render_template('resetpass.html', form=form)

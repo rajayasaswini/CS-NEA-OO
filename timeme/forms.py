@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField
+from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 import wtforms.validators as validators
 from timeme.models import *
@@ -7,11 +8,11 @@ from wtforms_sqlalchemy.fields import QuerySelectField
 
 
 class uRegistrationForm(FlaskForm):
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
     firstname = StringField('First Name', validators=[DataRequired()])
     lastname = StringField('Last Name', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+    bday = DateField('Birth Date', format='%Y-%m-%d')
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
@@ -21,11 +22,13 @@ class uRegistrationForm(FlaskForm):
         if user1:
             raise ValidationError('There is already an account under this email. Use another email or login.')
 
+
 class aRegistrationForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     firstname = StringField('First Name', validators=[DataRequired()])
     lastname = StringField('Last Name', validators=[DataRequired()])
+    bday = DateField('Birth Date', format='%Y-%m-%d')
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
@@ -131,3 +134,24 @@ class CreateEventType(FlaskForm):
         event = EventTypes.query.filter_by(type=eventType.data).first()
         if event or eventType.data.upper() == event.eventType.upper():
             raise ValidationError('This event already exists. Please enter another one.')
+
+class Profile(FlaskForm):
+    fname = StringField('First Name')
+    lname = StringField('lastname')
+    email = StringField('Email')
+    about = StringField('About')
+    submit = SubmitField('Submit')
+
+class RequestResetPass(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Send Email')
+
+    def validate_email(self, email):
+        user1 = Users.query.filter_by(email=email.data).first()
+        if user1 is None:
+            raise ValidationError('There is no account with this email.')
+
+class ResetPass(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset Password')

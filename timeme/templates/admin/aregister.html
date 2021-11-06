@@ -72,6 +72,27 @@
 
 				<br>
 
+				<form class ="form" method="post" action="">
+					{{ form.hidden_tag() }}
+					<br>
+
+					<div class="form-group">
+						{{ form.bday.label(id="left")}}
+
+						{% if form.bday.errors %}
+								{{ form.bday(class="form-control form-control-lg is-invalid") }}
+								<div class="invalid-feedback">
+										{% for error in form.bday.errors %}
+												<span>{{ error }}</span>
+										{% endfor %}
+								</div>
+						{% else %}
+								{{ form.bday(class="form-control form-control-lg") }}
+						{% endif %}
+					</div>
+
+				<br>
+
 				<div class="form-group">
 					{{ form.password.label(id="left")}}
 
