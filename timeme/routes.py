@@ -289,8 +289,12 @@ def timer():
 
 @app.route('/profile')
 def profile():
-    form = Profile()
-    return render_template("profile.html", form=form)
+    #form = Profile()
+    fname = current_user.firstname
+    lname = current_user.lastname
+    about = current_user.about
+    bday = current_user.birthday
+    return render_template("profile.html", fname = fname, lname = lname, about = about, bday = bday)
 
 def send_rp_email(user):
     token = user.get_token()
