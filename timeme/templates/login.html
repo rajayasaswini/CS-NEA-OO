@@ -14,7 +14,6 @@
 
 			<div class="login-logo">
 				<p>Login</p>
-
 			</div>
 
 			<form class ="form" method="post" action="">
@@ -63,14 +62,10 @@
 
 				<div class="form-group">
 						{{ form.submit(class="login-button") }}
+						<small class="text muted ml-2">
+							<a href="{{ url_for('reset_request')}}">Forgot password?</a>
+						</small>
 				</div>
-
-				<small class="text muted ml-2">
-					<a href="#">Forgot password?</a>
-				</small>
-
-				<br>
-
 			</form>
 			<div>
 				Don't have an account <a href="{{ url_for('choice') }}">Sign Up</a>

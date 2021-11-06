@@ -1,13 +1,13 @@
-<canvas id="myChart2" width="400" height="400"></canvas>
+<canvas id="myChart" width="1000" height="1000"></canvas>
 <script>
-  const ctx = document.getElementById('myChart2').getContext('2d');
-  const myChart = new Chart(ctx, {
+const ctx = document.getElementById('myChart').getContext('2d');
+const myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        labels: {{ labels | safe }},
         datasets: [{
-            label: '# of Votes',
-            data: [4,5,6,7,8,9],
+            //label: 'Distance',
+            data: {{ values | safe }},
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
@@ -27,11 +27,22 @@
             borderWidth: 1
         }]
     },
+
     options: {
         scales: {
-            y: {
-                beginAtZero: true
-            }
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index, values) {
+                        return value;
+                    }
+                }
+            }],
+        },
+        title: {
+            display: true,
+            text: 'Custom Chart Title'
         }
-    });
+    }
+});
 </script>

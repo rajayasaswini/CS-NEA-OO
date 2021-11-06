@@ -1,0 +1,44 @@
+{% include "html/homeheader.html" %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+			<meta charset="UTF-8">
+			<meta http-equiv="X-UA-Compatible" content="IE=edge">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<link rel="stylesheet" href="../static/loginstyle.css">
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+			<title>Enter Email</title>
+	</head>
+	<body>
+    <div class="login">
+
+      <div class="login-logo">
+        <p>Reset Password</p>
+      </div>
+
+      <form class ="form" method="post" action="">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+          {{ form.email.label(id="left")}}
+
+          {% if form.email.errors %}
+              {{ form.email(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.email.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.email(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+
+        <br>
+
+        <div class="form-group">
+            {{ form.submit(class="login-button") }}
+        </div>
+      </form>
+
+  </body>

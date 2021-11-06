@@ -1,8 +1,9 @@
 {% include "html/adminheader.html" %}
-<p>Admin Dashboard</p>
+<p>Welcome back to the class {{ name }}!</p>
 {% extends "charts/chart_layout.html" %}
 
 {% block content %}
+
 <div class="col-xs-10 col-sm-6 col-md-6">
     <div class="card card-style mb-2">
         <div class="card-body">
@@ -13,18 +14,7 @@
     </div>
 </div>
 
-<div class="col-xs-10 col-sm-6 col-md-6">
-    <div class="card card-style mb-2">
-        <div class="card-body">
-            <div class="chart-container" style="position: relative;">
-                <canvas id="myChart2"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% block javascript%}
-{% include "charts/chart.html" %}
-{% include "charts/chart2.html" %}
+{% include "charts/dt-bar.html" %}
 {% endblock %}
 {% endblock %}
