@@ -298,7 +298,7 @@ def profile():
 
 def send_rp_email(user):
     token = user.get_token()
-    mess = Message('Password Reset Request', sender="raja8450@dubaicollege.org", recipients=[user.email])
+    mess = Message('Password Reset Request', sender="noreply@timeme.com", recipients=[user.email])
     mess.body = f'''This email has been sent since you want to reset your password.
 If you did not request to reset your password, please ignore this email.
 {url_for('reset_token', token=token, _external=True)}'''
