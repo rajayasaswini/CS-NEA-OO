@@ -38,8 +38,8 @@ class Users(db.Model, UserMixin):
             return None
         return Users.query.get(user_id)
 
-    #def __repr__(self):
-    #    return '{} {}'.format(str(self.firstname), str(self.lastname))
+    def __repr__(self):
+        return '{} {}'.format(str(self.firstname), str(self.lastname))
 
 class Classes(db.Model):
     __tablename__ = "classes"
