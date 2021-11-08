@@ -289,7 +289,10 @@ def timer():
 @app.route('/profile')
 def profile():
     #form = Profile()
+<<<<<<< HEAD
     image_file = url_for('static', filename='pics/' + current_user.photo)
+=======
+>>>>>>> ba7b071bb452ab4ef0285940b60b0c44c8b26801
     return render_template("profile.html")
 
 def send_rp_email(user):
