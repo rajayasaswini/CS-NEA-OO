@@ -13,8 +13,7 @@ class uRegistrationForm(FlaskForm):
     lastname = StringField('Last Name', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     bday = DateField('Birth Date', format='%Y-%m-%d')
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
 
     def validate_email(self, email):

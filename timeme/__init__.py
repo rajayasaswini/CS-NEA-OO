@@ -15,11 +15,11 @@ app.config['SECRET_KEY'] = 'cb1414668bb6f2a30c99cfb0e9c1441b'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_man = LoginManager(app)
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_SERVER'] = 'smtp.office365.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('example@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('password')
+app.config['MAIL_USERNAME'] = 'email-outlook'
+app.config['MAIL_PASSWORD'] = 'password'
 mail = Mail(app)
 
 from timeme import routes

@@ -200,7 +200,22 @@ def enterdata():
         if form.validate_on_submit():
             name = str(form.user.data)
             name = name.split(' ')
-            fname,lname = name[0], name[1]
+            fname = ''
+            lname = ''
+            if len(name) == 2:
+                fname,lname = name[0], name[1]
+            elif len(name) > 2:
+                lname = name[len(name)-1]
+                name.remove(lname)
+                count = 0
+                for i in name:
+                    if count == 0:
+                        fname += i + ' '
+                        count += 1
+                    else:
+                        fname += i
+                count = 0
+            print(fname, lname)
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
@@ -259,28 +274,12 @@ def createET():
     else:
         return redirect(url_for('login'))
 
-@app.route('/classposts')
-def classposts():
-    return render_template("temp.html")
-
-@app.route('/gallery')
-def gallery():
-    return render_template("temp.html")
-
 @app.route('/assignments')
 def assignments():
     return render_template("temp.html")
 
-@app.route('/posts')
-def posts():
-    return render_template("temp.html")
-
 @app.route('/data')
 def data():
-    return render_template("temp.html")
-
-@app.route('/journal')
-def journal():
     return render_template("temp.html")
 
 @app.route('/timer')
@@ -290,15 +289,12 @@ def timer():
 @app.route('/profile')
 def profile():
     #form = Profile()
-    fname = current_user.firstname
-    lname = current_user.lastname
-    about = current_user.about
-    bday = current_user.birthday
-    return render_template("profile.html", fname = fname, lname = lname, about = about, bday = bday)
+    image_file = url_for('static', filename='pics/' + current_user.photo)
+    return render_template("profile.html")
 
 def send_rp_email(user):
     token = user.get_token()
-    mess = Message('Password Reset Request', sender="noreply@timeme.com", recipients=[user.email])
+    mess = Message('Password Reset Request', sender="raja8450@dubaicollege.org", recipients=[user.email])
     mess.body = f'''This email has been sent since you want to reset your password.
 If you did not request to reset your password, please ignore this email.
 {url_for('reset_token', token=token, _external=True)}'''
@@ -327,7 +323,7 @@ def reset_token(token):
     user = Users.verify_token(token)
     if user is None:
         flash('Invalid token', 'warning')
-        return redirect(url_for('reest_request'))
+        return redirect(url_for('reset_request'))
     form = ResetPass()
     if form.validate_on_submit():
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
