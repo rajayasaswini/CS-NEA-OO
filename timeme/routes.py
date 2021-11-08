@@ -259,28 +259,12 @@ def createET():
     else:
         return redirect(url_for('login'))
 
-@app.route('/classposts')
-def classposts():
-    return render_template("temp.html")
-
-@app.route('/gallery')
-def gallery():
-    return render_template("temp.html")
-
 @app.route('/assignments')
 def assignments():
     return render_template("temp.html")
 
-@app.route('/posts')
-def posts():
-    return render_template("temp.html")
-
 @app.route('/data')
 def data():
-    return render_template("temp.html")
-
-@app.route('/journal')
-def journal():
     return render_template("temp.html")
 
 @app.route('/timer')
