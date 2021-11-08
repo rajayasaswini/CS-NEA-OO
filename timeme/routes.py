@@ -200,7 +200,22 @@ def enterdata():
         if form.validate_on_submit():
             name = str(form.user.data)
             name = name.split(' ')
-            fname,lname = name[0], name[1]
+            fname = ''
+            lname = ''
+            if len(name) == 2:
+                fname,lname = name[0], name[1]
+            elif len(name) > 2:
+                lname = name[len(name)-1]
+                name.remove(lname)
+                count = 0
+                for i in name:
+                    if count == 0:
+                        fname += i + ' '
+                        count += 1
+                    else:
+                        fname += i
+                count = 0
+            print(fname, lname)
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
@@ -274,11 +289,7 @@ def timer():
 @app.route('/profile')
 def profile():
     #form = Profile()
-    fname = current_user.firstname
-    lname = current_user.lastname
-    about = current_user.about
-    bday = current_user.birthday
-    return render_template("profile.html", fname = fname, lname = lname, about = about, bday = bday)
+    return render_template("profile.html")
 
 def send_rp_email(user):
     token = user.get_token()

@@ -81,36 +81,33 @@ class Events(db.Model):
     def __repr__(self):
         return '{}'.format(str(self.eventDistance))
 
-class Logs(db.Model):
-    __tablename__ = "logs"
-    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
-    logID = db.Column(db.Integer, primary_key=True, nullable=False)
-    logContent = db.Column(db.String)
-    logDateTime = db.Column(db.DateTime, nullable=False)
-    log_user = db.relationship('Users', lazy=True, foreign_keys=[userID])
+#class Logs(db.Model):
+#    __tablename__ = "logs"
+#    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
+#    logID = db.Column(db.Integer, primary_key=True, nullable=False)
+#    logContent = db.Column(db.String)
+#    logDateTime = db.Column(db.DateTime, nullable=False)
+#    log_user = db.relationship('Users', lazy=True, foreign_keys=[userID])
 
 
-class Photos(db.Model):
-    __tablename__ = "postphotos"
-    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
-    postID = db.Column(db.Integer, db.ForeignKey("posts.postID"))
-    postPhotoID = db.Column(db.Integer, primary_key=True, nullable=False)
-    postPhoto = db.Column(db.String(20), default='default.jpg')
-    postDateTime = db.Column(db.DateTime, nullable=False)
-    photos_user = db.relationship('Users', lazy=True, foreign_keys=[userID])
-    photo_post = db.relationship('Posts', lazy=True, foreign_keys=[postID])
+#class Photos(db.Model):
+#    __tablename__ = "postphotos"
+#    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
+#    postID = db.Column(db.Integer, db.ForeignKey("posts.postID"))
+#    postPhotoID = db.Column(db.Integer, primary_key=True, nullable=False)
+#    postPhoto = db.Column(db.String(20), default='default.jpg')
+#    postDateTime = db.Column(db.DateTime, nullable=False)
+#    photos_user = db.relationship('Users', lazy=True, foreign_keys=[userID])
+#    photo_post = db.relationship('Posts', lazy=True, foreign_keys=[postID])
 
-
-
-class Posts(db.Model):
-    __tablename__ = "posts"
-    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
-    postID = db.Column(db.Integer, primary_key=True)
-    postContent = db.Column(db.String(255))
-    isPosted = db.Column(db.Integer)
-    postDateTime = db.Column(db.DateTime, nullable=False)
-    user_post = db.relationship('Users', lazy=True, foreign_keys=[userID])
-
+#class Posts(db.Model):
+#    __tablename__ = "posts"
+#    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
+#    postID = db.Column(db.Integer, primary_key=True)
+#    postContent = db.Column(db.String(255))
+#    isPosted = db.Column(db.Integer)
+#    postDateTime = db.Column(db.DateTime, nullable=False)
+#    user_post = db.relationship('Users', lazy=True, foreign_keys=[userID])
 
 class ScheduledAssignments(db.Model):
     __tablename__ = "scheduledassignments"
