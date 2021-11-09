@@ -11,6 +11,8 @@ from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
 import json
 
+current_classid = 0
+
 def check_user():
     if current_user.is_authenticated:
         if current_user.isAdmin == 1:
@@ -232,6 +234,7 @@ def enterdata():
 
 @app.route('/logout')
 def logout():
+    current_classid = 0
     logout_user()
     return redirect(url_for('index'))
 
