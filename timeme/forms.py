@@ -154,3 +154,9 @@ class ResetPass(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+class SetAssignment(FlaskForm):
+    dday = DateField('Due Date', format='%Y-%m-%d')
+    eventtype = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
+    eventdist = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
+    submit = SubmitField('Set Assignment')

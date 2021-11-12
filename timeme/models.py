@@ -112,14 +112,17 @@ class Events(db.Model):
 class ScheduledAssignments(db.Model):
     __tablename__ = "scheduledassignments"
     assignmentID = db.Column(db.Integer, primary_key=True)
+    classID = db.Column(db.Integer, db.ForeignKey("classes.classID"))
     eventID = db.Column(db.Integer, db.ForeignKey("events.eventID"))
-    scheduledDateTime = db.Column(db.DateTime, nullable=False)
-    returnDateTime = db.Column(db.DateTime, nullable=False)
+    scheduledDate = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    returnDate = db.Column(db.Date, nullable=False)
     schass_event = db.relationship('Events', lazy=True, foreign_keys=[eventID])
+    schass_class = db.relationship('Classes', lazy=True, foreign_keys=[classID])
 
 class ReturnedAssignment(db.Model):
     __tablename__ = "returnedassignments"
     rassid = db.Column(db.Integer, primary_key=True)
+    schassid = db.Column(db.Integer, db.ForeignKey("scheduledassignments.assignmentID"))
     userdstid = db.Column(db.Integer, db.ForeignKey("userdst.userDSTID"))
     isLate = db.Column(db.Integer)
     rass_dst = db.relationship('UserDST', lazy=True, foreign_keys=[userdstid])

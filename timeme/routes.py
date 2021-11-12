@@ -11,7 +11,7 @@ from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
 import json
 
-current_classid = 0
+current_classid = 1
 
 def check_user():
     if current_user.is_authenticated:
@@ -124,17 +124,18 @@ def login():
         return redirect(url_for('udash'))
     form = LoginForm()
     if form.validate_on_submit():
+        current_classid = 1
         #if form.validate_on_submit():
         user1 = Users.query.filter_by(email=form.email.data).first()
         if user1 and bcrypt.check_password_hash(user1.password, form.password.data):
             login_user(user1, remember=form.remember.data)
             if user1.isAdmin == 1:
-                return redirect(url_for('viewclasses'))
+                return redirect(url_for('viewclasses')), current_classid
             else:
-                return redirect(url_for('udash'))
+                return redirect(url_for('udash')), current_classid
     else:
         flash('Login Unsuccessful. Please check username and password', 'danger')
-    return render_template("login.html", title="Login", form=form)
+    return render_template("login.html", title="Login", form=form), current_classid
 
 @app.route('/viewclass', methods=['GET', 'POST'])
 def viewclasses():
@@ -236,7 +237,7 @@ def enterdata():
 def logout():
     current_classid = 0
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('index')), current_classid
 
 #done
 @app.route('/createE', methods=['GET', 'POST'])
@@ -277,9 +278,16 @@ def createET():
     else:
         return redirect(url_for('login'))
 
-@app.route('/assignments')
-def assignments():
-    return render_template("temp.html")
+@app.route('/createassignment', methods=['GET', 'POST'])
+def createassignment():
+    form = SetAssignment()
+    if form.validate_on_submit():
+        typeid = int(EventTypes.query.filter_by(type=str(form.eventtype.data)).first().id)
+        eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventdist.data))).first().eventID)
+        a = ScheduledAssignments(classID=current_classid, eventID=eventid, returnDate=form.dday.data)
+        db.session.add(a)
+        db.session.commit()
+    return render_template("admin/assignments.html", form=form)
 
 @app.route('/data')
 def data():
