@@ -102,12 +102,7 @@ def udash():
             return render_template("admin/admindash.html")
     elif check == 0:
         d_vs_t = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance).filter_by(isAssignment = 0).all())
-        print(d_vs_t)
         dates = []
-        for i in d_vs_t:
-            print("i", i)
-            for j in i:
-                print("j", j)
         labels = [row[0] for row in d_vs_t]
         values = [row[1] for row in d_vs_t]
         name = current_user.firstname
@@ -139,22 +134,15 @@ def login():
 
 @app.route('/viewclass', methods=['GET', 'POST'])
 def viewclasses():
-    headings = ('Class Name', 'Class Code')
-    data = ()
-    classdata = []
     check = check_user()
     if check == 1:
-        classN = Classes.query.filter_by(classAdminID=current_user.id).all()
-        print("classN:", classN)
-        for i in classN:
-            classdata.append(i)
-            for i in classdata:
-                print(i)
+        headings = ('Class Name', 'Class Code')
+        classes = Classes.query.filter_by(classAdminID=current_user.id).all()
+        return render_template("admin/viewclasses.html", headings=headings, classes=classes)
     elif check == 0:
         return redirect(url_for('udash'))
     else:
         return redirect(url_for('login'))
-    return render_template("admin/viewclasses.html")
 
 @app.route('/addclass', methods=['GET', 'POST'])
 def addclass():
@@ -179,7 +167,7 @@ def entercode():
     return render_template("entercode.html", title="Enter Code", form=form)
 
 from python.getspeed import *
-
+#done
 @app.route('/enterdata', methods=['GET', 'POST'])
 def enterdata():
     userSpeed = 0
@@ -218,7 +206,6 @@ def enterdata():
                     else:
                         fname += i
                 count = 0
-            print(fname, lname)
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
@@ -232,7 +219,7 @@ def enterdata():
         return render_template("admin/adminenterdata.html", form=form)
     else:
         return redirect(url_for('login'))
-
+#done
 @app.route('/logout')
 def logout():
     current_classid = 0
@@ -277,7 +264,7 @@ def createET():
         return redirect(url_for('udash'))
     else:
         return redirect(url_for('login'))
-
+#done
 @app.route('/createassignment', methods=['GET', 'POST'])
 def createassignment():
     form = SetAssignment()

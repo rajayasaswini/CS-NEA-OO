@@ -17,9 +17,16 @@
       <div class="view-table">
         <table>
           <tr>
-            <th>Class Name</th>
-            <th>Class Code</th>
+            {% for header in headings %}
+            <th>{{ header }}</th>
+            {% endfor %}
           </tr>
+          {% for row in classes %}
+          <tr>
+                <td>{{ row.className }}</td>
+                <td>{{ row.classCode }}</td>
+          </tr>
+          {% endfor %}
         </table>
       </div>
     </div>
