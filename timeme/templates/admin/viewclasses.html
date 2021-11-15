@@ -3,8 +3,12 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
-    <meta charset="utf-8">
-    <title></title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/loginstyle.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <title>View Classes</title>
   </head>
   <body>
     <div class="">
@@ -23,12 +27,37 @@
           </tr>
           {% for row in classes %}
           <tr>
-                <td>{{ row.className }}</td>
-                <td>{{ row.classCode }}</td>
+            <td><a href="{{ url_for('adash') }}">{{ row.className }}</a></td>
+            <td>{{ row.classCode }}</td>
           </tr>
           {% endfor %}
         </table>
       </div>
     </div>
+
+    <form class ="form" method="post" action="">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        {{ form.classname.label(id="left")}}
+
+        {% if form.classname.errors %}
+            {{ form.classname(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.classname.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.classname(class="form-control form-control-lg") }}
+        {% endif %}
+      </div>
+
+      <br>
+
+      <div class="form-group">
+          {{ form.submit(class="login-button") }}
+      </div>
+    </form>
   </body>
 </html>

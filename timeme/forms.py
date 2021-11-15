@@ -160,3 +160,13 @@ class SetAssignment(FlaskForm):
     eventtype = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
     eventdist = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
     submit = SubmitField('Set Assignment')
+
+from flask_login import current_user
+
+def classes_query():
+    classes = Classes.query(Classes.className).filter_by(classAdminID=current_user.id).all()
+    return classes
+
+class SelectClass(FlaskForm):
+    classname = QuerySelectField('Class name', query_factory=classes_query, allow_blank=True, validators=[DataRequired()])
+    submit = SubmitField('Go to class dashboard')

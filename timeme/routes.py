@@ -125,20 +125,23 @@ def login():
         if user1 and bcrypt.check_password_hash(user1.password, form.password.data):
             login_user(user1, remember=form.remember.data)
             if user1.isAdmin == 1:
-                return redirect(url_for('viewclasses')), current_classid
+                return redirect(url_for('viewclasses'))
             else:
-                return redirect(url_for('udash')), current_classid
+                return redirect(url_for('udash'))
     else:
         flash('Login Unsuccessful. Please check username and password', 'danger')
-    return render_template("login.html", title="Login", form=form), current_classid
+    return render_template("login.html", title="Login", form=form)
 
 @app.route('/viewclass', methods=['GET', 'POST'])
 def viewclasses():
     check = check_user()
     if check == 1:
+        form = SelectClass()
+        classes = db.session.query(Classes.className).filter_by(classAdminID=current_user.id).all()
+        print(classes)
         headings = ('Class Name', 'Class Code')
         classes = Classes.query.filter_by(classAdminID=current_user.id).all()
-        return render_template("admin/viewclasses.html", headings=headings, classes=classes)
+        return render_template("admin/viewclasses.html", headings=headings, classes=classes, form=form)
     elif check == 0:
         return redirect(url_for('udash'))
     else:
@@ -224,7 +227,7 @@ def enterdata():
 def logout():
     current_classid = 0
     logout_user()
-    return redirect(url_for('index')), current_classid
+    return redirect(url_for('index'))
 
 #done
 @app.route('/createE', methods=['GET', 'POST'])
