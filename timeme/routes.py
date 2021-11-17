@@ -1,4 +1,5 @@
-from flask import Flask, render_template, url_for, flash, redirect
+from flask import Flask, render_template, url_for, flash, redirect, session
+#from flask.ext.session import Session
 from timeme import app, db, bcrypt, mail
 from timeme.forms import *
 from timeme.models import *
@@ -85,13 +86,15 @@ def adash():
         #get a sum of the distance run of a user
         labels = []
         d_vs_t = db.session.query(UserDST.userID, UserDST.userDistance).filter_by(isAssignment = 0).all()
+        classname = list(db.session.query(Classes.className).filter_by(classID=session["current_classid"]).first())
+        classname = classname[0]
         for row in d_vs_t:
             name = db.session.query(Users.firstname).filter_by(id = row[0]).first()
             labels.append(name)
         labels = [row[0] for row in labels]
         values = [row[1] for row in d_vs_t]
         name = current_user.firstname
-        return render_template("admin/admindash.html", labels=labels, values=values, name=name)
+        return render_template("admin/admindash.html", labels=labels, values=values, name=name, classname=classname)
     else:
         return redirect(url_for('login'))
 #done
@@ -119,7 +122,6 @@ def login():
         return redirect(url_for('udash'))
     form = LoginForm()
     if form.validate_on_submit():
-        current_classid = 1
         #if form.validate_on_submit():
         user1 = Users.query.filter_by(email=form.email.data).first()
         if user1 and bcrypt.check_password_hash(user1.password, form.password.data):
@@ -131,22 +133,38 @@ def login():
     else:
         flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title="Login", form=form)
-
 @app.route('/viewclass', methods=['GET', 'POST'])
 def viewclasses():
+    #checks the user's authentication
     check = check_user()
+    #if admin
     if check == 1:
+        #form is set to SelectClass
         form = SelectClass()
-        classes = db.session.query(Classes.className).filter_by(classAdminID=current_user.id).all()
-        print(classes)
+        #getting the class names and codes to put in table
+        classn = list(db.session.query(Classes.className, Classes.classCode).filter_by(classAdminID = current_user.id).all())
+        #setting the headings of the columns
         headings = ('Class Name', 'Class Code')
-        classes = Classes.query.filter_by(classAdminID=current_user.id).all()
-        return render_template("admin/viewclasses.html", headings=headings, classes=classes, form=form)
+        #if the form is validated
+        if form.validate_on_submit():
+            print(form.classname.data)
+            #we get the classid from the name that we got from the form
+            classid = list(db.session.query(Classes.classID).filter_by(className=str(form.classname.data), classAdminID=current_user.id).first())
+<<<<<<< HEAD
+            session["current_classid"] = classid[0]
+            return redirect(url_for('adash'))
+=======
+            #current_classid = classid[0]
+            #print(current_classid)
+            #if current_classid is not None:
+                #pass
+            #return redirect(url_for('adash'))
+>>>>>>> e0c3c8d73468dbefe78deef5e973fcfa2749c4df
+        return render_template("admin/viewclasses.html", headings=headings, classes=classn, form=form)
     elif check == 0:
         return redirect(url_for('udash'))
     else:
         return redirect(url_for('login'))
-
 @app.route('/addclass', methods=['GET', 'POST'])
 def addclass():
     form=AddClass()
@@ -268,6 +286,7 @@ def createET():
     else:
         return redirect(url_for('login'))
 #done
+
 @app.route('/createassignment', methods=['GET', 'POST'])
 def createassignment():
     form = SetAssignment()
@@ -286,7 +305,6 @@ def data():
 @app.route('/timer')
 def timer():
     return render_template("temp.html")
-
 @app.route('/profile')
 def profile():
     #form = Profile()

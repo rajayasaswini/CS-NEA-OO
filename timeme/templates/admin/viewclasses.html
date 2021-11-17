@@ -1,4 +1,4 @@
-{% include "html/adminheader.html" %}
+{% include "html/adminview.html" %}
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -12,9 +12,6 @@
   </head>
   <body>
     <div class="">
-      <div class="classes">
-
-      </div>
       <div class="add">
         <a href="{{ url_for('addclass') }}">Add Class</a>
       </div>
@@ -27,7 +24,7 @@
           </tr>
           {% for row in classes %}
           <tr>
-            <td><a href="{{ url_for('adash') }}">{{ row.className }}</a></td>
+            <td>{{ row.className }}</td>
             <td>{{ row.classCode }}</td>
           </tr>
           {% endfor %}

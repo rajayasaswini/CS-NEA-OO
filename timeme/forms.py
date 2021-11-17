@@ -164,8 +164,7 @@ class SetAssignment(FlaskForm):
 from flask_login import current_user
 
 def classes_query():
-    classes = Classes.query(Classes.className).filter_by(classAdminID=current_user.id).all()
-    return classes
+    return Classes.query.filter_by(classAdminID=current_user.id).all()
 
 class SelectClass(FlaskForm):
     classname = QuerySelectField('Class name', query_factory=classes_query, allow_blank=True, validators=[DataRequired()])

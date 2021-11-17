@@ -1,7 +1,9 @@
 {% include "html/adminheader.html" %}
-<p>Welcome back to the class {{ name }}!</p>
+<p>Welcome back to {{ classname }} {{ name }}!</p>
+<div class="go-back">
+  <a href="{{ url_for('viewclasses') }}">Go Back</a>
+</div>
 {% extends "charts/chart_layout.html" %}
-
 {% block content %}
 
 <div class="col-xs-10 col-sm-6 col-md-6">

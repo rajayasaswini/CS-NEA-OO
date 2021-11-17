@@ -50,7 +50,8 @@ class Classes(db.Model):
     classes_admin = db.relationship('Users', lazy=True, foreign_keys=[classAdminID])
 
     def __repr__(self):
-        return f"['{self.className}', '{self.classCode}']"
+        #return f"['{self.className}', '{self.classCode}]"
+        return '{}'.format(str(self.className))
 
 class ClassesUsers(db.Model):
     __tablename__="classusers"
