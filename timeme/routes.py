@@ -12,8 +12,6 @@ from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
 import json
 
-current_classid = 1
-
 def check_user():
     if current_user.is_authenticated:
         if current_user.isAdmin == 1:
@@ -104,8 +102,8 @@ def udash():
     if check == 1:
             return render_template("admin/admindash.html")
     elif check == 0:
+        session["current_classid"] = (list(db.session.query(ClassesUsers.classID).filter_by(usersID=current_user.id).first()))[0]
         d_vs_t = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance).filter_by(isAssignment = 0).all())
-        dates = []
         labels = [row[0] for row in d_vs_t]
         values = [row[1] for row in d_vs_t]
         name = current_user.firstname
@@ -150,16 +148,13 @@ def viewclasses():
             print(form.classname.data)
             #we get the classid from the name that we got from the form
             classid = list(db.session.query(Classes.classID).filter_by(className=str(form.classname.data), classAdminID=current_user.id).first())
-<<<<<<< HEAD
             session["current_classid"] = classid[0]
             return redirect(url_for('adash'))
-=======
             #current_classid = classid[0]
             #print(current_classid)
             #if current_classid is not None:
                 #pass
             #return redirect(url_for('adash'))
->>>>>>> e0c3c8d73468dbefe78deef5e973fcfa2749c4df
         return render_template("admin/viewclasses.html", headings=headings, classes=classn, form=form)
     elif check == 0:
         return redirect(url_for('udash'))
@@ -243,7 +238,9 @@ def enterdata():
 #done
 @app.route('/logout')
 def logout():
-    current_classid = 0
+    session["current_classid"] = 0
+    val = session["current_classid"]
+    print(val)
     logout_user()
     return redirect(url_for('index'))
 
@@ -264,7 +261,7 @@ def createevent():
                 neweve = Events(eventTypeID=eventid, eventDistance=int(str(form.eventDistance.data)), eventTime=0)
                 db.session.add(neweve)
             db.session.commit()
-        return render_template("createevent.html", form=form)
+        return render_template("admin\createevent.html", form=form)
     elif check == 0:
         return redirect(url_for('udash'))
     else:
@@ -280,7 +277,7 @@ def createET():
             newET = EventTypes(type=form.eventType.data)
             db.session.add(newET)
             db.session.commit()
-        return render_template("createeventtype.html", form=form)
+        return render_template("admin/createeventtype.html", form=form)
     elif check == 0:
         return redirect(url_for('udash'))
     else:
@@ -293,7 +290,7 @@ def createassignment():
     if form.validate_on_submit():
         typeid = int(EventTypes.query.filter_by(type=str(form.eventtype.data)).first().id)
         eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventdist.data))).first().eventID)
-        a = ScheduledAssignments(classID=current_classid, eventID=eventid, returnDate=form.dday.data)
+        a = ScheduledAssignments(classID=session["current_classid"], eventID=eventid, returnDate=form.dday.data)
         db.session.add(a)
         db.session.commit()
     return render_template("admin/assignments.html", form=form)
@@ -305,9 +302,9 @@ def data():
 @app.route('/timer')
 def timer():
     return render_template("temp.html")
+
 @app.route('/profile')
 def profile():
-    #form = Profile()
     image_file = url_for('static', filename='pics/' + current_user.photo)
     return render_template("profile.html")
 
