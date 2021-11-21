@@ -347,20 +347,15 @@ def submitassignment():
                 #print("assignmentname", i)
             assignment1 = form.assignmentname.data
             #(type, event, assign) = assignment1
-            type = assignment1[1][0]
+            type = assignment[1][0]
             event = assignment[1][1]
             assign = assignment[1][2]
             #assign = assignment[2]
             print("type", type)
             print("event", event)
             print("assign", assign)
-            #print("assignment1", assignment1)
-            #for type, event, assign in assignment1:
-                #assignmentlist = [str(type), str(event), str(assign)]
-                #print("assignmentlist", assignmentlist)
-            #for i in form.assignmentname.data:
-                #print("i", i)
-            assignmentlist = ['Sprint', '1000', '2021-10-20']
+            assignmentlist = [type, str(event), str(assign)]
+            print("alist", assignmentlist)
             session["current_assignment"] = assignmentlist
             typeid = int(EventTypes.query.filter_by(type=assignmentlist[0]).first().id)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=assignmentlist[1]).first().eventID)
