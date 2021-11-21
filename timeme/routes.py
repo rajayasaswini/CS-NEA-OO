@@ -12,6 +12,8 @@ from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
 import json
 
+#session["isAssignment"] = 0
+
 def check_user():
     if current_user.is_authenticated:
         if current_user.isAdmin == 1:
@@ -191,6 +193,11 @@ def enterdata():
     check = check_user()
     if check == 0:
         form = UserEnterData()
+        assign = 0
+        if session["isAssignment"] == 1:
+            assign = 1
+            print(session["isAssignment"])
+            print(session["current_assignment"])
         if form.validate_on_submit():
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
             userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
@@ -198,9 +205,21 @@ def enterdata():
             dist = int(dist)
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
-            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
+            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=assign)
+            if session["isAssignment"] == 1:
+                assign = 1
+                details = session["current_assignment"]
+                time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+                typeid = int(EventTypes.query.filter_by(type=details[0]).first().id)
+                eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=details[1]).first().eventID)
+                userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=int(details[1]), userTime=time , userSpeed=0.1, isAssignment=assign)
             db.session.add(userdst)
             db.session.commit()
+            if session["isAssignment"] == 1:
+                userdstid = userdst.userDSTID
+                assignment = ReturnedAssignment(schassid=session["current_assignmentid"], userdstid=userdstid, isLate=0)
+                db.session.add(assignment)
+                db.session.commit()
         return render_template("user/userenterdata.html", form=form)
     elif check == 1:
         form = AdminEnterData()
@@ -254,14 +273,14 @@ def createevent():
             eventid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             dist = form.eventDistance.data
             if form.eventDistance.data is None:
-                time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+                time = int(form.eventTimeM.data)*60 + int(form.eventTimeS.data)
                 neweve = Events(eventTypeID=eventid, eventDistance=0, eventTime=time)
                 db.session.add(neweve)
             else:
                 neweve = Events(eventTypeID=eventid, eventDistance=int(str(form.eventDistance.data)), eventTime=0)
                 db.session.add(neweve)
             db.session.commit()
-        return render_template("admin\createevent.html", form=form)
+        return render_template("admin/createevent.html", form=form)
     elif check == 0:
         return redirect(url_for('udash'))
     else:
@@ -283,7 +302,6 @@ def createET():
     else:
         return redirect(url_for('login'))
 #done
-
 @app.route('/createassignment', methods=['GET', 'POST'])
 def createassignment():
     form = SetAssignment()
@@ -294,6 +312,87 @@ def createassignment():
         db.session.add(a)
         db.session.commit()
     return render_template("admin/assignments.html", form=form)
+
+@app.route('/assignment', methods=['GET', 'POST'])
+def submitassignment():
+    check = check_user()
+    if check == 0:
+        assign = []
+        form = SelectAssignment()
+        headings = ['Event Type', 'Event Distance', 'Due Date']
+        assignment = list(db.session.query(EventTypes.type, Events.eventDistance, ScheduledAssignments.returnDate).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
+        print(assignment)
+        form.assignmentname.choices = assignment
+        #for type, event, assign in assignment:
+            #schass = [str(type), str(event), str(assign)]
+            #schass2 = [i for i in schass]
+            #assign.append(schass2)
+        #print("schass2", schass2)
+        count = 1
+        for type, event, assign in assignment:
+            #print("tea",type,event,assign)
+            schass = [str(count), str(type) + " "  + str(event) + " " + str(assign)]
+            schass2 = [i for i in schass]
+            schass3 = [i.split() for i in schass]
+            schass4 = [schass[1]]
+        print("schass4", schass4)
+        #    schass3 = [str(count), str(type), str(assign)]
+        #    schass4 = [i for i in schass3]
+        #    print(schass4)
+        #    assignments.append(schass2)
+        if form.validate_on_submit():
+            session["isAssignment"] = 1
+            print("assignmentname", form.assignmentname.data)
+            #for i in form.assignmentname.data:
+                #print("assignmentname", i)
+            assignment1 = form.assignmentname.data
+            #(type, event, assign) = assignment1
+            type = assignment1[1][0]
+            event = assignment[1][1]
+            assign = assignment[1][2]
+            #assign = assignment[2]
+            print("type", type)
+            print("event", event)
+            print("assign", assign)
+            #print("assignment1", assignment1)
+            #for type, event, assign in assignment1:
+                #assignmentlist = [str(type), str(event), str(assign)]
+                #print("assignmentlist", assignmentlist)
+            #for i in form.assignmentname.data:
+                #print("i", i)
+            assignmentlist = ['Sprint', '1000', '2021-10-20']
+            session["current_assignment"] = assignmentlist
+            typeid = int(EventTypes.query.filter_by(type=assignmentlist[0]).first().id)
+            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=assignmentlist[1]).first().eventID)
+            print(typeid, eventid)
+            print(eventid, assignmentlist[2])
+            session["current_assignmentid"] = ScheduledAssignments.query.filter_by(classID=session["current_classid"], eventID=eventid, returnDate=str(assignmentlist[2])).first()
+            #print ("assignmentid", session["current_assignmentid"])
+            #print(assignmentlist[2])
+            return redirect(url_for('enterdata'))
+        return render_template('user/assignments.html', headings=headings, assignments=assignment, form=form)
+    else:
+        return redirect(url_for('login'))
+        #assignment = list(db.session.query(EventTypes, Events, ScheduledAssignments).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
+        #print(assignment)
+        #print(assignments)
+        #for type, event, assign in assignment:
+            #print (str(type.type), str(event.eventDistance), str(assign.returnDate))
+        #assign = []
+        #for type, event, assign in assignment:
+        #    schass = [str(type.type) + ' ' + str(event.eventDistance), str(assign.returnDate)]
+        #    print(schass)
+            #labels = [row[0] for row in labels]
+            #values = [row[1] for row in d_vs_t]
+
+        #print(assign)
+
+        #setting the headings of the columns
+        #headings = ('Event Type', 'EventDistance','Event Time' 'Due Date')
+
+            #classid = list(db.session.query(Classes.classID).filter_by(className=str(form.classname.data), classAdminID=current_user.id).first())
+    #        session["isAssignment"] = 1
+    #        return redirect(url_for('enterdata'))
 
 @app.route('/data')
 def data():

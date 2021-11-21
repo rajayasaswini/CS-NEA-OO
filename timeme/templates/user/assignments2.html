@@ -16,21 +16,21 @@
         <table>
           <tr>
             {% for header in headings %}
-              <th>{{ header }}</th>
+            <th>{{ header }}</th>
             {% endfor %}
           </tr>
           {% for row in assignments %}
-            <tr>
-              <td>{{ row.type }}</td>
-              <td>{{ row.eventDistance }}</td>
-              <td>{{ row.returnDate }}</td>
-            </tr>
+          <tr>
+            <td>{{ row.eventID }}</td>
+            <td>{{ row.returnDate }}</td>
+            <!--<td>{{ row.returnDate }}</td>-->
+          </tr>
           {% endfor %}
         </table>
       </div>
     </div>
 
-    <form class ="form" method="post" action="">
+    <!--<form class ="form" method="post" action="">
       {{ form.hidden_tag() }}
 
       <div class="form-group">
@@ -53,6 +53,6 @@
       <div class="form-group">
           {{ form.submit(class="login-button") }}
       </div>
-    </form>
+    </form>-->
   </body>
 </html>

@@ -120,6 +120,12 @@ class ScheduledAssignments(db.Model):
     schass_event = db.relationship('Events', lazy=True, foreign_keys=[eventID])
     schass_class = db.relationship('Classes', lazy=True, foreign_keys=[classID])
 
+    def __repr__(self):
+        date = self.returnDate
+        eventID = self.eventID
+        #eventTypeID = Events.query(Events.eventTypeID, Events.eventDistance).filter_by(eventID = eventID)
+        return "['{}-{}-{}']".format(str(date.year), str(date.month), str(date.day))
+
 class ReturnedAssignment(db.Model):
     __tablename__ = "returnedassignments"
     rassid = db.Column(db.Integer, primary_key=True)

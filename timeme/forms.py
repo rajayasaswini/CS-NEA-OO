@@ -6,7 +6,6 @@ import wtforms.validators as validators
 from timeme.models import *
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-
 class uRegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     firstname = StringField('First Name', validators=[DataRequired()])
@@ -83,7 +82,7 @@ def user_query():
 
 class UserEnterData(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)
-    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True)
+    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[validators.InputRequired()])
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
@@ -169,3 +168,19 @@ def classes_query():
 class SelectClass(FlaskForm):
     classname = QuerySelectField('Class name', query_factory=classes_query, allow_blank=True, validators=[DataRequired()])
     submit = SubmitField('Go to class dashboard')
+
+#from flask import session
+def assignmentquery():
+    assignments = list(db.session.query(EventTypes.type, Events.eventDistance, ScheduledAssignments.returnDate).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
+    for type, event, assign in assignments:
+        return (type, event, assign)
+    #event = db.session.query(EventTypes, Events, ScheduledAssignments).select_from(EventTypes).join(Events).join(ScheduledAssignments).all()
+    #for type, event, assign in event:
+        #return str(type.type, event.eventDistance, assign.eventID)
+    #return list(db.session.query(ScheduledAssignments.eventID, ScheduledAssignments.returnDate).filter_by(classID = 1).all())
+    #return ScheduledAssignments.query(Events.eventID).filter_by(classID = 1).all()
+
+class SelectAssignment(FlaskForm):
+    assignmentname = SelectField('Assignment Name', choices=[], validators=[DataRequired()])
+    #assignmentname = QuerySelectField('Assignment Name', query_factory=assign_query, validators=[DataRequired()])
+    submit = SubmitField('Enter data')
