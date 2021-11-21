@@ -147,16 +147,9 @@ def viewclasses():
         headings = ('Class Name', 'Class Code')
         #if the form is validated
         if form.validate_on_submit():
-            print(form.classname.data)
-            #we get the classid from the name that we got from the form
             classid = list(db.session.query(Classes.classID).filter_by(className=str(form.classname.data), classAdminID=current_user.id).first())
             session["current_classid"] = classid[0]
             return redirect(url_for('adash'))
-            #current_classid = classid[0]
-            #print(current_classid)
-            #if current_classid is not None:
-                #pass
-            #return redirect(url_for('adash'))
         return render_template("admin/viewclasses.html", headings=headings, classes=classn, form=form)
     elif check == 0:
         return redirect(url_for('udash'))
@@ -282,7 +275,6 @@ def enterdata():
 def logout():
     session["current_classid"] = 0
     val = session["current_classid"]
-    print(val)
     logout_user()
     return redirect(url_for('index'))
 
@@ -344,74 +336,28 @@ def submitassignment():
         form = SelectAssignment()
         headings = ['Event Type', 'Event Distance', 'Due Date']
         assignment = list(db.session.query(EventTypes.type, Events.eventDistance, ScheduledAssignments.returnDate).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
-        print(assignment)
         form.assignmentname.choices = assignment
-        #for type, event, assign in assignment:
-            #schass = [str(type), str(event), str(assign)]
-            #schass2 = [i for i in schass]
-            #assign.append(schass2)
-        #print("schass2", schass2)
         count = 1
         for type, event, assign in assignment:
-            #print("tea",type,event,assign)
             schass = [str(count), str(type) + " "  + str(event) + " " + str(assign)]
             schass2 = [i for i in schass]
             schass3 = [i.split() for i in schass]
             schass4 = [schass[1]]
-        print("schass4", schass4)
-        #    schass3 = [str(count), str(type), str(assign)]
-        #    schass4 = [i for i in schass3]
-        #    print(schass4)
-        #    assignments.append(schass2)
         if form.validate_on_submit():
             session["isAssignment"] = 1
-            print("assignmentname", form.assignmentname.data)
-            #for i in form.assignmentname.data:
-                #print("assignmentname", i)
             assignment1 = form.assignmentname.data
-            #(type, event, assign) = assignment1
             type = assignment[1][0]
             event = assignment[1][1]
             assign = assignment[1][2]
-            #assign = assignment[2]
-            print("type", type)
-            print("event", event)
-            print("assign", assign)
             assignmentlist = [type, str(event), str(assign)]
-            print("alist", assignmentlist)
             session["current_assignment"] = assignmentlist
             typeid = int(EventTypes.query.filter_by(type=assignmentlist[0]).first().id)
-            print(typeid)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=assignmentlist[1]).first().eventID)
-            print(typeid, eventid)
-            print(eventid, assignmentlist[2])
             session["current_assignmentid"] = ScheduledAssignments.query.filter_by(classID=session["current_classid"], eventID=eventid, returnDate=str(assignmentlist[2])).first().assignmentID
-            #print ("assignmentid", session["current_assignmentid"])
-            #print(assignmentlist[2])
             return redirect(url_for('enterdata'))
         return render_template('user/assignments.html', headings=headings, assignments=assignment, form=form)
     else:
         return redirect(url_for('login'))
-        #assignment = list(db.session.query(EventTypes, Events, ScheduledAssignments).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
-        #print(assignment)
-        #print(assignments)
-        #for type, event, assign in assignment:
-            #print (str(type.type), str(event.eventDistance), str(assign.returnDate))
-        #assign = []
-        #for type, event, assign in assignment:
-        #    schass = [str(type.type) + ' ' + str(event.eventDistance), str(assign.returnDate)]
-        #    print(schass)
-            #labels = [row[0] for row in labels]
-            #values = [row[1] for row in d_vs_t]
-
-        #print(assign)
-
-        #setting the headings of the columns
-        #headings = ('Event Type', 'EventDistance','Event Time' 'Due Date')
-
-            #classid = list(db.session.query(Classes.classID).filter_by(className=str(form.classname.data), classAdminID=current_user.id).first())
-    #        session["isAssignment"] = 1
-    #        return redirect(url_for('enterdata'))
 
 @app.route('/data')
 def data():
