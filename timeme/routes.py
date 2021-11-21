@@ -193,11 +193,34 @@ def enterdata():
     check = check_user()
     if check == 0:
         form = UserEnterData()
+        eventtype_list = []
+        eventdist_list = []
+        eventtype_query = list(db.session.query(EventTypes.type).all())
+        count = 0
+        for i in eventtype_query:
+            count += 1
+            temp = (count, i[0])
+            eventtype_list.append(temp)
+        event_query = list(db.session.query(Events.eventDistance).all())
+        count = 0
+        for i in event_query:
+            count+=1
+            temp = (count, i[0])
+            eventdist_list.append(temp)
+        form.eventType.choices = eventtype_list
+        form.eventDistance.choices = eventdist_list
         assign = 0
         if session["isAssignment"] == 1:
             assign = 1
-            print(session["isAssignment"])
-            print(session["current_assignment"])
+            details = session["current_assignment"]
+            eventtype_list= []
+            eventdist_list = []
+            temp = (1, details[0])
+            eventtype_list.append(temp)
+            temp = (1, details[1])
+            eventdist_list.append(temp)
+            form.eventType.choices = eventtype_list
+            form.eventDistance.choices = eventdist_list
         if form.validate_on_submit():
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
             userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
@@ -358,10 +381,11 @@ def submitassignment():
             print("alist", assignmentlist)
             session["current_assignment"] = assignmentlist
             typeid = int(EventTypes.query.filter_by(type=assignmentlist[0]).first().id)
+            print(typeid)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=assignmentlist[1]).first().eventID)
             print(typeid, eventid)
             print(eventid, assignmentlist[2])
-            session["current_assignmentid"] = ScheduledAssignments.query.filter_by(classID=session["current_classid"], eventID=eventid, returnDate=str(assignmentlist[2])).first()
+            session["current_assignmentid"] = ScheduledAssignments.query.filter_by(classID=session["current_classid"], eventID=eventid, returnDate=str(assignmentlist[2])).first().assignmentID
             #print ("assignmentid", session["current_assignmentid"])
             #print(assignmentlist[2])
             return redirect(url_for('enterdata'))
