@@ -186,24 +186,78 @@ def enterdata():
     check = check_user()
     if check == 0:
         form = UserEnterData()
-        eventtypes_list = []
-        eventdists_list = []
-        eventtype_query = list(db.session.query(EventTypes.type).all())
-        count = 0
-        for i in eventtype_query:
-            count += 1
-            temp = (count, i[0])
-            eventtypes_list.append(temp)
-        event_query = list(db.session.query(Events.eventDistance).all())
-        count = 0
-        for i in event_query:
-            count+=1
-            temp = (count, i[0])
-            eventdists_list.append(temp)
-        form.eventType.choices = eventtypes_list
-        form.eventDistance.choices = eventdists_list
+        #eventtypes_list = []
+        #eventdists_list = []
+        #eventtype_query = list(db.session.query(EventTypes.type).all())
+        #count = 0
+
+        #for i in eventtype_query:
+        #    count += 1
+        #    temp = (count, i[0])
+        #    eventtypes_list.append(temp)
+        #event_query = list(db.session.query(Events.eventDistance).all())
+
+        #count = 0
+
+        #for i in event_query:
+        #    count+=1
+        #    temp = (count, i[0])
+        #    eventdists_list.append(temp)
+        #form.eventType.choices = eventtypes_list
+        #form.eventDistance.choices = eventdists_list
+
         assign = 0
-        if session["isAssignment"] == 1:
+
+        if session["isAssignment"] != 1:
+            eventtypes_list = []
+            eventdists_list = []
+            eventtype_query = list(db.session.query(EventTypes.type).all())
+            count = 0
+
+            for i in eventtype_query:
+                count += 1
+                temp = (count, i[0])
+                eventtypes_list.append(temp)
+            event_query = list(db.session.query(Events.eventDistance).all())
+
+            count = 0
+
+            for i in event_query:
+                count+=1
+                temp = (count, i[0])
+                eventdists_list.append(temp)
+            form.eventType.choices = eventtypes_list
+            form.eventDistance.choices = eventdists_list
+
+            assign = 0
+
+            if form.validate_on_submit():
+                time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+                userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
+                dist = str(form.eventDistance.data)
+                dist = int(dist)
+                typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+                eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
+                userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=assign)
+                db.session.add(userdst)
+                db.session.commit()
+            #if session["isAssignment"] == 1:
+            #    assign = 1
+            #    details = session["current_assignment"]
+            #    time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+            #    typeid = int(EventTypes.query.filter_by(type=details[0]).first().id)
+            #    eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=details[1]).first().eventID)
+            #    userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=int(details[1]), userTime=time , userSpeed=0.1, isAssignment=assign)
+            #    print(session["isAssignment"], session["current_assignment"])
+
+        #if session["isAssignment"] == 1:
+        #    userdstid = userdst.userDSTID
+        #    assignment = ReturnedAssignment(schassid=session["current_assignmentid"], userdstid=userdstid, isLate=0)
+        #    db.session.add(assignment)
+        #    db.session.commit()
+        #    session["isAssignment"] == 0
+        #    session["current_assignment"] = None
+        else:
             assign = 1
             details = session["current_assignment"]
             eventtype_list= []
@@ -214,15 +268,7 @@ def enterdata():
             eventdist_list.append(temp)
             form.eventType.choices = eventtype_list
             form.eventDistance.choices = eventdist_list
-        if form.validate_on_submit():
-            time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
-            userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
-            dist = str(form.eventDistance.data)
-            dist = int(dist)
-            typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
-            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
-            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=assign)
-            if session["isAssignment"] == 1:
+            if form.validate_on_submit():
                 assign = 1
                 details = session["current_assignment"]
                 time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
@@ -230,16 +276,15 @@ def enterdata():
                 eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=details[1]).first().eventID)
                 userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=int(details[1]), userTime=time , userSpeed=0.1, isAssignment=assign)
                 print(session["isAssignment"], session["current_assignment"])
-            db.session.add(userdst)
-            db.session.commit()
-            if session["isAssignment"] == 1:
+                db.session.add(userdst)
+                db.session.commit()
                 userdstid = userdst.userDSTID
                 assignment = ReturnedAssignment(schassid=session["current_assignmentid"], userdstid=userdstid, isLate=0)
                 db.session.add(assignment)
                 db.session.commit()
-                session["isAssignment"] == 0
-                session["current_assignment"] = None
-            print(session["isAssignment"], session["current_assignment"])
+        session["isAssignment"] == 0
+        session["current_assignment"] = None
+        print(session["isAssignment"], session["current_assignment"])
         return render_template("user/userenterdata.html", form=form)
     elif check == 1:
         form = AdminEnterData()

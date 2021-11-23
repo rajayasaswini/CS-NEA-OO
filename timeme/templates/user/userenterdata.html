@@ -86,6 +86,25 @@
         <div class="form-group">
 						{{ form.submit(class="login-button") }}
 				</div>
+<!--
+        <div class="form-group">
+          {{ form.userInterval.label(id="left")}}
+
+          {{form.addInterval}}
+          {#{form.data.userInterval}#}
+          <div class="invalid-feedback">
+            {%for interval in form.userInterval %}
+                  <div class="row">
+                    <div class="col-md-6">Distance{{ form.intervalDist(class="form-control form-control-lg") }}</div>
+                    <div class="col-md-6">Distance{{ form.intervalTime(class="form-control form-control-lg") }}</div>
+                  </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-group">
+            {{ form.submit(class="login-button") }}
+        </div>-->
       </form>
     </div>
   </body>
