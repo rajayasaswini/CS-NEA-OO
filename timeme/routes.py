@@ -187,23 +187,26 @@ def enterdata():
     check = check_user()
     if check == 0:
         form = UserEnterData()
-        eventtypes_list = []
-        eventdists_list = []
-        eventtype_query = list(db.session.query(EventTypes.type).all())
-        count = 0
-        for i in eventtype_query:
-            count += 1
-            temp = (count, i[0])
-            eventtypes_list.append(temp)
-        event_query = list(db.session.query(Events.eventDistance).all())
-        count = 0
-        for i in event_query:
-            count+=1
-            temp = (count, i[0])
-            eventdists_list.append(temp)
-        form.eventType.choices = eventtypes_list
-        form.eventDistance.choices = eventdists_list
+        #eventtypes_list = []
+        #eventdists_list = []
+        #eventtype_query = list(db.session.query(EventTypes.type).all())
+        #count = 0
+        #for i in eventtype_query:
+        #    count += 1
+        #    temp = (count, i[0])
+        #    eventtypes_list.append(temp)
+        #event_query = list(db.session.query(Events.eventDistance).all())
+        #count = 0
+        #for i in event_query:
+        #    count+=1
+        #    temp = (count, i[0])
+        #    eventdists_list.append(temp)
+        #form.eventType.choices = eventtypes_list
+        #form.eventDistance.choices = eventdists_list
         assign = 0
+        if form.addInterval.data:
+            form.userInterval.append_entry()
+        return render_template("user/userenterdata.html", form=form)
         if form.validate_on_submit():
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
             userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
@@ -214,9 +217,32 @@ def enterdata():
             userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=assign)
             db.session.add(userdst)
             db.session.commit()
-        return render_template("user/userenterdata.html", form=form)        #if form.addInterval.data:
-        #    form.userInterval.append_entry()
-        #    return render_template("user/userenterdata.html", form=form)
+            dstid = int(UserDST.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
+            intervaldata = form.data["userInterval"]
+            print("intervaldata", intervaldata)
+            print("dstid", dstid)
+            for i in intervaldata:
+                dst = UserDST.query.filter_by(userID=current_user.id).all()
+                print("dst", dst)
+                #dsttime = 0
+                #dstdistance = 0
+                if dstid is not None:
+                    dstIntervals = Intervals.query.filter_by(userDSTID=dstid).all()
+                    print("dstint", dstIntervals)
+                    if len(dstIntervals) is not None:
+                        for i in intervaldata:
+                            intdist = i["intervalDist"]
+                            print("intdist", intdist)
+                            inttime = i["intervalTime"]
+                            print("inttime", inttime)
+                            newInterval = Intervals(userdstid=dstid, dist=intdist, time=inttime)
+                            db.session.add(newInterval)
+                            db.session.commit()
+                    else:
+                        pass
+        return render_template("user/userenterdata.html", form=form)
+
+        #if form.addInterval.data:
         #if form.validate_on_submit():
         #    time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
         #    userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
@@ -379,7 +405,7 @@ def enterassignment():
     now = datetime.now()
     check = check_user()
     if check == 0:
-        form = UserEnterData()
+        form = SubmitAssignment()
         assign = 0
         if session["isAssignment"] == 1:
             assign = 1
