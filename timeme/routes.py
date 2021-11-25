@@ -12,8 +12,7 @@ from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
 import json
 
-#session["isAssignment"] = 0
-
+#done
 def check_user():
     if current_user.is_authenticated:
         if current_user.isAdmin == 1:
@@ -133,6 +132,7 @@ def login():
     else:
         flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template("login.html", title="Login", form=form)
+#done
 @app.route('/viewclass', methods=['GET', 'POST'])
 def viewclasses():
     #checks the user's authentication
@@ -155,6 +155,7 @@ def viewclasses():
         return redirect(url_for('udash'))
     else:
         return redirect(url_for('login'))
+#done
 @app.route('/addclass', methods=['GET', 'POST'])
 def addclass():
     form=AddClass()
@@ -165,7 +166,7 @@ def addclass():
         flash(f'Class Created','success')
         return redirect(url_for('viewclasses'))
     return render_template("admin/addclass.html", form=form)
-
+#done
 @app.route('/enterclasscode', methods=['GET','POST'])
 def entercode():
     form = EnterCode()
@@ -213,7 +214,44 @@ def enterdata():
             userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=assign)
             db.session.add(userdst)
             db.session.commit()
-        return render_template("user/userenterdata.html", form=form)
+        return render_template("user/userenterdata.html", form=form)        #if form.addInterval.data:
+        #    form.userInterval.append_entry()
+        #    return render_template("user/userenterdata.html", form=form)
+        #if form.validate_on_submit():
+        #    time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+        #    userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
+        #    dist = str(form.eventDistance.data)
+        #    dist = int(dist)
+        #    typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first())
+        #    print(typeid)
+            #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.data["eventDistance"]))).first().eventID)
+            #userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=assign)
+            #db.session.add(userdst)
+            #db.session.commit()
+            #dstid = int(UserDST.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
+            #intervaldata = form.data["userInterval"]
+            #print("intervaldata", intervaldata)
+            #print("dstid", dstid)
+        #    for i in intervaldata:
+        #        dst = UserDST.query.filter_by(userID=current_user.id).all()
+        #        print("dst", dst)
+        #        #dsttime = 0
+        #        #dstdistance = 0
+        #        if dstid is not None:
+        #            dstIntervals = Intervals.query.filter_by(userDSTID=dstid).all()
+        #            print("dstint", dstIntervals)
+        #            if len(dstIntervals) is not None:
+        #                for i in intervaldata:
+        #                    intdist = i["intervalDist"]
+        #                    print("intdist", intdist)
+        #                    inttime = i["intervalTime"]
+        #                    print("inttime", inttime)
+        #                    newInterval = Intervals(userdstid=dstid, dist=intdist, time=inttime)
+        #                    db.session.add(newInterval)
+        #                    db.session.commit()
+        #            else:
+        #                pass
+        #return render_template("user/userenterdata.html", form=form)
     elif check == 1:
         form = AdminEnterData()
         if form.validate_on_submit():
@@ -254,7 +292,6 @@ def logout():
     val = session["current_classid"]
     logout_user()
     return redirect(url_for('index'))
-
 #done
 @app.route('/createE', methods=['GET', 'POST'])
 def createevent():
@@ -304,7 +341,7 @@ def createassignment():
         db.session.add(a)
         db.session.commit()
     return render_template("admin/assignments.html", form=form)
-
+#done but could format it better
 @app.route('/assignment', methods=['GET', 'POST'])
 def submitassignment():
     check = check_user()
@@ -335,7 +372,7 @@ def submitassignment():
         return render_template('user/assignments.html', headings=headings, assignments=assignment, form=form)
     else:
         return redirect(url_for('login'))
-
+#done
 @app.route('/enterassignment', methods=['GET', 'POST'])
 def enterassignment():
     userSpeed = 0
@@ -375,21 +412,20 @@ def enterassignment():
                 session["current_assignment"] = None
             print(session["isAssignment"], session["current_assignment"])
     return render_template("user/userenterdata.html", form=form)
-
-
+#not done
 @app.route('/data')
 def data():
     return render_template("temp.html")
-
+#not done
 @app.route('/timer')
 def timer():
     return render_template("temp.html")
-
+#not done
 @app.route('/profile')
 def profile():
     image_file = url_for('static', filename='pics/' + current_user.photo)
     return render_template("profile.html")
-
+#done
 def send_rp_email(user):
     token = user.get_token()
     mess = Message('Password Reset Request', sender="raja8450@dubaicollege.org", recipients=[user.email])
@@ -397,7 +433,7 @@ def send_rp_email(user):
 If you did not request to reset your password, please ignore this email.
 {url_for('reset_token', token=token, _external=True)}'''
     mail.send(mess)
-
+#done
 @app.route('/requestpass', methods=['GET', 'POST'])
 def reset_request():
     check = check_user()
@@ -410,7 +446,7 @@ def reset_request():
         flash('An email has been sent to your email address.', 'info')
         return redirect(url_for('login'))
     return render_template('requestrp.html', form=form)
-
+#not done
 @app.route('/resetpass/<token>', methods=['GET', 'POST'])
 def reset_token(token):
     check = check_user()
@@ -426,6 +462,10 @@ def reset_token(token):
     if form.validate_on_submit():
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user.password = hashed_pass
+        user = Users.query.filter(Users.id == current_user.id)
+        user.update({
+            "password": hashed_pass
+        })
         db.session.commit()
         flash(f'Login now','success')
         return redirect(url_for('login'))

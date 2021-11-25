@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField, FieldList, FormField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField, FieldList, FormField, Form
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 import wtforms.validators as validators
@@ -80,14 +80,18 @@ def eventtype_query():
 def user_query():
     return Users.query
 
+class Intervals(Form):
+    intervalDist = IntegerField('Distance from start', validators=[validators.Optional()])
+    intervalTime = IntegerField('Time', validators=[validators.Optional()])
+
 class UserEnterData(FlaskForm):
     eventType = SelectField('Event Type', choices=[], validators=[DataRequired()])
     eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
-    userInterval = FieldList(FormField(Intervals))
     submit = SubmitField('Submit')
-    addInterval = SubmitField('Add Interval')
+    #userInterval = FieldList(FormField(Intervals), label="Intervals")
+    #addInterval = SubmitField(label='Add Interval')
 
 class AdminEnterData(FlaskForm):
     user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
@@ -97,9 +101,9 @@ class AdminEnterData(FlaskForm):
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
 
-class Intervals(FlaskForm):
-    intervalDist = IntegerField('Distance from start', validators=[validators.Optional()])
-    intervalTime = IntegerField('Time', validators=[validators.Optional()])
+#class Intervals(Form):
+#    intervalDist = IntegerField('Distance from start', validators=[validators.Optional()])
+#    intervalTime = IntegerField('Time', validators=[validators.Optional()])
 
 class CreateEvent(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
