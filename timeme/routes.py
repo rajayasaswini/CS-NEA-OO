@@ -219,86 +219,14 @@ def enterdata():
             db.session.add(userdst)
             db.session.commit()
             dstid = int(UserDST.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
-            print(dstid)
             intervals(current_user.id, form.userInterval.data, dstid)
-            #intervaldata = form.userInterval.data
-            #for i in intervaldata:
-            #    id = UserDST.query.filter_by(userID=current_user.id).all()
-            #    if dstid is not None:
-            #        interval = Intervals.query.filter_by(userdstid=dstid).all()
-            #        if not len(interval):
-            #            for j in intervaldata:
-            #                dist = j["intervalDist"]
-            #                timeM = int(j["intervalM"])
-            #                timeS = int(j["intervalS"])
-            #                time = timeM*60 + timeS
-            #                newinterval = Intervals(userdstid=dstid, dist=dist, time=time)
-            #                db.session.add(newInterval)
-            #        else:
-            #            pass
-            #db.session.commit()
-            #for i in intervaldata:
-            #    dst = UserDST.query.filter_by(userID=current_user.id).all()
-            #    print("dst", dst)
-                #dsttime = 0
-                #dstdistance = 0
-            #    if dstid is not None:
-            #        dstIntervals = Intervals.query.filter_by(userDSTID=dstid).all()
-            #        print("dstint", dstIntervals)
-            #        if len(dstIntervals) is not None:
-            #            for i in intervaldata:
-            #                intdist = int(interval.form.intervalDist.data)
-            #                #intdist = i["intervalDist"]
-            #                print("intdist", intdist)
-            #                intmin = int(i["intervalM"])
-            #                print("inttime", inttime)
-            #                intseconds = int(i["intervalS"])
-            #                time = intmin*60 + intseconds
-            #                newInterval = Intervals(userdstid=dstid, dist=intdist, time=time)
-            #                db.session.add(newInterval)
-            #                db.session.commit()
-            #        else:
-            #            pass
         return render_template("user/userenterdata.html", form=form)
 
-        #if form.addInterval.data:
-        #if form.validate_on_submit():
-        #    time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
-        #    userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
-        #    dist = str(form.eventDistance.data)
-        #    dist = int(dist)
-        #    typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first())
-        #    print(typeid)
-            #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.data["eventDistance"]))).first().eventID)
-            #userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=assign)
-            #db.session.add(userdst)
-            #db.session.commit()
-            #dstid = int(UserDST.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
-            #intervaldata = form.data["userInterval"]
-            #print("intervaldata", intervaldata)
-            #print("dstid", dstid)
-        #    for i in intervaldata:
-        #        dst = UserDST.query.filter_by(userID=current_user.id).all()
-        #        print("dst", dst)
-        #        #dsttime = 0
-        #        #dstdistance = 0
-        #        if dstid is not None:
-        #            dstIntervals = Intervals.query.filter_by(userDSTID=dstid).all()
-        #            print("dstint", dstIntervals)
-        #            if len(dstIntervals) is not None:
-        #                for i in intervaldata:
-        #                    intdist = i["intervalDist"]
-        #                    print("intdist", intdist)
-        #                    inttime = i["intervalTime"]
-        #                    print("inttime", inttime)
-        #                    newInterval = Intervals(userdstid=dstid, dist=intdist, time=inttime)
-        #                    db.session.add(newInterval)
-        #                    db.session.commit()
-        #            else:
-        #                pass
-        #return render_template("user/userenterdata.html", form=form)
     elif check == 1:
         form = AdminEnterData()
+        if form.addInterval.data:
+            form.userInterval.append_entry()
+            return render_template("user/userenterdata.html", form=form)
         if form.validate_on_submit():
             name = str(form.user.data)
             name = name.split(' ')
@@ -327,6 +255,8 @@ def enterdata():
             userdst = UserDST(userID=userid, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
             db.session.add(userdst)
             db.session.commit()
+            dstid = int(UserDST.query.filter_by(userID=userid).all()[-1].userDSTID)
+            intervals(current_user.id, form.userInterval.data, dstid)
         return render_template("admin/adminenterdata.html", form=form)
     else:
         return redirect(url_for('login'))

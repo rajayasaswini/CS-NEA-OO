@@ -101,6 +101,19 @@
 				</div>
 
         <div class="form-group">
+          {{form.addInterval}}
+          <div class="userIntervals">
+            {%for interval in form.userInterval %}
+                  <div class="row">
+                    <div class="col-md-6">Distance{{ interval.form.intervalDist(class="form-control form-control-lg") }}</div>
+                    <div class="col-md-6">Minutes{{ interval.form.intervalM(class="form-control form-control-lg") }}</div>
+                    <div class="col-md-6">Seconds{{ interval.form.intervalS(class="form-control form-control-lg") }}</div>
+                  </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-group">
 						{{ form.submit(class="login-button") }}
 				</div>
       </form>

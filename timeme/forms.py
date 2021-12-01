@@ -94,13 +94,6 @@ class UserEnterData(FlaskForm):
     userInterval = FieldList(FormField(Intervals), label="Intervals")
     addInterval = SubmitField(label='Add Interval')
 
-class SubmitAssignment(FlaskForm):
-    eventType = SelectField('Event Type', choices=[], validators=[DataRequired()])
-    eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
-    userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
-    userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
-    submit = SubmitField('Submit')
-
 class AdminEnterData(FlaskForm):
     user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True,validators=[DataRequired()])
@@ -108,10 +101,15 @@ class AdminEnterData(FlaskForm):
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
+    userInterval = FieldList(FormField(Intervals), label="Intervals")
+    addInterval = SubmitField(label='Add Interval')
 
-#class Intervals(Form):
-#    intervalDist = IntegerField('Distance from start', validators=[validators.Optional()])
-#    intervalTime = IntegerField('Time', validators=[validators.Optional()])
+class SubmitAssignment(FlaskForm):
+    eventType = SelectField('Event Type', choices=[], validators=[DataRequired()])
+    eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
+    userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
+    userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
+    submit = SubmitField('Submit')
 
 class CreateEvent(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
