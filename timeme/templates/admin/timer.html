@@ -1,4 +1,5 @@
 {% include "html/adminheader.html" %}
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -7,7 +8,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../static/enterdata.css">    <title>Enter Data</title>
+    <link rel="stylesheet" href="../../static/enterdata.css">
+
+    <title>Timer</title>
+    <!-- <link rel="stylesheet" href="../../static/timer.css">    <title>Timer</title> -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   </head>
   <body>
     <div class="enterdata">
@@ -15,99 +20,74 @@
         <p>Timer</p>
       </div>
       {% if form.data.start == True %}
-        {% set url = url_for('starttimer') %}
+        {% set url = url_for('timer_start') %}
+        <!-- <h1><div id="timer"></div></h1> -->
       {% elif form.data.store == True and starttime != "00:00:00" %}
-        {% set url = url_for('starttimer') %}
+        {% set url = url_for('timer_start') %}
+      {% elif form.data.store == True and starttime == "00:00:00" %}
+        {% set url = url_for('timer_reset') %}
+      {% elif form.data.reset == True %}
+        {% set url = url_for('timer_reset') %}
+        <!-- <h1><div id="timer_reset">00:00:00</div></h1> -->
+        <!-- <h1><div id="timer"></div></h1> -->
       {% endif %}
+      <iframe src="{{url}}" style="height: 70px; width:100%;border: 0;"></iframe>
+
+      <!-- <div id="timer">{#{ url_for('time_feed') }#}</div> -->
+
       <form class ="form" method="post" action="">
-				{{ form.hidden_tag() }}
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                {% if form.data.start == True %}
+                  {% set disabledstatus = True %}
+                {% else %}
+                  {% set disabledstatus = False %}
+                {% endif %}
+                {{ form.start(class="enterdata-button", disabled=disabledstatus)}}
+                <!-- <input class="login-button" id="start" name="start" onclick="startTimer()" type="button" value="START"> -->
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                {{ form.reset(class="enterdata-button") }}
+                <!--, onclick="clearInterval(timerVar)" -->
+              </div>
+              </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                {{ form.store(class="enterdata-button") }}
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="form-group">
-					{{ form.user.label(id="left")}}
-
-					{% if form.user.errors %}
-							{{ form.user(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.user.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.user(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
-
-        <br>
-
-        <div class="form-group">
-					{{ form.eventType.label(id="left")}}
-
-					{% if form.eventType.errors %}
-							{{ form.eventType(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.eventType.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.eventType(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
-
-        <br>
+          <!-- <ul id="intervals"></ul> -->
+          <div class="users">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in form.users %}
+                  <tr>
+                    <td class="col-md-6">{{ user.form.users }}</td>
+                    <td class="col-md-6">{{ user.form.time }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         <div class="form-group">
-					{{ form.eventDistance.label(id="left")}}
-
-					{% if form.eventDistance.errors %}
-							{{ form.eventDistance(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.eventDistance.errors %}
-											<span>{{ error }}</span><p>m</p>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.eventDistance(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
-
-        <br>
-
-        <div class="form-group">
-					{{ form.userTimeM.label(id="left")}}
-
-					{% if form.userTimeM.errors %}
-							{{ form.userTimeM(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.userTimeM.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.userTimeM(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
-
-        <br>
-
-        <div class="form-group">
-					{{ form.userTimeS.label(id="left")}}
-
-					{% if form.userTimeS.errors %}
-							{{ form.userTimeS(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.userTimeS.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.userTimeS(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
-
-        <div class="form-group">
-						{{ form.submit(class="login-button") }}
-				</div>
+            {{ form.submit(class="enterdata-button") }}
+        </div>
       </form>
     </div>
   </body>

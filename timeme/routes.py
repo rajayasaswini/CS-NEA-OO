@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, flash, redirect, session
+from flask import Flask, render_template, url_for, flash, redirect, session, request, Response, g
 #from flask.ext.session import Session
 from timeme import app, db, bcrypt, mail
 from timeme.forms import *
@@ -392,68 +392,6 @@ def enterassignment():
 def data():
     return render_template("temp.html")
 
-@app.route('/register', methods=["GET", "POST"])
-def takeregister():
-    check = check_user()
-    if check == 1:
-        return render_template('temp.html')
-#not done
-starttime = "00:00:00"
-def update_starttime():
-    global starttime
-    starttime = datetime.now()
-
-def return_starttime():
-    global starttime
-    return starttime
-
-def reset_starttime():
-    global starttime
-    starttime = "00:00:00"
-
-seconds = -1
-def current_time():
-    global seconds
-    seconds += 1
-    second = seconds%60
-    minutes = seconds//60
-    hours = seconds//3600
-    format_timer = "{:02}:{:02}:{:02}".format(hours, minutes, second)
-    return format_timer
-
-@app.route('/starttimer', methods=['GET', 'POST'])
-def starttimer():
-    seconds = 0
-    return """<h1><meta http-equiv="refresh" content="1"/>{}<h1>""".format()
-
-@app.route('/resettime', methods=['GET', 'POST'])
-def resettimer():
-    global seconds
-    seconds = 0
-    return """<h1>00:00:00</h1>"""
-
-@app.route('/timer', methods=['GET', 'POST'])
-def timer():
-    check = check_user()
-    if check == 1:
-        form = Timing()
-        if form.start.data:
-            update_starttime()
-        elif form.store.data:
-            starttime = return_starttime
-            if starttime != "00:00:00":
-                now = str(datetime.now() - starttime).split('.')[0]
-            else:
-                now = starttime
-            form.users.append_entry(
-                {
-                    "time": now,
-                    "user": QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
-                }
-            )
-            return render_template("admin/timer.html", form=form)
-        elif form.reset.data:
-            reset_starttime()
 #not done
 @app.route('/profile')
 def profile():
@@ -504,3 +442,150 @@ def reset_token(token):
         flash(f'Login now','success')
         return redirect(url_for('login'))
     return render_template('resetpass.html', form=form)
+
+current_event = " "
+def update_event(type, dist):
+    global current_event
+    current_event = str(type) + " " + str(dist)
+
+def return_event():
+    return current_event
+
+@app.route('/chooseevent', methods=['GET', 'POST'])
+def chooseevent():
+    check = check_user()
+    if check == 1:
+        form = ChooseEvent()
+        if form.validate_on_submit():
+            if form.submit.data:
+                update_event(form.eventType.data, form.eventDistance.data)
+                return redirect(url_for('timer'))
+        return render_template("admin/chooseevent.html", form=form)
+    else:
+        return redirect(url_for('login'))
+
+starttime = "00:00:00"
+def update_starttime():
+    global starttime
+    starttime = datetime.now()
+
+def return_starttime():
+    global starttime
+    return starttime
+
+def reset_starttime():
+    global starttime
+    starttime = "00:00:00"
+
+seconds = -1
+def get_current_time():
+    global seconds
+    seconds += 1
+    remaining_seconds = seconds%60
+    minutes = seconds//60
+    hours = seconds//3600
+    timer_format = "{:02}:{:02}:{:02}".format(hours, minutes, remaining_seconds)
+    return timer_format
+
+
+@app.route('/timer_start', methods=['GET', 'POST'])
+def timer_start():
+    seconds = 0
+    return """<h1>
+    <meta http-equiv="refresh" content="1" />{}</h1>""".format(get_current_time())
+
+@app.route('/timer_reset', methods=['GET', 'POST'])
+def timer_reset():
+    global seconds
+    seconds = 0
+    return """<h1>00:00:00</h1>"""
+
+#!!!
+def addtime(users):
+    event = return_event().split(" ")
+    type = event[0]
+    dist = event[1]
+    print(dist)
+    user = users
+    check = check_user()
+    for i in range(0,len(users)):
+        userlist = [j[1] for j in user[i].items()]
+        times = userlist[0].split(':')
+        name = userlist[1]
+        print(name)
+        time = int(times[0])*3600 + int(times[1])*60 + int(times[2])
+        userSpeed = 0
+        userSpeed = getspeed(time, str(dist), userSpeed)
+        typeid = int(EventTypes.query.filter_by(type=str(type)).first().id)
+        eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(dist)).first().eventID)
+        if check == 0:
+            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
+            db.session.add(userdst)
+        elif check == 1:
+            #userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+            userdst = UserDST(userID=3, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
+            db.session.add(userdst)
+        db.session.commit()
+
+
+    #time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+    #userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
+    #dist = str(form.eventDistance.data)
+    #dist = int(dist)
+    #typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+    #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
+    #userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=assign)
+    #db.session.add(userdst)
+    #db.session.commit()
+
+    #print(type, dist)
+    #users = get_user_data()
+
+    #for name, id in users['Users Present for Today'].items():
+    #    for user_dict in users:
+    #        if name == user_dict["users"].firstname + ' ' + user_dict["users"].lastname:
+    #            time = user_dict["time"].split(":")
+    #            time = int(time[0])*3600 + int(time[1])*60 + int(time[2])
+    #            time = time if time > 1 else 1
+    #            userSpeed = getspeed(time, str(users["eventDistance"]), userSpeed)
+    #            dist = str(users["eventDistance"])
+    #            dist = int(dist)
+    #            typeid = int(EventTypes.query.filter_by(type=str(users["eventType"])).first().id)
+    #            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(users["eventDistance"]))).first().eventID)
+    #            userdst = UserDST(userID=id, eventID=eventid, userDistance=dist, userTime=time, userSpeed=userSpeed, isAssignment=0)
+    #            db.session.add(userdst)
+    #db.session.commit()
+
+
+@app.route('/timer', methods=['GET', 'POST'])
+def timer():
+    check = check_user()
+    if check == 1:
+        form = Timer()
+
+        if form.start.data:
+            update_starttime()
+            pass
+        elif form.store.data:
+            starttime = return_starttime()
+
+            if starttime != "00:00:00":
+                time = str(datetime.now() - starttime).split('.')[0]
+            else:
+                time = starttime
+
+            form.users.append_entry(
+                {
+                    "time": time,
+                    "users": QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+                }
+            )
+            return render_template("admin/timer.html", form=form, starttime=starttime)
+        elif form.reset.data:
+            reset_starttime()
+
+        if form.submit.data:
+            flash(f'Data submitted','success')
+            users = form.users.data
+            addtime(users)
+        return render_template("admin/timer.html", form=form)

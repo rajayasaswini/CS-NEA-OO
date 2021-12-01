@@ -198,14 +198,26 @@ class SelectAssignment(FlaskForm):
 userreg_query = Users.query.all()
 #!!!
 
-class AddTime(Form):
-    time = StringField('Time', validators=[validators.InputRequired()])
-    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
 
-class Timing(FlaskForm):
+class RegisterData(FlaskForm):
+    all_users = Users.query.all()
+    users = [e.firstname + " " + e.lastname for e in all_users]
+    users = {user: ["Present", "Absent"] for user in users}
+    submit = SubmitField('Submit Attendance')
+
+class ChooseEvent(FlaskForm):
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)
+    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True)
+    submit = SubmitField('Continue')
+
+class SelectUser(Form):
+    time = StringField('Time', validators=[validators.InputRequired()])
+    users = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+
+class Timer(FlaskForm):
     start = SubmitField('Start')
-    pause = SubmitField('Pause')
     reset = SubmitField('Reset')
     store = SubmitField('Store')
-    users = FieldList(FormField(AddTime))
+
+    users = FieldList(FormField(SelectUser), label='Users')
     submit = SubmitField('Submit')
