@@ -180,6 +180,23 @@ def entercode():
 
 from python.getspeed import *
 #done
+def intervals(userid, intervaldata, userdstid):
+    for i in intervaldata:
+        id = UserDST.query.filter_by(userID=userid).all()
+        if userdstid is not None:
+            interval = Intervals.query.filter_by(userdstid=userdstid).all()
+            if not len(interval):
+                for j in intervaldata:
+                    dist = j["intervalDist"]
+                    timeM = int(j["intervalM"])
+                    timeS = int(j["intervalS"])
+                    time = timeM*60 + timeS
+                    newinterval = Intervals(userdstid=userdstid, dist=dist, time=time)
+                    db.session.add(newinterval)
+            else:
+                pass
+    db.session.commit()
+
 @app.route('/enterdata', methods=['GET', 'POST'])
 def enterdata():
     userSpeed = 0
@@ -187,26 +204,10 @@ def enterdata():
     check = check_user()
     if check == 0:
         form = UserEnterData()
-        #eventtypes_list = []
-        #eventdists_list = []
-        #eventtype_query = list(db.session.query(EventTypes.type).all())
-        #count = 0
-        #for i in eventtype_query:
-        #    count += 1
-        #    temp = (count, i[0])
-        #    eventtypes_list.append(temp)
-        #event_query = list(db.session.query(Events.eventDistance).all())
-        #count = 0
-        #for i in event_query:
-        #    count+=1
-        #    temp = (count, i[0])
-        #    eventdists_list.append(temp)
-        #form.eventType.choices = eventtypes_list
-        #form.eventDistance.choices = eventdists_list
         assign = 0
         if form.addInterval.data:
             form.userInterval.append_entry()
-        return render_template("user/userenterdata.html", form=form)
+            return render_template("user/userenterdata.html", form=form)
         if form.validate_on_submit():
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
             userSpeed = getspeed(time, str(form.eventDistance.data), userSpeed)
@@ -218,28 +219,46 @@ def enterdata():
             db.session.add(userdst)
             db.session.commit()
             dstid = int(UserDST.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
-            intervaldata = form.data["userInterval"]
-            print("intervaldata", intervaldata)
-            print("dstid", dstid)
-            for i in intervaldata:
-                dst = UserDST.query.filter_by(userID=current_user.id).all()
-                print("dst", dst)
+            print(dstid)
+            intervals(current_user.id, form.userInterval.data, dstid)
+            #intervaldata = form.userInterval.data
+            #for i in intervaldata:
+            #    id = UserDST.query.filter_by(userID=current_user.id).all()
+            #    if dstid is not None:
+            #        interval = Intervals.query.filter_by(userdstid=dstid).all()
+            #        if not len(interval):
+            #            for j in intervaldata:
+            #                dist = j["intervalDist"]
+            #                timeM = int(j["intervalM"])
+            #                timeS = int(j["intervalS"])
+            #                time = timeM*60 + timeS
+            #                newinterval = Intervals(userdstid=dstid, dist=dist, time=time)
+            #                db.session.add(newInterval)
+            #        else:
+            #            pass
+            #db.session.commit()
+            #for i in intervaldata:
+            #    dst = UserDST.query.filter_by(userID=current_user.id).all()
+            #    print("dst", dst)
                 #dsttime = 0
                 #dstdistance = 0
-                if dstid is not None:
-                    dstIntervals = Intervals.query.filter_by(userDSTID=dstid).all()
-                    print("dstint", dstIntervals)
-                    if len(dstIntervals) is not None:
-                        for i in intervaldata:
-                            intdist = i["intervalDist"]
-                            print("intdist", intdist)
-                            inttime = i["intervalTime"]
-                            print("inttime", inttime)
-                            newInterval = Intervals(userdstid=dstid, dist=intdist, time=inttime)
-                            db.session.add(newInterval)
-                            db.session.commit()
-                    else:
-                        pass
+            #    if dstid is not None:
+            #        dstIntervals = Intervals.query.filter_by(userDSTID=dstid).all()
+            #        print("dstint", dstIntervals)
+            #        if len(dstIntervals) is not None:
+            #            for i in intervaldata:
+            #                intdist = int(interval.form.intervalDist.data)
+            #                #intdist = i["intervalDist"]
+            #                print("intdist", intdist)
+            #                intmin = int(i["intervalM"])
+            #                print("inttime", inttime)
+            #                intseconds = int(i["intervalS"])
+            #                time = intmin*60 + intseconds
+            #                newInterval = Intervals(userdstid=dstid, dist=intdist, time=time)
+            #                db.session.add(newInterval)
+            #                db.session.commit()
+            #        else:
+            #            pass
         return render_template("user/userenterdata.html", form=form)
 
         #if form.addInterval.data:
@@ -442,10 +461,70 @@ def enterassignment():
 @app.route('/data')
 def data():
     return render_template("temp.html")
+
+@app.route('/register', methods=["GET", "POST"])
+def takeregister():
+    check = check_user()
+    if check == 1:
+        form = Register()
+        return render_template('admin/register.html', form=form)
 #not done
-@app.route('/timer')
+starttime = "00:00:00"
+def update_starttime():
+    global starttime
+    starttime = datetime.now()
+
+def return_starttime():
+    global starttime
+    return starttime
+
+def reset_starttime():
+    global starttime
+    starttime = "00:00:00"
+
+seconds = -1
+def current_time():
+    global seconds
+    seconds += 1
+    second = seconds%60
+    minutes = seconds//60
+    hours = seconds//3600
+    format_timer = "{:02}:{:02}:{:02}".format(hours, minutes, second)
+    return format_timer
+
+@app.route('/starttimer', methods=['GET', 'POST'])
+def starttimer():
+    seconds = 0
+    return """<h1><meta http-equiv="refresh" content="1"/>{}<h1>""".format()
+
+@app.route('/resettime', methods=['GET', 'POST'])
+def resettimer():
+    global seconds
+    seconds = 0
+    return """<h1>00:00:00</h1>"""
+
+@app.route('/timer', methods=['GET', 'POST'])
 def timer():
-    return render_template("temp.html")
+    check = check_user()
+    if check == 1:
+        form = Timing()
+        if form.start.data:
+            update_starttime()
+        elif form.store.data:
+            starttime = return_starttime
+            if starttime != "00:00:00":
+                now = str(datetime.now() - starttime).split('.')[0]
+            else:
+                now = starttime
+            form.users.append_entry(
+                {
+                    "time": now,
+                    "user": QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+                }
+            )
+            return render_template("admin/timer.html", form=form)
+        elif form.reset.data:
+            reset_starttime()
 #not done
 @app.route('/profile')
 def profile():

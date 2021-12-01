@@ -82,7 +82,8 @@ def user_query():
 
 class Intervals(Form):
     intervalDist = IntegerField('Distance from start', validators=[validators.Optional()])
-    intervalTime = IntegerField('Time', validators=[validators.Optional()])
+    intervalM = IntegerField('Time', validators=[validators.Optional()])
+    intervalS = IntegerField('Time', validators=[validators.Optional()])
 
 class UserEnterData(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
@@ -201,3 +202,24 @@ class SelectAssignment(FlaskForm):
     assignmentname = SelectField('Assignment Name', choices=[], validators=[DataRequired()])
     #assignmentname = QuerySelectField('Assignment Name', query_factory=assign_query, validators=[DataRequired()])
     submit = SubmitField('Enter data')
+
+#!!!
+userreg_query = Users.query.all()
+#!!!
+
+class Register(FlaskForm):
+    user = [i.firstname + " " + i.lastname for i in userreg_query]
+    reg = {user: ["Present", "Absent"] for user in user}
+    submit = SubmitField('Submit')
+
+class AddTime(Form):
+    time = StringField('Time', validators=[validators.InputRequired()])
+    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+
+class Timing(FlaskForm):
+    start = SubmitField('Start')
+    pause = SubmitField('Pause')
+    reset = SubmitField('Reset')
+    store = SubmitField('Store')
+    users = FieldList(FormField(AddTime))
+    submit = SubmitField('Submit')

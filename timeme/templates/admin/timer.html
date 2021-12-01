@@ -1,4 +1,4 @@
-{% include "html/studentheader.html" %}
+{% include "html/adminheader.html" %}
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -12,10 +12,32 @@
   <body>
     <div class="enterdata">
       <div class="enterdata-logo">
-        <p>Enter Data</p>
+        <p>Timer</p>
       </div>
+      {% if form.data.start == True %}
+        {% set url = url_for('starttimer') %}
+      {% elif form.data.store == True and starttime != "00:00:00" %}
+        {% set url = url_for('starttimer') %}
+      {% endif %}
       <form class ="form" method="post" action="">
 				{{ form.hidden_tag() }}
+
+        <div class="form-group">
+					{{ form.user.label(id="left")}}
+
+					{% if form.user.errors %}
+							{{ form.user(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.user.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.user(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+        <br>
 
         <div class="form-group">
 					{{ form.eventType.label(id="left")}}
@@ -84,22 +106,8 @@
 				</div>
 
         <div class="form-group">
-          {{form.addInterval}}
-          <div class="userIntervals">
-            {%for interval in form.userInterval %}
-                  <div class="row">
-                    <div class="col-md-6">Distance{{ interval.form.intervalDist(class="form-control form-control-lg") }}</div>
-                    <div class="col-md-6">Minutes{{ interval.form.intervalM(class="form-control form-control-lg") }}</div>
-                    <div class="col-md-6">Seconds{{ interval.form.intervalS(class="form-control form-control-lg") }}</div>
-                  </div>
-            {% endfor %}
-          </div>
-        </div>
-
-        <div class="form-group">
-            {{ form.submit(class="login-button") }}
-        </div>
-
+						{{ form.submit(class="login-button") }}
+				</div>
       </form>
     </div>
   </body>
