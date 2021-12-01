@@ -196,7 +196,7 @@ def intervals(userid, intervaldata, userdstid):
             else:
                 pass
     db.session.commit()
-
+#done
 @app.route('/enterdata', methods=['GET', 'POST'])
 def enterdata():
     userSpeed = 0
@@ -396,8 +396,7 @@ def data():
 def takeregister():
     check = check_user()
     if check == 1:
-        form = Register()
-        return render_template('admin/register.html', form=form)
+        return render_template('temp.html')
 #not done
 starttime = "00:00:00"
 def update_starttime():

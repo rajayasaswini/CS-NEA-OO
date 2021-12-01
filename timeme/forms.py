@@ -185,30 +185,18 @@ class SelectClass(FlaskForm):
     classname = QuerySelectField('Class name', query_factory=classes_query, allow_blank=True, validators=[DataRequired()])
     submit = SubmitField('Go to class dashboard')
 
-#from flask import session
 def assignmentquery():
     assignments = list(db.session.query(EventTypes.type, Events.eventDistance, ScheduledAssignments.returnDate).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
     for type, event, assign in assignments:
         return (type, event, assign)
-    #event = db.session.query(EventTypes, Events, ScheduledAssignments).select_from(EventTypes).join(Events).join(ScheduledAssignments).all()
-    #for type, event, assign in event:
-        #return str(type.type, event.eventDistance, assign.eventID)
-    #return list(db.session.query(ScheduledAssignments.eventID, ScheduledAssignments.returnDate).filter_by(classID = 1).all())
-    #return ScheduledAssignments.query(Events.eventID).filter_by(classID = 1).all()
 
 class SelectAssignment(FlaskForm):
     assignmentname = SelectField('Assignment Name', choices=[], validators=[DataRequired()])
-    #assignmentname = QuerySelectField('Assignment Name', query_factory=assign_query, validators=[DataRequired()])
     submit = SubmitField('Enter data')
 
 #!!!
 userreg_query = Users.query.all()
 #!!!
-
-class Register(FlaskForm):
-    user = [i.firstname + " " + i.lastname for i in userreg_query]
-    reg = {user: ["Present", "Absent"] for user in user}
-    submit = SubmitField('Submit')
 
 class AddTime(Form):
     time = StringField('Time', validators=[validators.InputRequired()])
