@@ -20,7 +20,6 @@ class uRegistrationForm(FlaskForm):
         if user1:
             raise ValidationError('There is already an account under this email. Use another email or login.')
 
-
 class aRegistrationForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
@@ -37,11 +36,9 @@ class aRegistrationForm(FlaskForm):
         if admin:
             raise ValidationError('There is already an account under this email. Use another email or login.')
 
-
 class ClassForm(FlaskForm):
     classcode = StringField('Class Code', validators=[DataRequired(), Length(min=6, max=6)])
     submit = SubmitField('Submit')
-
 
 class LoginForm(FlaskForm):
     email = StringField('Email',
@@ -198,12 +195,13 @@ class SelectAssignment(FlaskForm):
 userreg_query = Users.query.all()
 #!!!
 
+class AddUser(Form):
+    userReg = QuerySelectField('Time', query_factory=user_query, allow_blank=True, validators=[validators.Optional()])
 
-class RegisterData(FlaskForm):
-    all_users = Users.query.all()
-    users = [e.firstname + " " + e.lastname for e in all_users]
-    users = {user: ["Present", "Absent"] for user in users}
-    submit = SubmitField('Submit Attendance')
+class UserReg(FlaskForm):
+    submit = SubmitField('Submit')
+    user = FieldList(FormField(AddUser), label="Intervals")
+    addUser = SubmitField(label='Add User')
 
 class ChooseEvent(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)

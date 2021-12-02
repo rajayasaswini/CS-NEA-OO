@@ -1,5 +1,4 @@
 from flask import Flask, render_template, url_for, flash, redirect, session, request, Response, g
-#from flask.ext.session import Session
 from timeme import app, db, bcrypt, mail
 from timeme.forms import *
 from timeme.models import *
@@ -589,3 +588,22 @@ def timer():
             users = form.users.data
             addtime(users)
         return render_template("admin/timer.html", form=form)
+#!!!
+
+def addtoreg(name):
+    print("e")
+
+@app.route('/register', methods=['GET', 'POST'])
+def takeregister():
+    form = UserReg()
+    if form.addUser.data:
+        form.user.append_entry()
+        return render_template("admin/register.html", form=form)
+    if form.submit.data:
+        newreg = Registers(classid=session["current_classid"])
+        for i in form.user.data:
+            name = str(i['userReg']).split(' ')
+            fname, lname = name[0], name[1]
+            userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+            #regid = int(Registers.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
+    return render_template("admin/register.html", form=form)
