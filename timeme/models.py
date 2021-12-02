@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, date
+from datetime import datetime
 from sqlalchemy.sql import text
 from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
@@ -149,20 +149,19 @@ class UserDST(db.Model):
 
 class Registers(db.Model):
     __tablename__ = "registers"
-    registersid = db.Column(db.Integer, primary_key=True)
-    classid = db.Column(db.Integer, db.ForeignKey('classes.classID'))
-    regDate = db.Column(db.Date, nullable=False, default=date.today())
-    reg_class = db.relationship('Classes', lazy=True, foreign_keys=[classid])
+    regid = db.Column(db.Integer, primary_key=True)
+    classID = db.Column(db.Integer, db.ForeignKey("classes.classID"))
+    class_reg = db.relationship('Classes', lazy=True, foreign_keys=[classID])
 
 class Register(db.Model):
     __tablename__ = "register"
+    regid = db.Column(db.Integer, db.ForeignKey("registers.regid"))
     registerid = db.Column(db.Integer, primary_key=True)
-    regid = db.Column(db.Integer, db.ForeignKey("registers.registersid"))
-    userid = db.Column(db.Integer, db.ForeignKey("users.id"))
+    userid = db.Column(db.Integer, db.ForeignKey("classusers.cuid"))
     datetime = db.Column(db.DateTime, nullable=False)
     isPresent = db.Column(db.Integer)
-    user_reg = db.relationship('Users', lazy=True, foreign_keys=[userid])
-    reg_id = db.relationship('Registers', lazy=True, foreign_keys=[regid])
+    user_reg = db.relationship('ClassesUsers', lazy=True, foreign_keys=[userid])
+    reg_reg = db.relationship('Registers', lazy=True, foreign_keys=[regid])
 
 class Intervals(db.Model):
     __tablename__ = "interval"

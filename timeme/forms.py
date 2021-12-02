@@ -1,6 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField, FieldList, FormField, Form
-from wtforms.fields.html5 import DateField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField, FieldList, FormField, Form, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 import wtforms.validators as validators
 from timeme.models import *
@@ -192,7 +191,7 @@ class SelectAssignment(FlaskForm):
     submit = SubmitField('Enter data')
 
 #!!!
-userreg_query = Users.query.all()
+#userreg_query = Users.query.all()
 #!!!
 
 class AddUser(Form):

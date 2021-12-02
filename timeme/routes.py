@@ -604,6 +604,6 @@ def takeregister():
         for i in form.user.data:
             name = str(i['userReg']).split(' ')
             fname, lname = name[0], name[1]
-            userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+            #userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             #regid = int(Registers.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
     return render_template("admin/register.html", form=form)
