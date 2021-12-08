@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy.sql import text
 from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
@@ -151,14 +151,14 @@ class Registers(db.Model):
     __tablename__ = "registers"
     regid = db.Column(db.Integer, primary_key=True)
     classID = db.Column(db.Integer, db.ForeignKey("classes.classID"))
+    date = db.Column(db.DateTime, nullable=False, default=date.today())
     class_reg = db.relationship('Classes', lazy=True, foreign_keys=[classID])
 
-class Register(db.Model):
-    __tablename__ = "register"
+class RegPresent(db.Model):
+    __tablename__ = "regpresent"
     regid = db.Column(db.Integer, db.ForeignKey("registers.regid"))
     registerid = db.Column(db.Integer, primary_key=True)
     userid = db.Column(db.Integer, db.ForeignKey("classusers.cuid"))
-    datetime = db.Column(db.DateTime, nullable=False)
     isPresent = db.Column(db.Integer)
     user_reg = db.relationship('ClassesUsers', lazy=True, foreign_keys=[userid])
     reg_reg = db.relationship('Registers', lazy=True, foreign_keys=[regid])

@@ -1,0 +1,46 @@
+{% if user == 1 %}
+  {% include "html/adminheader.html" %}
+{% elif user == 0 %}
+  {% include "html/studentheader.html" %}
+{% endif %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/loginstyle.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <title>View Data</title>
+  </head>
+  <body>
+    <div class="">
+      <div class="view-table">
+        <table>
+          <tr>
+            {% for header in headings %}
+            <th>{{ header }}</th>
+            {% endfor %}
+          </tr>
+          {% for row in data %}
+          <tr>
+            <td>{{ row.dstDateTime }}</td>
+            <td>{{ row.userDistance }}</td>
+            <td>{{ row.userTime }}</td>
+            <td>{{ row.userSpeed }}</td>
+            <td>
+              <form class="" action="" method="post">
+                <div class="form-group">
+                  {{ form.review(class="login-button") }}
+                  {{ form.submit(class="login-button") }}
+                </div>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

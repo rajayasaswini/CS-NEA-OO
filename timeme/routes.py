@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, flash, redirect, session, request, Response, g
+from flask import Flask, render_template, url_for, flash, redirect, session, request
 from timeme import app, db, bcrypt, mail
 from timeme.forms import *
 from timeme.models import *
@@ -11,6 +11,8 @@ from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
 import json
 
+#session["present"] = []
+test = 'abc'
 #done
 def check_user():
     if current_user.is_authenticated:
@@ -387,9 +389,16 @@ def enterassignment():
             print(session["isAssignment"], session["current_assignment"])
     return render_template("user/userenterdata.html", form=form)
 #not done
-@app.route('/data')
+@app.route('/data', methods=['GET', 'POST'])
 def data():
-    return render_template("temp.html")
+    check = check_user()
+    if check == 0:
+        form = EditData()
+        headings = ('Date', 'Distance', 'Time', 'Speed', ' ')
+        userdst = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance, UserDST.userTime, UserDST.userSpeed).filter_by(userID=current_user.id).all())
+        if form.submit.data:
+            print (userSpeed)
+        return render_template("data.html", headings=headings, data=userdst, form=form, user=check)
 
 #not done
 @app.route('/profile')
@@ -449,7 +458,7 @@ def update_event(type, dist):
 
 def return_event():
     return current_event
-
+#!!!
 @app.route('/chooseevent', methods=['GET', 'POST'])
 def chooseevent():
     check = check_user()
@@ -458,7 +467,10 @@ def chooseevent():
         if form.validate_on_submit():
             if form.submit.data:
                 update_event(form.eventType.data, form.eventDistance.data)
+                #if len(session["present"]) >= 0:
                 return redirect(url_for('timer'))
+                #elif len(session["present"]) == 0:
+                    #return redirect(url_for('timer'))
         return render_template("admin/chooseevent.html", form=form)
     else:
         return redirect(url_for('login'))
@@ -485,7 +497,6 @@ def get_current_time():
     hours = seconds//3600
     timer_format = "{:02}:{:02}:{:02}".format(hours, minutes, remaining_seconds)
     return timer_format
-
 
 @app.route('/timer_start', methods=['GET', 'POST'])
 def timer_start():
@@ -555,13 +566,15 @@ def addtime(users):
     #            db.session.add(userdst)
     #db.session.commit()
 
-
 @app.route('/timer', methods=['GET', 'POST'])
 def timer():
     check = check_user()
+    event = return_event().split(" ")
     if check == 1:
         form = Timer()
-
+        date = (str(datetime.today()).split(' '))[0]
+        type = event[0]
+        distance = event[1]
         if form.start.data:
             update_starttime()
             pass
@@ -579,7 +592,7 @@ def timer():
                     "users": QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
                 }
             )
-            return render_template("admin/timer.html", form=form, starttime=starttime)
+            return render_template("admin/timer.html", form=form, starttime=starttime, user=check)
         elif form.reset.data:
             reset_starttime()
 
@@ -587,23 +600,101 @@ def timer():
             flash(f'Data submitted','success')
             users = form.users.data
             addtime(users)
-        return render_template("admin/timer.html", form=form)
+        return render_template("admin/timer.html", form=form, date=date, type=type, distance=distance, user=check)
+    if check == 0:
+        form = Timer()
+        date = (str(datetime.today()).split(' '))[0]
+        type = event[0]
+        distance = event[1]
+        if form.start.data:
+            update_starttime()
+            pass
+        elif form.store.data:
+            starttime = return_starttime()
+
+            if starttime != "00:00:00":
+                time = str(datetime.now() - starttime).split('.')[0]
+            else:
+                time = starttime
+
+            form.users.append_entry(
+                {
+                    "time": time,
+                    "users": QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+                }
+            )
+            return render_template("admin/timer.html", form=form, starttime=starttime, user=check)
+        elif form.reset.data:
+            reset_starttime()
+
+        if form.submit.data:
+            flash(f'Data submitted','success')
+            users = form.users.data
+            addtime(users)
+        return render_template("admin/timer.html", form=form, date=date, type=type, distance=distance, user=check)
+
+
+#@app.route('/regtimer', methods=['GET', 'POST'])
+#def regtimer():
+#    global present
+#    check = check_user()
+#    if check == 1:
+#        form = RegTimer()
+#        print(present)
+#        if form.start.data:
+#            update_starttime()
+#            pass
+#        elif form.store.data:
+#            starttime = return_starttime()
+#
+#            if starttime != "00:00:00":
+#                time = str(datetime.now() - starttime).split('.')[0]
+#            else:
+#                time = starttime
+#            #form.users.choices = present
+#            #reg = present
+#            reg = ["Bob", "Linda"]
+#            form.users.append_entry(
+#                {
+#                    "time": time,
+#                    "users": SelectField('Name', choices=reg, validators=[DataRequired()])
+#                }
+#            )
+#            return render_template("admin/timer.html", form=form, starttime=starttime)
+#        elif form.reset.data:
+#            reset_starttime()
+#
+#        if form.submit.data:
+#            users = form.users.data
+#            addtime(users)
+#            session["present"] = []
+#            return redirect(url_for('adash'))
+#        return render_template("admin/timer.html", form=form)
+
+present = []
+
 #!!!
-
-def addtoreg(name):
-    print("e")
-
 @app.route('/register', methods=['GET', 'POST'])
 def takeregister():
+    global present
     form = UserReg()
     if form.addUser.data:
         form.user.append_entry()
         return render_template("admin/register.html", form=form)
     if form.submit.data:
-        newreg = Registers(classid=session["current_classid"])
+        newreg = Registers(classID=session["current_classid"])
+        db.session.add(newreg)
+        db.session.commit()
         for i in form.user.data:
-            name = str(i['userReg']).split(' ')
-            fname, lname = name[0], name[1]
-            #userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
-            #regid = int(Registers.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
+            if i['userReg'] is not None:
+                present.append(str(i['userReg']))
+                name = str(i['userReg']).split(' ')
+                fname, lname = name[0], name[1]
+                userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+                regid = int(Registers.query.filter_by(classID=session["current_classid"]).all()[-1].regid)
+                newreg = RegPresent(regid=regid, userid=userid, isPresent=1)
+                db.session.add(newreg)
+        db.session.commit()
+        print(present)
+        return redirect(url_for('chooseevent'))
     return render_template("admin/register.html", form=form)

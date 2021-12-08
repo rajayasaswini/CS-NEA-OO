@@ -1,3 +1,5 @@
 /app.py
 /__pycache__
 /timeme/__pycache__
+/env
+/timeme/TimeMe.db

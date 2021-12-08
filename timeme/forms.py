@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField, FieldList, FormField, Form, DateField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField, FieldList, FormField, Form
+from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 import wtforms.validators as validators
 from timeme.models import *
@@ -190,6 +191,9 @@ class SelectAssignment(FlaskForm):
     assignmentname = SelectField('Assignment Name', choices=[], validators=[DataRequired()])
     submit = SubmitField('Enter data')
 
+class EditData(FlaskForm):
+    review = SubmitField('Review')
+    submit = SubmitField('Edit')
 #!!!
 #userreg_query = Users.query.all()
 #!!!
@@ -200,6 +204,7 @@ class AddUser(Form):
 class UserReg(FlaskForm):
     submit = SubmitField('Submit')
     user = FieldList(FormField(AddUser), label="Intervals")
+    #if pressed, a new text field from AddUser pops up
     addUser = SubmitField(label='Add User')
 
 class ChooseEvent(FlaskForm):
@@ -211,6 +216,11 @@ class SelectUser(Form):
     time = StringField('Time', validators=[validators.InputRequired()])
     users = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
 
+#class TimerTime(Form):
+#class RegSelectUser(Form):
+#    time = StringField('Time', validators=[validators.InputRequired()])
+#    users = SelectField('Name', choices=[], validators=[validators.Optional()])
+
 class Timer(FlaskForm):
     start = SubmitField('Start')
     reset = SubmitField('Reset')
@@ -218,3 +228,11 @@ class Timer(FlaskForm):
 
     users = FieldList(FormField(SelectUser), label='Users')
     submit = SubmitField('Submit')
+
+#class Timer(FlaskForm):
+#    start = SubmitField('Start')
+#    reset = SubmitField('Reset')
+#    store = SubmitField('Store')
+#
+#    users = FieldList(FormField(TimerTime), label='Users')
+#    submit = SubmitField('Submit')

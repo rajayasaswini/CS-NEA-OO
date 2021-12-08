@@ -1,4 +1,8 @@
-{% include "html/adminheader.html" %}
+{% if user == 1 %}
+  {% include "html/adminheader.html" %}
+{% elif user == 0 %}
+  {% include "html/studentheader.html" %}
+{% endif %}
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -15,6 +19,11 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   </head>
   <body>
+    <div class="event">
+      <p>Today's date: {{ date }}</p>
+      <p>Event Type: {{ type }}</p>
+      <p>Event Distance: {{ distance }}</p>
+    </div>
     <div class="enterdata">
       <div class="enterdata-logo">
         <p>Timer</p>

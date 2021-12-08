@@ -12,6 +12,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///TimeMe.db'
 app.config['SECRET_KEY'] = 'cb1414668bb6f2a30c99cfb0e9c1441b'
 
 db = SQLAlchemy(app)
+app.config['DEBUG'] = True
 bcrypt = Bcrypt(app)
 login_man = LoginManager(app)
 app.config['MAIL_SERVER'] = 'smtp.office365.com'
