@@ -85,16 +85,29 @@ def adash():
     elif check == 1:
         #get a sum of the distance run of a user
         labels = []
-        d_vs_t = db.session.query(UserDST.userID, UserDST.userDistance).filter_by(isAssignment = 0).all()
-        classname = list(db.session.query(Classes.className).filter_by(classID=session["current_classid"]).first())
-        classname = classname[0]
-        for row in d_vs_t:
-            name = db.session.query(Users.firstname).filter_by(id = row[0]).first()
-            labels.append(name)
-        labels = [row[0] for row in labels]
-        values = [row[1] for row in d_vs_t]
+        distances = []
+        #using the current_classid, get the ids
+        #then with the ids, get their firstnames and their distances
+        #first get the firstname and append it to the labels list
+        #then with the id, get all the distances that they have run
+        #with all the distances that they have run, get the sum of the distance
+        #add the names to the labels list
+        #add the distances to the values list
+        #all ids of the users in the class are added into a list
+        ids = [row[0] for row in list(db.session.query(ClassesUsers.usersID).filter_by(classID=session["current_classid"]).all())]
+        #all the names that are related to the userids are stored in the list
+        names = [(db.session.query(Users.firstname).filter_by(id = row).first())[0] for row in ids]
+        #for every id
+        for i in ids:
+            #sum of all the distances that they have run is saved
+            distance = sum([row[0] for row in db.session.query(UserDST.userDistance).filter_by(userID=i).all()])
+            #the total distance is saved in the list
+            distances.append(distance)
+        #getting the class name
+        classname = (list(db.session.query(Classes.className).filter_by(classID=session["current_classid"]).first()))[0]
+        #gets the name of the user
         name = current_user.firstname
-        return render_template("admin/admindash.html", labels=labels, values=values, name=name, classname=classname)
+        return render_template("admin/admindash.html", labels=names, values=distances, name=name, classname=classname)
     else:
         return redirect(url_for('login'))
 #done
@@ -105,9 +118,10 @@ def udash():
             return render_template("admin/admindash.html")
     elif check == 0:
         session["current_classid"] = (list(db.session.query(ClassesUsers.classID).filter_by(usersID=current_user.id).first()))[0]
-        d_vs_t = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance).filter_by(isAssignment = 0).all())
-        labels = [row[0] for row in d_vs_t]
-        values = [row[1] for row in d_vs_t]
+
+        #d_vs_t = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance).filter_by(isAssignment = 0).all())
+        #labels = [row[0] for row in d_vs_t]
+        #values = [row[1] for row in d_vs_t]
         name = current_user.firstname
         return render_template("user/userdash.html", labels=labels, values=values, name=name)
     else:
@@ -138,6 +152,7 @@ def login():
 def viewclasses():
     #checks the user's authentication
     check = check_user()
+    session["current_classid"] = 0
     #if admin
     if check == 1:
         #form is set to SelectClass
