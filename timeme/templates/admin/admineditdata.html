@@ -1,5 +1,4 @@
-{% include "html/studentheader.html" %}
-<!-- <h1>note: we can use the whole disabled thing to disable the users from using the dropdown</h1> -->
+{% include "html/adminheader.html" %}
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -17,6 +16,23 @@
       </div>
       <form class ="form" method="post" action="">
 				{{ form.hidden_tag() }}
+
+        <div class="form-group">
+					{{ form.user.label(id="left")}}
+
+					{% if form.user.errors %}
+							{{ form.user(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.user.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.user(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+        <br>
 
         <div class="form-group">
 					{{ form.eventType.label(id="left")}}
@@ -98,9 +114,8 @@
         </div>
 
         <div class="form-group">
-            {{ form.submit(class="login-button") }}
-        </div>
-
+						{{ form.submit(class="login-button") }}
+				</div>
       </form>
     </div>
   </body>

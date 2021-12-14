@@ -1,5 +1,4 @@
 {% include "html/studentheader.html" %}
-<!-- <h1>note: we can use the whole disabled thing to disable the users from using the dropdown</h1> -->
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -63,7 +62,7 @@
 									{% endfor %}
 							</div>
 					{% else %}
-							{{ form.userTimeM(class="form-control form-control-lg") }}
+							{{ form.userTimeM(class="form-control form-control-lg", placeholder=timeM) }}
 					{% endif %}
 				</div>
 
@@ -80,7 +79,7 @@
 									{% endfor %}
 							</div>
 					{% else %}
-							{{ form.userTimeS(class="form-control form-control-lg") }}
+							{{ form.userTimeS(class="form-control form-control-lg", placeholder=timeS) }}
 					{% endif %}
 				</div>
 

@@ -192,8 +192,9 @@ class SelectAssignment(FlaskForm):
     submit = SubmitField('Enter data')
 
 class EditData(FlaskForm):
+    id = IntegerField('ID', validators=[DataRequired()])
     review = SubmitField('Review')
-    submit = SubmitField('Edit')
+    edit = SubmitField('Edit')
 #!!!
 #userreg_query = Users.query.all()
 #!!!

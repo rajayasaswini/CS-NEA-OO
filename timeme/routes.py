@@ -119,9 +119,9 @@ def udash():
     elif check == 0:
         session["current_classid"] = (list(db.session.query(ClassesUsers.classID).filter_by(usersID=current_user.id).first()))[0]
 
-        #d_vs_t = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance).filter_by(isAssignment = 0).all())
-        #labels = [row[0] for row in d_vs_t]
-        #values = [row[1] for row in d_vs_t]
+        d_vs_t = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance).filter_by(isAssignment = 0).all())
+        labels = [row[0] for row in d_vs_t]
+        values = [row[1] for row in d_vs_t]
         name = current_user.firstname
         return render_template("user/userdash.html", labels=labels, values=values, name=name)
     else:
@@ -404,17 +404,63 @@ def enterassignment():
             print(session["isAssignment"], session["current_assignment"])
     return render_template("user/userenterdata.html", form=form)
 #not done
+dstid = 0
 @app.route('/data', methods=['GET', 'POST'])
 def data():
     check = check_user()
     if check == 0:
+        global dstid
         form = EditData()
-        headings = ('Date', 'Distance', 'Time', 'Speed', ' ')
-        userdst = list(db.session.query(UserDST.dstDateTime, UserDST.userDistance, UserDST.userTime, UserDST.userSpeed).filter_by(userID=current_user.id).all())
-        if form.submit.data:
-            print (userSpeed)
+        headings = ('ID', 'Date', 'Distance', 'Time', 'Speed')
+        userdst = list(db.session.query(UserDST.userDSTID, UserDST.dstDateTime, UserDST.userDistance, UserDST.userTime, UserDST.userSpeed).filter_by(userID=current_user.id).all())
+        if form.review.data:
+            print("review")
+        if form.edit.data:
+            dstid = form.id.data
+            return redirect(url_for('editdata'))
         return render_template("data.html", headings=headings, data=userdst, form=form, user=check)
 
+@app.route('/editdata', methods=['GET', 'POST'])
+def editdata():
+    check = check_user()
+    if check == 0:
+        global dstid
+        form = SubmitAssignment()
+        eventtype = []
+        eventdist = []
+        id = dstid
+        eventID = db.session.query(UserDST.eventID).filter_by(userDSTID=id).first()
+        eventdetails = list(db.session.query(Events.eventTypeID, Events.eventDistance).first())
+        #print(eventdetails)
+        eventtype = db.session.query(EventTypes.type).filter_by(id=eventdetails[0]).first()
+        type = [str(i) for i in eventtype]
+        distance = [str(eventdetails[1])]
+        #print(eventtype[0])
+        form.eventType.choices = type
+        form.eventDistance.choices = distance
+        time = list(db.session.query(UserDST.userTime).filter_by(userDSTID=dstid).first())[0]
+        timeM = time//60
+        timeS = time - timeM*60
+        #dstdetails = db.session.query(UserDST.eventID, UserDST.userDistance, UserDST.userTime, UserDST.userSpeed).filter(UserDST.userDSTID==1).first()
+        dstdetails = UserDST.query.filter(UserDST.userDSTID==dstid)
+        if form.validate_on_submit():
+            typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
+            #dstdetails.eventID = eventID
+            #dstdetails.userDistance = int(str(form.userDistance.data))
+            updatedtime = form.userTimeM.data*60 + form.userTimeS.data
+            #dstdetails.userTime = updatedtime
+            speed = 0
+            speed = getspeed(updatedtime, form.eventDistance.data, speed)
+            #dstdetails.userSpeed = speed
+            dstdetails.update({
+                "eventID": eventid,
+                "userDistance": int(str(form.eventDistance.data)),
+                "userTime": updatedtime,
+                "userSpeed": speed
+            })
+            db.session.commit()
+        return render_template("user/usereditdata.html", form=form, timeM=timeM, timeS=timeS)
 #not done
 @app.route('/profile')
 def profile():
