@@ -566,14 +566,21 @@ def alldata():
         predicted_date = recentdate + timedelta(days=2)
         pd = str(predicted_date.day)+'-'+str(predicted_date.month)+'-'+str(predicted_date.year)
         date.append(pd)
-        print(date[-1])
+        print(pd)
         pd1 = "16-12-2021"
         #pdx = pd
         #pdy =
         #print("prediction", predicted_date)
         #add the new predicted date into the date list
         pdy = reg.predict(np.array([[new_val]]))
-        return render_template("alldata.html", user=check, labels=date, values=time, values2=trendy, pdx=pd1, predicted_y=pdy)
+        pdy_list = []
+        for i in range(0, len(date)):
+            if i == len(date)-1:
+                pdy_list.append(pdy[0])
+            else:
+                pdy_list.append(None)
+        pdy_list = json.dumps(pdy_list)
+        return render_template("alldata.html", user=check, labels=date, values=time, values2=trendy, pdy=pdy_list)
     elif check == 1:
         return render_template("alldata.html", user=check)
 

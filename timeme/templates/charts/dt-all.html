@@ -20,14 +20,11 @@
               borderColor:'rgba(200, 100, 132, 1)',
               borderWidth: 1
           }, {
-              type: 'scatter',
+              type: 'line',
               label: 'Predicted Time',
-              data: [{
-                      x: /*'16-12-2021'*/{{ pdx | safe }},
-                      y: {{ predicted_y | safe }}
-                  }],
-                  fill: false,
-                  borderColor: 'rgb(54, 162, 235)'
+              data: {{ pdy | safe }},
+              fill: false,
+              borderColor: 'rgb(54, 162, 235)'
               //backgroundColor: 'rgba(255, 255, 255, 0.2)',
               //borderColor:'rgba(200, 100, 132, 1)',
               //borderWidth: 1
