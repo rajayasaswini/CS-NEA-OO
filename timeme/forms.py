@@ -195,6 +195,18 @@ class EditData(FlaskForm):
     id = IntegerField('ID', validators=[DataRequired()])
     review = SubmitField('Review')
     edit = SubmitField('Edit')
+
+class UserCheckEventData(FlaskForm):
+    eventtype = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
+    eventdist = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
+    submit = SubmitField('Check')
+
+class AdminCheckEventData(FlaskForm):
+    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+    eventtype = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
+    eventdist = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
+    submit = SubmitField('Check')
+
 #!!!
 #userreg_query = Users.query.all()
 #!!!

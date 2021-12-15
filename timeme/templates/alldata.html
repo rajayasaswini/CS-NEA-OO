@@ -31,19 +31,8 @@
         </div>
     </div>
 
-    <div class="col-xs-10 col-sm-6 col-md-6">
-        <div class="card card-style mb-2">
-            <div class="card-body">
-                <div class="chart-container" style="position: relative;">
-                    <canvas id="speedtime"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
     {% block javascript%}
-    {% include "charts/dt-dist-time.html" %}
-    {% include "charts/dt-speed-time.html" %}
+    {% include "charts/dt-all.html" %}
     {% endblock %}
     {% endblock %}
   </body>

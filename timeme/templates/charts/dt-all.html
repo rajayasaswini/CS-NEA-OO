@@ -1,0 +1,59 @@
+<canvas id="disttime" width="400" height="400"></canvas>
+<script>
+  var ctx = document.getElementById('disttime').getContext('2d');
+  var disttime = new Chart(ctx, {
+      //type: 'line',
+      data: {
+          labels: {{ labels | safe }},
+          datasets: [{
+              type: 'line',
+              label: 'Progress Over Time',
+              data: {{ values | safe }},
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor:'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+          }, {
+              type: 'line',
+              label: 'Best Fit',
+              data: {{ values2 | safe }},
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor:'rgba(200, 100, 132, 1)',
+              borderWidth: 1
+          }, {
+              type: 'scatter',
+              label: 'Predicted Time',
+              data: [{
+                      x: /*'16-12-2021'*/{{ pdx | safe }},
+                      y: {{ predicted_y | safe }}
+                  }],
+                  fill: false,
+                  borderColor: 'rgb(54, 162, 235)'
+              //backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              //borderColor:'rgba(200, 100, 132, 1)',
+              //borderWidth: 1
+          }],
+          //labels: {{ labels | safe }},
+      },
+      options: {
+          scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index, values) {
+                        return value;
+                    }
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    stepSize: 5,
+                    callback: function(value, index, values) {
+                        return value;
+                    }
+                }
+            }],
+          }
+      }
+  });
+</script>

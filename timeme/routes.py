@@ -10,6 +10,9 @@ from flask_bcrypt import Bcrypt
 from flask_login import login_user, current_user, logout_user
 from flask_mail import Message
 import json
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from datetime import timedelta
 
 #session["present"] = []
 test = 'abc'
@@ -414,12 +417,13 @@ def data():
         headings = ('ID', 'Date', 'Distance', 'Time', 'Speed')
         userdst = list(db.session.query(UserDST.userDSTID, UserDST.dstDateTime, UserDST.userDistance, UserDST.userTime, UserDST.userSpeed).filter_by(userID=current_user.id).all())
         if form.review.data:
-            print("review")
+            dstid = form.id.data
+            return redirect(url_for('reviewdata'))
         if form.edit.data:
             dstid = form.id.data
             return redirect(url_for('editdata'))
         return render_template("data.html", headings=headings, data=userdst, form=form, user=check)
-
+#only done for user
 @app.route('/editdata', methods=['GET', 'POST'])
 def editdata():
     check = check_user()
@@ -461,6 +465,118 @@ def editdata():
             })
             db.session.commit()
         return render_template("user/usereditdata.html", form=form, timeM=timeM, timeS=timeS)
+
+@app.route('/reviewdata', methods=['GET', 'POST'])
+def reviewdata():
+    global dstid
+    check = check_user()
+    if check == 0:
+        print(dstid)
+        labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=11).all()]
+        values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=11).all()]
+        values2 = [2,2,2,2,2,2,2,2,2,2]
+        speeds = []
+        for i in range(0,len(labels)):
+            speed = 0
+            speed = getspeed(labels[i], values[i], speed)
+            speeds.append(speed)
+        return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds)
+    elif check == 1:
+        return render_template("reviewdata.html", user=check)
+event = ' '
+@app.route('/chooseeventdata', methods=['GET', 'POST'])
+def chooseeventdata():
+    global event
+    check = check_user()
+    if check == 0:
+        form = UserCheckEventData()
+        if form.validate_on_submit():
+            event = str(form.eventtype.data) + ' ' + str(form.eventdist.data)
+            return redirect(url_for('alldata'))
+        return render_template("datachooseevent.html", user=check, form=form)
+    elif check == 1:
+        return render_template("datachooseevent.html", user=check)
+
+@app.route('/alldata', methods=['GET', 'POST'])
+def alldata():
+    global event
+    check = check_user()
+    if check == 0:
+        eventdetails = event.split(' ')
+        typeid = (list(db.session.query(EventTypes.id).filter_by(type=str(eventdetails[0])).first()))[0]
+        eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=str(eventdetails[1])).first().eventID)
+        time = [i[0] for i in db.session.query(UserDST.userTime).filter_by(userID=current_user.id, eventID=eventid).all()]
+        #print(time)
+        firstdate = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).first()]
+        #recentdate = list([i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()][-1])
+        #print(firstdate)
+        #print(recentdate)
+        days = []
+        #day = (str(recentdate[0]-firstdate[0]).split(' '))[0]
+        #print(days)
+        date = [str(i[0].day)+'-'+str(i[0].month)+'-'+str(i[0].year) for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()]
+        dates = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()]
+        #print(dates)
+        for i in dates:
+            #print("i", i)
+            date_object = ([j for j in i][0]).date()
+            #print("date", date_object)
+            #print(recentdate[0])
+            day = str(date_object - (firstdate[0]).date())
+            if day == '0:00:00':
+                day = 0
+            else:
+                day = int((day.split())[0])
+            #print("mock", mock)
+            #print(type(date_time_object[0]) == int)
+            ##day = (str(recentdate[0]-firstdate[0]).split(' '))[0]
+            days.append(day)
+        #print(days)
+        #x = np.array([[1], [2], [3]])
+        x_array = []
+        for i in days:
+            n = []
+            n.append(i)
+            x_array.append(n)
+        #print("x_array", x_array)
+        x = np.array(x_array)
+        #y = np.dot(x, np.array([1])) + 3
+        reg = LinearRegression().fit(x, time)
+        #print(reg.score(x, time))
+        new_val = days[-1] + 2
+        intercept = reg.intercept_
+        slope = reg.coef_
+        #print(intercept,slope)
+        #we have the intercept and the gradient
+        #first x-firstdate y-intercept and x-the final date y-calculate it using y=mx+b
+        #trendx = [firstdate,]
+        final_y = slope*days[-1] + intercept
+        trendy = []
+        for i in days:
+            trend = []
+            #y_val = slope*i + intercept
+            trend.append(slope*i + intercept)
+            trendy.append(trend[0][0])
+        #print(trendy)
+        #get the last date
+        recentdate = (list([i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()][-1]))[0]
+        #recentdate2 = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()][-1]
+        #print(recentdate)
+        #print(recentdate2)
+        predicted_date = recentdate + timedelta(days=2)
+        pd = str(predicted_date.day)+'-'+str(predicted_date.month)+'-'+str(predicted_date.year)
+        date.append(pd)
+        print(date[-1])
+        pd1 = "16-12-2021"
+        #pdx = pd
+        #pdy =
+        #print("prediction", predicted_date)
+        #add the new predicted date into the date list
+        pdy = reg.predict(np.array([[new_val]]))
+        return render_template("alldata.html", user=check, labels=date, values=time, values2=trendy, pdx=pd1, predicted_y=pdy)
+    elif check == 1:
+        return render_template("alldata.html", user=check)
+
 #not done
 @app.route('/profile')
 def profile():

@@ -1,0 +1,44 @@
+<canvas id="disttime" width="400" height="400"></canvas>
+<script>
+  var ctx = document.getElementById('disttime').getContext('2d');
+  var disttime = new Chart(ctx, {
+      type: 'line',
+      data: {
+          datasets: [{
+              label: 'Values',
+              data: {{ values | safe }},
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor:'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+          }/*, {
+              label: 'Values2',
+              data: {{ values2 | safe }},
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor:'rgba(200, 100, 132, 1)',
+              borderWidth: 1
+          }*/],
+          labels: {{ labels | safe }},
+      },
+      options: {
+          scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    callback: function(value, index, values) {
+                        return value;
+                    }
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    stepSize: 5,
+                    callback: function(value, index, values) {
+                        return value;
+                    }
+                }
+            }],
+          }
+      }
+  });
+</script>

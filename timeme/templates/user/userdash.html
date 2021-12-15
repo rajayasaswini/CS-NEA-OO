@@ -1,4 +1,7 @@
 {% include "html/studentheader.html" %}
+<head>
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</head>
 <p>Welcome back {{ name }}!</p>
 {% extends "charts/chart_layout.html" %}
 
@@ -15,6 +18,10 @@
 </div>
 
 {% block javascript%}
-{% include "charts/dt-bar.html" %}
+{% include "charts/dt-line.html" %}
 {% endblock %}
 {% endblock %}
+
+<div class="tweets">
+  <a class="twitter-timeline" href="https://twitter.com/DubaiCollege?ref_src=twsrc%5Etfw">Tweets by DubaiCollege</a>
+</div>
