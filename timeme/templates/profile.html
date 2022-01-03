@@ -1,16 +1,94 @@
-{% include "html/adminheader.html" %}
+{% if user == 1 %}
+  {% include "html/adminheader.html" %}
+{% elif user == 0 %}
+  {% include "html/studentheader.html" %}
+{% endif %}
 <head>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../static/syle.css">
+  <link rel="stylesheet" href="../static/loginstyle.css">
 </head>
-<body>
+{% block content %}
   <div class="content-section">
     <div class="media">
       <img class="rounded-circle account-img" src="{{ image_file }}">
       <div class="media-body">
-        <h2 class="login-logo">{{ current_user.firstname }} {{ current_user.lastname }}</h2>
-        <p class="text-secondary">{{ current_user.email}}</p>
+        <h2 class="account-heading">{{ current_user.firstname }} {{ current_user.lastname }}</h2>
+        <p class="text-secondary">{{ current_user.email }}</p>
       </div>
     </div>
-    <!-- FORM HERE -->
+    <div class="form-group">
+      <form class="" action="" method="post">
+        <div class="form-group">
+          {{ form.fname.label(id="left")}}
+
+          {% if form.fname.errors %}
+              {{ form.fname(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.fname.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.fname(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+
+        <br>
+
+        <div class="form-group">
+          {{ form.lname.label(id="left")}}
+
+          {% if form.lname.errors %}
+              {{ form.lname(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.lname.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.lname(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+
+        <br>
+
+        <div class="form-group">
+          {{ form.email.label(id="left")}}
+
+          {% if form.email.errors %}
+              {{ form.email(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.email.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.email(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+
+        <br>
+        
+        <div class="form-group">
+          {{ form.about.label(id="left")}}
+
+          {% if form.about.errors %}
+              {{ form.about(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.about.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.about(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{ form.submit(class="login-button") }}
+        </div>
+      </form>
+    </div>
+
   </div>
-</body>
+{% endblock content %}

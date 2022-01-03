@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, IntegerField, SelectField, FieldList, FormField, Form
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
@@ -148,10 +149,17 @@ class CreateEventType(FlaskForm):
 
 class Profile(FlaskForm):
     fname = StringField('First Name')
-    lname = StringField('lastname')
+    lname = StringField('Last Name')
     email = StringField('Email')
     about = StringField('About')
     submit = SubmitField('Submit')
+
+    def validate_email(self,email):
+        if email.data != current_user.email:
+            user = Users.query(filter_by=email.data).first()
+            if user:
+                raise ValidationError('There is already an account under this email. Use another email or login.')
+
 
 class RequestResetPass(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])

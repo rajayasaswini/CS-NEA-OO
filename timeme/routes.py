@@ -506,72 +506,40 @@ def alldata():
         typeid = (list(db.session.query(EventTypes.id).filter_by(type=str(eventdetails[0])).first()))[0]
         eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=str(eventdetails[1])).first().eventID)
         time = [i[0] for i in db.session.query(UserDST.userTime).filter_by(userID=current_user.id, eventID=eventid).all()]
-        #print(time)
         firstdate = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).first()]
-        #recentdate = list([i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()][-1])
-        #print(firstdate)
-        #print(recentdate)
         days = []
-        #day = (str(recentdate[0]-firstdate[0]).split(' '))[0]
-        #print(days)
         date = [str(i[0].day)+'-'+str(i[0].month)+'-'+str(i[0].year) for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()]
         dates = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()]
-        #print(dates)
         for i in dates:
-            #print("i", i)
             date_object = ([j for j in i][0]).date()
-            #print("date", date_object)
-            #print(recentdate[0])
             day = str(date_object - (firstdate[0]).date())
             if day == '0:00:00':
                 day = 0
             else:
                 day = int((day.split())[0])
-            #print("mock", mock)
-            #print(type(date_time_object[0]) == int)
-            ##day = (str(recentdate[0]-firstdate[0]).split(' '))[0]
             days.append(day)
-        #print(days)
-        #x = np.array([[1], [2], [3]])
         x_array = []
         for i in days:
             n = []
             n.append(i)
             x_array.append(n)
-        #print("x_array", x_array)
         x = np.array(x_array)
-        #y = np.dot(x, np.array([1])) + 3
         reg = LinearRegression().fit(x, time)
-        #print(reg.score(x, time))
         new_val = days[-1] + 2
         intercept = reg.intercept_
         slope = reg.coef_
-        #print(intercept,slope)
-        #we have the intercept and the gradient
-        #first x-firstdate y-intercept and x-the final date y-calculate it using y=mx+b
-        #trendx = [firstdate,]
         final_y = slope*days[-1] + intercept
         trendy = []
         for i in days:
             trend = []
-            #y_val = slope*i + intercept
             trend.append(slope*i + intercept)
             trendy.append(trend[0][0])
-        #print(trendy)
-        #get the last date
         recentdate = (list([i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()][-1]))[0]
-        #recentdate2 = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=current_user.id, eventID=eventid).all()][-1]
-        #print(recentdate)
-        #print(recentdate2)
         predicted_date = recentdate + timedelta(days=2)
         pd = str(predicted_date.day)+'-'+str(predicted_date.month)+'-'+str(predicted_date.year)
         date.append(pd)
         print(pd)
         pd1 = "16-12-2021"
-        #pdx = pd
-        #pdy =
-        #print("prediction", predicted_date)
-        #add the new predicted date into the date list
         pdy = reg.predict(np.array([[new_val]]))
         pdy_list = []
         for i in range(0, len(date)):
@@ -585,9 +553,36 @@ def alldata():
         return render_template("alldata.html", user=check)
 
 #not done
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    image_file = url_for('static', filename='pics/' + current_user.photo)
+    check = check_user()
+    if check == 0:
+        form = Profile()
+        image_file = url_for('static', filename='pics/' + current_user.photo)
+        if form.submit.data:
+            #print(0)
+            #current_user.firstname = form.fname.data
+            #current_user.lastname = form.lname.data
+            #current_user.email = form.email.data
+            #current_user.about = form.about.data
+            #db.session.commit()
+            #print(form.fname.data, form.lname.data, form.email.data, form.about.data)
+            id = current_user.id
+            user = Users.query.filter(Users.id==id)
+            print(user)
+            user.update({
+                "firstname": form.fname.data,
+                "lastname": form.lname.data,
+                "email": form.email.data,
+                "about": form.about.data
+            })
+            db.session.commit()
+        #elif request.method == 'GET':
+        #    form.fname.data = current_user.firstname
+        #    form.lname.data = current_user.lastname
+        #    form.email.data = current_user.email
+        #    form.about.data = current_user.about
+        return render_template("profile.html", image_file=image_file, user=check, form=form)
     return render_template("profile.html")
 #done
 def send_rp_email(user):
