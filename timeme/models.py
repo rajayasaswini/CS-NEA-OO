@@ -79,8 +79,8 @@ class Events(db.Model):
     eventT_r = db.relationship('EventTypes', lazy=True, foreign_keys=[eventTypeID])
 
 
-    def __repr__(self):
-        return '{}'.format(str(self.eventDistance))
+    #def __repr__(self):
+    #    return '{}'.format(str(self.eventDistance))
 
 #class Logs(db.Model):
 #    __tablename__ = "logs"

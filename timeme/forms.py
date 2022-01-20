@@ -70,7 +70,8 @@ class EnterCode(FlaskForm):
             raise ValidationError('There is no class with that code. Please enter a valid code.')
 
 def event_query():
-    return Events.query
+    eventdist = [i[0] for i in db.session.query(Events.eventDistance).all()]
+    return eventdist
 
 def eventtype_query():
     return EventTypes.query
@@ -83,7 +84,19 @@ class Intervals(Form):
     intervalM = IntegerField('Time', validators=[validators.Optional()])
     intervalS = IntegerField('Time', validators=[validators.Optional()])
 
+eventdist = [i[0] for i in db.session.query(Events.eventDistance).filter(Events.eventTime==0).all()]
+eventtime = [i[0] for i in db.session.query(Events.eventTime).filter(Events.eventDistance==0).all()]
+
 class UserEnterData(FlaskForm):
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
+    eventDistance = SelectField('Event Distance', choices=eventdist, validators=[DataRequired()])
+    userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
+    userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
+    submit = SubmitField('Submit')
+    userInterval = FieldList(FormField(Intervals), label="Intervals")
+    addInterval = SubmitField(label='Add Interval')
+
+class UserEnterDist(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
     eventDistance = QuerySelectField('Event Distance', query_factory=event_query, validators=[DataRequired()])
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])

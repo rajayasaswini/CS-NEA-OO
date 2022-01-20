@@ -279,6 +279,15 @@ def enterdata():
         return render_template("admin/adminenterdata.html", form=form)
     else:
         return redirect(url_for('login'))
+
+@app.route('/enterdist', methods=['GET', 'POST'])
+def enterdist():
+    form = UserEnterDist()
+    return render_template("user/userenterdist.html", choice=2, form=form)
+
+@app.route('/enterdatachoice', methods=['GET', 'POST'])
+def enterdatachoice():
+    return render_template("choice.html", choice=2)
 #done
 @app.route('/logout')
 def logout():

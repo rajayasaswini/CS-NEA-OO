@@ -1,23 +1,42 @@
-{% include "html/homeheader.html" %}
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-			<meta charset="UTF-8">
-			<meta http-equiv="X-UA-Compatible" content="IE=edge">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<link rel="stylesheet" href="../static/loginstyle.css">
-			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-			<title>Login</title>
-	</head>
-	<body>
-		<div class="choice">
-      <button class="nav-button">
-        <strong><a href="{{ url_for('aregister') }}">Teacher/Admin</a></strong>
-      </button>
-      <button class="nav-button">
-        <strong><a href="{{ url_for('uregister') }}">Student/User</a></strong>
-      </button>
-    </div>
-	</body>
-</html>
+{% if choice==1 %}
+	{% include "html/homeheader.html" %}
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+				<link rel="stylesheet" href="../static/loginstyle.css">
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+				<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+				<title>Login</title>
+		</head>
+		<body>
+			<div class="choice">
+	      <button class="nav-button">
+	        <strong><a href="{{ url_for('aregister') }}">Teacher/Admin</a></strong>
+	      </button>
+	      <button class="nav-button">
+	        <strong><a href="{{ url_for('uregister') }}">Student/User</a></strong>
+	      </button>
+	    </div>
+		</body>
+	</html>
+{% elif choice==2 %}
+	{% include "html/studentheader.html" %}
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+				<link rel="stylesheet" href="../static/loginstyle.css">
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+				<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		</head>
+		<body>
+			<div class="choice">
+				<button class="nav-button">
+					<strong><a href="{{ url_for('enterdata') }}">Enter Time for Distance-based Event</a></strong>
+				</button>
+				<button class="nav-button">
+					<strong><a href="{{ url_for('enterdist') }}">Enter Distance for Time-based Event</a></strong>
+				</button>
+			</div>
+		</body>
+	</html>
+{% endif %}
