@@ -98,9 +98,8 @@ class UserEnterData(FlaskForm):
 
 class UserEnterDist(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
-    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, validators=[DataRequired()])
-    userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
-    userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
+    userTime = SelectField('Minutes', choices=[], validators=[validators.InputRequired()])
+    eventDistance = IntegerField('Event Distance', validators=[DataRequired()])
     submit = SubmitField('Submit')
     userInterval = FieldList(FormField(Intervals), label="Intervals")
     addInterval = SubmitField(label='Add Interval')
@@ -111,6 +110,15 @@ class AdminEnterData(FlaskForm):
     eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
+    submit = SubmitField('Submit')
+    userInterval = FieldList(FormField(Intervals), label="Intervals")
+    addInterval = SubmitField(label='Add Interval')
+
+class AdminEnterDist(FlaskForm):
+    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
+    userTime = SelectField('Minutes', choices=[], validators=[validators.InputRequired()])
+    eventDistance = IntegerField('Event Distance', validators=[DataRequired()])
     submit = SubmitField('Submit')
     userInterval = FieldList(FormField(Intervals), label="Intervals")
     addInterval = SubmitField(label='Add Interval')
@@ -188,11 +196,17 @@ class ResetPass(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
 
-class SetAssignment(FlaskForm):
+class SetDistAssignment(FlaskForm):
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
+    eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
     dday = DateField('Due Date', format='%Y-%m-%d')
-    eventtype = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
-    eventdist = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
-    submit = SubmitField('Set Assignment')
+    submit = SubmitField('Submit')
+
+class SetTimedAssignment(FlaskForm):
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
+    eventTime = SelectField('Event Distance', choices=[], validators=[DataRequired()])
+    dday = DateField('Due Date', format='%Y-%m-%d')
+    submit = SubmitField('Submit')
 
 from flask_login import current_user
 

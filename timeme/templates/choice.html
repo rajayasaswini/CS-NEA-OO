@@ -27,6 +27,7 @@
 				<link rel="stylesheet" href="../static/loginstyle.css">
 				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 				<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+				<title>Choose Event Type</title>
 		</head>
 		<body>
 			<div class="choice">
@@ -35,6 +36,27 @@
 				</button>
 				<button class="nav-button">
 					<strong><a href="{{ url_for('enterdist') }}">Enter Distance for Time-based Event</a></strong>
+				</button>
+			</div>
+		</body>
+	</html>
+{% elif choice==3 %}
+	{% include "html/studentheader.html" %}
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+				<link rel="stylesheet" href="../static/loginstyle.css">
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+				<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+				<title>Choose Event Type</title>
+		</head>
+		<body>
+			<div class="choice">
+				<button class="nav-button">
+					<strong><a href="{{ url_for('createdistassignment') }}">Distance-based Event</a></strong>
+				</button>
+				<button class="nav-button">
+					<strong><a href="{{ url_for('createtimedassignment') }}">Time-based Event</a></strong>
 				</button>
 			</div>
 		</body>

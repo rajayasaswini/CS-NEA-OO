@@ -1,4 +1,5 @@
 {% include "html/studentheader.html" %}
+<!-- <h1>note: we can use the whole disabled thing to disable the users from using the dropdown</h1> -->
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -7,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../static/enterdata.css">    <title>Enter Data</title>
+    <link rel="stylesheet" href="../../static/enterdata.css">    <title>Set Assignment using Time-Based Events</title>
   </head>
   <body>
     <div class="enterdata">
@@ -35,49 +36,36 @@
         <br>
 
         <div class="form-group">
-					{{ form.eventDistance.label(id="left")}}
+					{{ form.eventTime.label(id="left")}}
 
-					{% if form.eventDistance.errors %}
-							{{ form.eventDistance(class="form-control form-control-lg is-invalid") }}
+					{% if form.eventTime.errors %}
+							{{ form.eventTime(class="form-control form-control-lg is-invalid") }}
 							<div class="invalid-feedback">
-									{% for error in form.eventDistance.errors %}
+									{% for error in form.eventTime.errors %}
 											<span>{{ error }}</span><p>m</p>
 									{% endfor %}
 							</div>
 					{% else %}
-							{{ form.eventDistance(class="form-control form-control-lg") }}
+							{{ form.eventTime(class="form-control form-control-lg") }}
 					{% endif %}
 				</div>
+
+        <div class="form-group">
+          {{ form.dday.label(id="left")}}
+
+          {% if form.dday.errors %}
+              {{ form.dday(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.dday.errors %}
+                      <span>{{ error }}</span><p>m</p>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.dday(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
 
         <br>
-
-        <div class="form-group">
-					{{ form.userTime.label(id="left")}}
-
-					{% if form.userTime.errors %}
-							{{ form.userTime(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.userTime.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.userTime(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
-
-        <div class="form-group">
-          {{form.addInterval}}
-          <div class="userIntervals">
-            {%for interval in form.userInterval %}
-                  <div class="row">
-                    <div class="col-md-6">Distance{{ interval.form.intervalDist(class="form-control form-control-lg") }}</div>
-                    <div class="col-md-6">Minutes{{ interval.form.intervalM(class="form-control form-control-lg") }}</div>
-                    <div class="col-md-6">Seconds{{ interval.form.intervalS(class="form-control form-control-lg") }}</div>
-                  </div>
-            {% endfor %}
-          </div>
-        </div>
 
         <div class="form-group">
             {{ form.submit(class="login-button") }}

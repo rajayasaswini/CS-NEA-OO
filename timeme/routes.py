@@ -279,12 +279,102 @@ def enterdata():
         return render_template("admin/adminenterdata.html", form=form)
     else:
         return redirect(url_for('login'))
-
+#done
 @app.route('/enterdist', methods=['GET', 'POST'])
 def enterdist():
-    form = UserEnterDist()
-    return render_template("user/userenterdist.html", choice=2, form=form)
-
+    userSpeed = 0
+    now = datetime.now()
+    check = check_user()
+    if check == 0:
+        form = UserEnterDist()
+        assign = 0
+        if form.addInterval.data:
+            form.userInterval.append_entry()
+            return render_template("user/userenterdata.html", form=form)
+        times = [i[0] for i in db.session.query(Events.eventTime).filter(Events.eventTime!=0).all()]
+        timeMS = []
+        #changes time into MM:SS format
+        for time in times:
+            min = time//60
+            sec = time - (min*60)
+            if len(str(sec)) == 1:
+                sec = "0"+str(sec)
+            elif len(str(sec)) == 2:
+                sec = str(sec)
+            digtime = str(min) + ":" + sec
+            timeMS.append(digtime)
+        form.userTime.choices = timeMS
+        if form.validate_on_submit():
+            userSpeed = 0
+            time = form.userTime.data
+            times = [int(i) for i in time.split(":")]
+            timeinS = times[0]*60 + times[1]
+            #time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
+            userSpeed = getspeed(timeinS, str(form.eventDistance.data), userSpeed)
+            dist = str(form.eventDistance.data)
+            #dist = int(dist)
+            typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventTime=timeinS).first().eventID)
+            print(typeid, eventid)
+            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=timeinS , userSpeed=userSpeed, isAssignment=assign)
+            db.session.add(userdst)
+            db.session.commit()
+            dstid = int(UserDST.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
+            intervals(current_user.id, form.userInterval.data, dstid)
+        return render_template("user/userenterdist.html", form=form)
+    elif check == 1:
+        form = AdminEnterDist()
+        if form.addInterval.data:
+            form.userInterval.append_entry()
+            return render_template("admin/adminenterdata.html", form=form)
+        times = [i[0] for i in db.session.query(Events.eventTime).filter(Events.eventTime!=0).all()]
+        timeMS = []
+        for time in times:
+            min = time//60
+            sec = time - (min*60)
+            if len(str(sec)) == 1:
+                sec = "0"+str(sec)
+            elif len(str(sec)) == 2:
+                sec = str(sec)
+            digtime = str(min) + ":" + sec
+            timeMS.append(digtime)
+        form.userTime.choices = timeMS
+        if form.validate_on_submit():
+            name = str(form.user.data)
+            name = name.split(' ')
+            fname = ''
+            lname = ''
+            if len(name) == 2:
+                fname,lname = name[0], name[1]
+            elif len(name) > 2:
+                lname = name[len(name)-1]
+                name.remove(lname)
+                count = 0
+                for i in name:
+                    if count == 0:
+                        fname += i + ' '
+                        count += 1
+                    else:
+                        fname += i
+                count = 0
+            userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+            userSpeed = 0
+            time = form.userTime.data
+            times = [int(i) for i in time.split(":")]
+            timeinS = times[0]*60 + times[1]
+            userSpeed = getspeed(timeinS, str(form.eventDistance.data), userSpeed)
+            dist = str(form.eventDistance.data)
+            typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventTime=timeinS).first().eventID)
+            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=timeinS , userSpeed=userSpeed, isAssignment=0)
+            db.session.add(userdst)
+            db.session.commit()
+            dstid = int(UserDST.query.filter_by(userID=userid).all()[-1].userDSTID)
+            intervals(current_user.id, form.userInterval.data, dstid)
+        return render_template("admin/adminenterdata.html", form=form)
+    else:
+        return redirect(url_for('login'))
+#done
 @app.route('/enterdatachoice', methods=['GET', 'POST'])
 def enterdatachoice():
     return render_template("choice.html", choice=2)
@@ -334,16 +424,61 @@ def createET():
     else:
         return redirect(url_for('login'))
 #done
-@app.route('/createassignment', methods=['GET', 'POST'])
-def createassignment():
-    form = SetAssignment()
-    if form.validate_on_submit():
-        typeid = int(EventTypes.query.filter_by(type=str(form.eventtype.data)).first().id)
-        eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventdist.data))).first().eventID)
-        a = ScheduledAssignments(classID=session["current_classid"], eventID=eventid, returnDate=form.dday.data)
-        db.session.add(a)
-        db.session.commit()
-    return render_template("admin/assignments.html", form=form)
+@app.route('/setassignmentchoice', methods=['GET', 'POST'])
+def setassignmentchoice():
+    return render_template("choice.html", choice=3)
+#done
+@app.route('/createdistassignment', methods=['GET', 'POST'])
+def createdistassignment():
+    check = check_user()
+    if check == 1:
+        form = SetDistAssignment()
+        distances = [i[0] for i in db.session.query(Events.eventDistance).filter(Events.eventDistance!=0).all()]
+        form.eventDistance.choices = distances
+        if form.validate_on_submit():
+            typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
+            a = ScheduledAssignments(classID=session["current_classid"], eventID=eventid, returnDate=form.dday.data)
+            db.session.add(a)
+            db.session.commit()
+        return render_template("admin/distassignments.html", form=form)
+    elif check == 0:
+        return redirect(url_for('udash'))
+    else:
+        return redirect(url_for('login'))
+#done
+@app.route('/createtimedassignment', methods=['GET', 'POST'])
+def createtimedassignment():
+    check = check_user()
+    if check == 1:
+        form = SetTimedAssignment()
+        times = [i[0] for i in db.session.query(Events.eventTime).filter(Events.eventTime!=0).all()]
+        timeMS = []
+        #changes time into MM:SS format
+        for time in times:
+            min = time//60
+            sec = time - (min*60)
+            if len(str(sec)) == 1:
+                sec = "0"+str(sec)
+            elif len(str(sec)) == 2:
+                sec = str(sec)
+            digtime = str(min) + ":" + sec
+            timeMS.append(digtime)
+        form.eventTime.choices = timeMS
+        if form.validate_on_submit():
+            time = form.eventTime.data
+            times = [int(i) for i in time.split(":")]
+            typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
+            timeinS = times[0]*60 + times[1]
+            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventTime=timeinS).first().eventID)
+            a = ScheduledAssignments(classID=session["current_classid"], eventID=eventid, returnDate=form.dday.data)
+            db.session.add(a)
+            db.session.commit()
+        return render_template("admin/timeassignments.html", form=form)
+    elif check == 0:
+        return redirect(url_for('udash'))
+    else:
+        return redirect(url_for('login'))
 #done but could format it better
 @app.route('/assignment', methods=['GET', 'POST'])
 def submitassignment():
