@@ -3,3 +3,4 @@
 /timeme/__pycache__
 /env
 /timeme/TimeMe.db
+/timeme/__init__.py

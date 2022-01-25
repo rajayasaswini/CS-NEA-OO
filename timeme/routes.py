@@ -185,6 +185,26 @@ def addclass():
         flash(f'Class Created','success')
         return redirect(url_for('viewclasses'))
     return render_template("admin/addclass.html", form=form)
+
+def send_classcode(user, classcode):
+    mess = Message('Class Code', sender="raja8450@dubaicollege.org", recipients=[user])
+    mess.body = f'''Your teacher has sent you a class code: {classcode}'''
+    mail.send(mess)
+
+@app.route('/addmember', methods=['GET', 'POST'])
+def addmember():
+    form = UserEmail()
+    if form.addUser.data:
+        form.user.append_entry()
+        return render_template("admin/addmemberemail.html", form=form)
+    if form.submit.data:
+        classcode = [i for i in db.session.query(Classes.classCode).filter(Classes.classID == session['current_classid']).first()][0]
+        print("cc", classcode)
+        for i in form.user.data:
+            email = i['userEmail']
+            if len(email) != 0:
+                send_classcode(email, classcode)
+    return render_template("admin/addmemberemail.html", title="Add Member", form=form)
 #done
 @app.route('/enterclasscode', methods=['GET','POST'])
 def entercode():

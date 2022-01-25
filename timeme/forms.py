@@ -252,8 +252,16 @@ class AddUser(Form):
 class UserReg(FlaskForm):
     submit = SubmitField('Submit')
     user = FieldList(FormField(AddUser), label="Intervals")
-    #if pressed, a new text field from AddUser pops up
     addUser = SubmitField(label='Add User')
+
+class AddEmail(Form):
+    userEmail = StringField('Email', validators=[validators.Optional()])
+
+class UserEmail(FlaskForm):
+    submit = SubmitField('Submit')
+    user = FieldList(FormField(AddEmail), label="Email")
+    addUser = SubmitField(label='Add User')
+
 
 class ChooseEvent(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)
