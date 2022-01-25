@@ -701,9 +701,8 @@ def alldata():
 def profile():
     check = check_user()
     if check == 0:
-        form = Profile()
-        image_file = url_for('static', filename='pics/' + current_user.photo)
-        if form.submit.data:
+        #image_file = url_for('static', filename='pics/' + current_user.photo)
+        #if form.submit.data:
             #print(0)
             #current_user.firstname = form.fname.data
             #current_user.lastname = form.lname.data
@@ -711,23 +710,45 @@ def profile():
             #current_user.about = form.about.data
             #db.session.commit()
             #print(form.fname.data, form.lname.data, form.email.data, form.about.data)
-            id = current_user.id
-            user = Users.query.filter(Users.id==id)
-            print(user)
-            user.update({
-                "firstname": form.fname.data,
-                "lastname": form.lname.data,
-                "email": form.email.data,
-                "about": form.about.data
-            })
-            db.session.commit()
+            #id = current_user.id
+            #user = Users.query.filter(Users.id==id)
+            #print(user)
+            #user.update({
+            #    "firstname": form.fname.data,
+            #    "lastname": form.lname.data,
+            #    "email": form.email.data,
+            #    "about": form.about.data
+            #})
+            #db.session.commit()
         #elif request.method == 'GET':
         #    form.fname.data = current_user.firstname
         #    form.lname.data = current_user.lastname
         #    form.email.data = current_user.email
         #    form.about.data = current_user.about
-        return render_template("profile.html", image_file=image_file, user=check, form=form)
+        return render_template("profile.html", user=check)
     return render_template("profile.html")
+
+@app.route('/editprofile', methods=['GET', 'POST'])
+def editprofile():
+    #check = check_user()
+    form = Profile()
+    form.fname.data = current_user.firstname
+    form.lname.data = current_user.lastname
+    form.email.data = current_user.email
+    form.about.data = current_user.about
+    if form.validate_on_submit():
+        print(0)
+        user = Users.query.filter(Users.id==current_user.id)
+        user.update({
+            "firstname": form.fname.data,
+            "lastname": form.lname.data,
+            "email": form.email.data,
+            "about": form.about.data
+        })
+        db.session.commit()
+        return redirect(url_for('profile'))
+    return render_template("editprofile.html", form=form)
+
 #done
 def send_rp_email(user):
     token = user.get_token()
@@ -955,44 +976,6 @@ def timer():
             users = form.users.data
             addtime(users)
         return render_template("admin/timer.html", form=form, date=date, type=type, distance=distance, user=check)
-
-
-#@app.route('/regtimer', methods=['GET', 'POST'])
-#def regtimer():
-#    global present
-#    check = check_user()
-#    if check == 1:
-#        form = RegTimer()
-#        print(present)
-#        if form.start.data:
-#            update_starttime()
-#            pass
-#        elif form.store.data:
-#            starttime = return_starttime()
-#
-#            if starttime != "00:00:00":
-#                time = str(datetime.now() - starttime).split('.')[0]
-#            else:
-#                time = starttime
-#            #form.users.choices = present
-#            #reg = present
-#            reg = ["Bob", "Linda"]
-#            form.users.append_entry(
-#                {
-#                    "time": time,
-#                    "users": SelectField('Name', choices=reg, validators=[DataRequired()])
-#                }
-#            )
-#            return render_template("admin/timer.html", form=form, starttime=starttime)
-#        elif form.reset.data:
-#            reset_starttime()
-#
-#        if form.submit.data:
-#            users = form.users.data
-#            addtime(users)
-#            session["present"] = []
-#            return redirect(url_for('adash'))
-#        return render_template("admin/timer.html", form=form)
 
 present = []
 

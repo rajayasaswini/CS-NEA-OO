@@ -175,11 +175,11 @@ class Profile(FlaskForm):
     about = StringField('About')
     submit = SubmitField('Submit')
 
-    def validate_email(self,email):
-        if email.data != current_user.email:
-            user = Users.query(filter_by=email.data).first()
-            if user:
-                raise ValidationError('There is already an account under this email. Use another email or login.')
+    #def validate_email(self,email):
+    #    if email.data != current_user.email:
+    #        user = Users.query(filter_by=email.data).first()
+    #        if user:
+    #            raise ValidationError('There is already an account under this email. Use another email or login.')
 
 
 class RequestResetPass(FlaskForm):

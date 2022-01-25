@@ -16,79 +16,9 @@
         <p class="text-secondary">{{ current_user.email }}</p>
       </div>
     </div>
-    <div class="form-group">
-      <form class="" action="" method="post">
-        <div class="form-group">
-          {{ form.fname.label(id="left")}}
-
-          {% if form.fname.errors %}
-              {{ form.fname(class="form-control form-control-lg is-invalid") }}
-              <div class="invalid-feedback">
-                  {% for error in form.fname.errors %}
-                      <span>{{ error }}</span>
-                  {% endfor %}
-              </div>
-          {% else %}
-              {{ form.fname(class="form-control form-control-lg") }}
-          {% endif %}
-        </div>
-
-        <br>
-
-        <div class="form-group">
-          {{ form.lname.label(id="left")}}
-
-          {% if form.lname.errors %}
-              {{ form.lname(class="form-control form-control-lg is-invalid") }}
-              <div class="invalid-feedback">
-                  {% for error in form.lname.errors %}
-                      <span>{{ error }}</span>
-                  {% endfor %}
-              </div>
-          {% else %}
-              {{ form.lname(class="form-control form-control-lg") }}
-          {% endif %}
-        </div>
-
-        <br>
-
-        <div class="form-group">
-          {{ form.email.label(id="left")}}
-
-          {% if form.email.errors %}
-              {{ form.email(class="form-control form-control-lg is-invalid") }}
-              <div class="invalid-feedback">
-                  {% for error in form.email.errors %}
-                      <span>{{ error }}</span>
-                  {% endfor %}
-              </div>
-          {% else %}
-              {{ form.email(class="form-control form-control-lg") }}
-          {% endif %}
-        </div>
-
-        <br>
-        
-        <div class="form-group">
-          {{ form.about.label(id="left")}}
-
-          {% if form.about.errors %}
-              {{ form.about(class="form-control form-control-lg is-invalid") }}
-              <div class="invalid-feedback">
-                  {% for error in form.about.errors %}
-                      <span>{{ error }}</span>
-                  {% endfor %}
-              </div>
-          {% else %}
-              {{ form.about(class="form-control form-control-lg") }}
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          {{ form.submit(class="login-button") }}
-        </div>
-      </form>
-    </div>
+    <button class="nav-button">
+      <strong><a href="{{ url_for('editprofile') }}">Edit Profile</a></strong>
+    </button>
 
   </div>
 {% endblock content %}
