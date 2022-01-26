@@ -185,12 +185,12 @@ def addclass():
         flash(f'Class Created','success')
         return redirect(url_for('viewclasses'))
     return render_template("admin/addclass.html", form=form)
-
+#done
 def send_classcode(user, classcode):
     mess = Message('Class Code', sender="raja8450@dubaicollege.org", recipients=[user])
     mess.body = f'''Your teacher has sent you a class code: {classcode}'''
     mail.send(mess)
-
+#done
 @app.route('/addmember', methods=['GET', 'POST'])
 def addmember():
     form = UserEmail()
