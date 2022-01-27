@@ -19,39 +19,21 @@
             <th>{{ header }}</th>
             {% endfor %}
           </tr>
-          {% for row in classes %}
+          {% for row in assignments %}
           <tr>
-            <td>{{ row.className }}</td>
-            <td>{{ row.classCode }}</td>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+            <td>{{ row[4] }}</td>
+            <td>{{ row[5] }}</td>
+            <td>{{ row[6] }}</td>
+            <td>{{ row[7] }}</td>
           </tr>
           {% endfor %}
         </table>
       </div>
     </div>
 
-    <form class ="form" method="post" action="">
-      {{ form.hidden_tag() }}
-
-      <div class="form-group">
-        {{ form.classname.label(id="left")}}
-
-        {% if form.classname.errors %}
-            {{ form.classname(class="form-control form-control-lg is-invalid") }}
-            <div class="invalid-feedback">
-                {% for error in form.classname.errors %}
-                    <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-        {% else %}
-            {{ form.classname(class="form-control form-control-lg") }}
-        {% endif %}
-      </div>
-
-      <br>
-
-      <div class="form-group">
-          {{ form.submit(class="login-button") }}
-      </div>
-    </form>
   </body>
 </html>

@@ -500,7 +500,7 @@ def createtimedassignment():
     else:
         return redirect(url_for('login'))
 #done but could format it better
-@app.route('/assignment', methods=['GET', 'POST'])
+@app.route('/submitassignment', methods=['GET', 'POST'])
 def submitassignment():
     check = check_user()
     if check == 0:
@@ -570,6 +570,32 @@ def enterassignment():
                 session["current_assignment"] = None
             print(session["isAssignment"], session["current_assignment"])
     return render_template("user/userenterdata.html", form=form)
+
+@app.route('/viewsetassignments', methods=['GET', 'POST'])
+def viewsetassignments():
+    check = check_user()
+    if check == 1:
+        assignments = []
+        assignment_query = db.session.query(ScheduledAssignments.assignmentID, ScheduledAssignments.eventID, ScheduledAssignments.scheduledDate, ScheduledAssignments.returnDate).filter_by(classID = session["current_classid"])
+        for i in assignment_query:
+            eventdetails = db.session.query(Events.eventDistance, Events.eventTime).filter_by(eventID = int(i[1])).first()
+            eventtypeID = [i for i in db.session.query(Events.eventTypeID).filter_by(eventID = int(i[1])).first()][0]
+            eventtypes = []
+            eventtype = [i for i in db.session.query(EventTypes.type).filter_by(id = eventtypeID).first()][0]
+            eventtypes.append(eventtype[0])
+            num_of_people = len(list(ReturnedAssignment.query.filter_by(schassid = i.assignmentID)))
+            assid = i.assignmentID
+            eventid = i.eventID
+            scheduled = (str(i.scheduledDate).split(" "))[0]
+            returndate = i.returnDate
+            dist = eventdetails.eventDistance
+            time = eventdetails.eventTime
+            assignment = (assid, eventid, scheduled, returndate, eventtype, dist, time, num_of_people)
+            assignments.append(assignment)
+        print(assignments[0][0])
+        headings = ('Assignment ID', 'Event ID', 'Set Date', 'Due Date', 'Event Type', 'Event Distance', 'Event Time', 'Handed In')
+    return render_template("admin/schassignment.html", assignments=assignments, headings=headings)
+
 #not done
 dstid = 0
 @app.route('/data', methods=['GET', 'POST'])
