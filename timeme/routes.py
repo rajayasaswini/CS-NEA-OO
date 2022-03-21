@@ -571,6 +571,7 @@ def enterassignment():
             print(session["isAssignment"], session["current_assignment"])
     return render_template("user/userenterdata.html", form=form)
 
+#done
 @app.route('/viewsetassignments', methods=['GET', 'POST'])
 def viewsetassignments():
     check = check_user()
@@ -674,6 +675,7 @@ def reviewdata():
     elif check == 1:
         return render_template("reviewdata.html", user=check)
 event = ' '
+#filtering through events
 @app.route('/chooseeventdata', methods=['GET', 'POST'])
 def chooseeventdata():
     global event
@@ -685,7 +687,7 @@ def chooseeventdata():
             return redirect(url_for('alldata'))
         return render_template("datachooseevent.html", user=check, form=form)
     elif check == 1:
-        return render_template("datachooseevent.html", user=check)
+        return render_template("datachooseevent.html", user=check, form=AdminCheckEventData())
 
 @app.route('/alldata', methods=['GET', 'POST'])
 def alldata():
@@ -849,19 +851,21 @@ def update_event(type, dist):
 def return_event():
     return current_event
 #!!!
+#choose event after registering
 @app.route('/chooseevent', methods=['GET', 'POST'])
 def chooseevent():
     check = check_user()
     if check == 1:
         form = ChooseEvent()
-        if form.validate_on_submit():
-            if form.submit.data:
-                update_event(form.eventType.data, form.eventDistance.data)
-                #if len(session["present"]) >= 0:
-                return redirect(url_for('timer'))
-                #elif len(session["present"]) == 0:
-                    #return redirect(url_for('timer'))
-        return render_template("admin/chooseevent.html", form=form)
+        #if form.validate_on_submit():
+        #    if form.submit.data:
+        #        update_event(form.eventType.data, form.eventDistance.data)
+        #        return_event()
+        #        if len(session["present"]) >= 0:
+        #            return redirect(url_for('timer'))
+        #        #elif len(session["present"]) == 0:
+        #         #   return redirect(url_for('timer'))
+        return render_template("admin/chooseevent.html")
     else:
         return redirect(url_for('login'))
 
@@ -1048,5 +1052,13 @@ def takeregister():
                 db.session.add(newreg)
         db.session.commit()
         print(present)
-        return redirect(url_for('chooseevent'))
+        if form.submit.data:
+            return redirect(url_for('adash'))
     return render_template("admin/register.html", form=form)
+
+@app.route('/viewregisters', methods=['GET', 'POST'])
+def viewregister():
+    check = check_user()
+    classregs = db.session.query(Registers.regid).filter_by(classID=session["current_classid"]).all()
+    headings = ('Register ID', 'Date')
+    return render_template("admin/viewregister.html", headings=headings, user=check, row=classregs)

@@ -251,7 +251,7 @@ class AddUser(Form):
 
 class UserReg(FlaskForm):
     submit = SubmitField('Submit')
-    user = FieldList(FormField(AddUser), label="Intervals")
+    user = FieldList(FormField(AddUser), label="Name")
     addUser = SubmitField(label='Add User')
 
 class AddEmail(Form):
