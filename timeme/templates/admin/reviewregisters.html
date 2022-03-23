@@ -25,38 +25,12 @@
           </tr>
           {% for row in data %}
           <tr>
-            <td>{{ row.regid }}</td>
-            <td>{{ row.date }}</td>
+            <td>{{ row[0][0] }}</td>
+            <td>{{ row[1][0] }}</td>
           </tr>
           {% endfor %}
         </table>
       </div>
     </div>
-
-    <form class ="form" method="post" action="">
-      {{ form.hidden_tag() }}
-
-      <div class="form-group">
-        {{ form.regID.label(id="left")}}
-
-        {% if form.regID.errors %}
-            {{ form.regID(class="form-control form-control-lg is-invalid") }}
-            <div class="invalid-feedback">
-                {% for error in form.regID.errors %}
-                    <span>{{ error }}</span>
-                {% endfor %}
-            </div>
-        {% else %}
-            {{ form.regID(class="form-control form-control-lg") }}
-        {% endif %}
-      </div>
-
-      <br>
-
-      <div class="form-group">
-          {{ form.submit(class="login-button") }}
-      </div>
-    </form>
-
   </body>
 </html>

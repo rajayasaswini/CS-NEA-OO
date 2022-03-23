@@ -254,6 +254,10 @@ class UserReg(FlaskForm):
     user = FieldList(FormField(AddUser), label="Name")
     addUser = SubmitField(label='Add User')
 
+class ReviewRegisters(FlaskForm):
+    regID = IntegerField('Register ID', validators=[DataRequired()])
+    submit = SubmitField('Review')
+
 class AddEmail(Form):
     userEmail = StringField('Email', validators=[validators.Optional()])
 

@@ -199,7 +199,7 @@ def addmember():
         return render_template("admin/addmemberemail.html", form=form)
     if form.submit.data:
         classcode = [i for i in db.session.query(Classes.classCode).filter(Classes.classID == session['current_classid']).first()][0]
-        print("cc", classcode)
+        #print("cc", classcode)
         for i in form.user.data:
             email = i['userEmail']
             if len(email) != 0:
@@ -335,7 +335,7 @@ def enterdist():
             #dist = int(dist)
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventTime=timeinS).first().eventID)
-            print(typeid, eventid)
+            #print(typeid, eventid)
             userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=timeinS , userSpeed=userSpeed, isAssignment=assign)
             db.session.add(userdst)
             db.session.commit()
@@ -558,7 +558,7 @@ def enterassignment():
                 typeid = int(EventTypes.query.filter_by(type=details[0]).first().id)
                 eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=details[1]).first().eventID)
                 userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=int(details[1]), userTime=time , userSpeed=0.1, isAssignment=assign)
-                print(session["isAssignment"], session["current_assignment"])
+                #print(session["isAssignment"], session["current_assignment"])
             db.session.add(userdst)
             db.session.commit()
             if session["isAssignment"] == 1:
@@ -568,7 +568,7 @@ def enterassignment():
                 db.session.commit()
                 session["isAssignment"] == 0
                 session["current_assignment"] = None
-            print(session["isAssignment"], session["current_assignment"])
+            #print(session["isAssignment"], session["current_assignment"])
     return render_template("user/userenterdata.html", form=form)
 
 #done
@@ -593,7 +593,7 @@ def viewsetassignments():
             time = eventdetails.eventTime
             assignment = (assid, eventid, scheduled, returndate, eventtype, dist, time, num_of_people)
             assignments.append(assignment)
-        print(assignments[0][0])
+        #print(assignments[0][0])
         headings = ('Assignment ID', 'Event ID', 'Set Date', 'Due Date', 'Event Type', 'Event Distance', 'Event Time', 'Handed In')
     return render_template("admin/schassignment.html", assignments=assignments, headings=headings)
 
@@ -662,7 +662,7 @@ def reviewdata():
     global dstid
     check = check_user()
     if check == 0:
-        print(dstid)
+        #print(dstid)
         labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=11).all()]
         values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=11).all()]
         values2 = [2,2,2,2,2,2,2,2,2,2]
@@ -730,7 +730,7 @@ def alldata():
         predicted_date = recentdate + timedelta(days=2)
         pd = str(predicted_date.day)+'-'+str(predicted_date.month)+'-'+str(predicted_date.year)
         date.append(pd)
-        print(pd)
+        #print(pd)
         pd1 = "16-12-2021"
         pdy = reg.predict(np.array([[new_val]]))
         pdy_list = []
@@ -785,7 +785,7 @@ def editprofile():
     form.email.data = current_user.email
     form.about.data = current_user.about
     if form.validate_on_submit():
-        print(0)
+        #print(0)
         user = Users.query.filter(Users.id==current_user.id)
         user.update({
             "firstname": form.fname.data,
@@ -851,21 +851,21 @@ def update_event(type, dist):
 def return_event():
     return current_event
 #!!!
-#choose event after registering
+#choose event before timer
 @app.route('/chooseevent', methods=['GET', 'POST'])
 def chooseevent():
     check = check_user()
     if check == 1:
         form = ChooseEvent()
-        #if form.validate_on_submit():
-        #    if form.submit.data:
-        #        update_event(form.eventType.data, form.eventDistance.data)
-        #        return_event()
-        #        if len(session["present"]) >= 0:
-        #            return redirect(url_for('timer'))
-        #        #elif len(session["present"]) == 0:
-        #         #   return redirect(url_for('timer'))
-        return render_template("admin/chooseevent.html")
+        if form.validate_on_submit():
+            if form.submit.data:
+                update_event(form.eventType.data, form.eventDistance.data)
+                return_event()
+                if len(session["present"]) >= 0:
+                    return redirect(url_for('timer'))
+                elif len(session["present"]) == 0:
+                    return redirect(url_for('timer'))
+        return render_template("admin/chooseevent.html", form=form)
     else:
         return redirect(url_for('login'))
 
@@ -909,14 +909,14 @@ def addtime(users):
     event = return_event().split(" ")
     type = event[0]
     dist = event[1]
-    print(dist)
+    #print(dist)
     user = users
     check = check_user()
     for i in range(0,len(users)):
         userlist = [j[1] for j in user[i].items()]
         times = userlist[0].split(':')
         name = userlist[1]
-        print(name)
+        #print(name)
         time = int(times[0])*3600 + int(times[1])*60 + int(times[2])
         userSpeed = 0
         userSpeed = getspeed(time, str(dist), userSpeed)
@@ -1051,14 +1051,42 @@ def takeregister():
                 newreg = RegPresent(regid=regid, userid=userid, isPresent=1)
                 db.session.add(newreg)
         db.session.commit()
-        print(present)
+        #print(present)
         if form.submit.data:
             return redirect(url_for('adash'))
     return render_template("admin/register.html", form=form)
-
+#viewing registers all at once
 @app.route('/viewregisters', methods=['GET', 'POST'])
 def viewregister():
     check = check_user()
-    classregs = db.session.query(Registers.regid).filter_by(classID=session["current_classid"]).all()
+    form = ReviewRegisters()
+    classregs = db.session.query(Registers.regid, Registers.date).filter_by(classID = session["current_classid"]).all()
     headings = ('Register ID', 'Date')
-    return render_template("admin/viewregister.html", headings=headings, user=check, row=classregs)
+    if form.validate_on_submit():
+        session['regid'] = form.regID.data
+        return redirect(url_for('reviewregister'))
+    return render_template("admin/viewregister.html", headings=headings, user=check, data=classregs, form=form)
+#viewing the names in a register
+@app.route('/reviewregister', methods=['GET', 'POST'])
+def reviewregister():
+    check = check_user()
+    regid = session['regid']
+    headings = ('First Name', 'Last Name')
+    inreg = [i[0] for i in db.session.query(RegPresent.userid).filter_by(regid  = regid)]
+    firstname = []
+    lastname = []
+    data = []
+    for i in inreg:
+        fname = [str(i[0]) for i in db.session.query(Users.firstname).filter_by(id = i)]
+        lname = [str(i[0]) for i in db.session.query(Users.lastname).filter_by(id = i)]
+        firstname.append(fname)
+        lastname.append(lname)
+        #name = db.session.query(Users.firstname, Users.lastname).filter_by(id = i)
+        #data.append(name)
+
+    for i in range(0, len(firstname)):
+        data.append([firstname[i], lastname[i]])
+    print(data)
+    #print(data)
+    #regstudents = db.session.query(RegPresent.regid, Registers.date).filter_by(classID = session["current_classid"]).all()
+    return render_template("admin/reviewregisters.html", user=check, headings=headings, data=data)
