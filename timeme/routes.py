@@ -571,11 +571,32 @@ def enterassignment():
             #print(session["isAssignment"], session["current_assignment"])
     return render_template("user/userenterdata.html", form=form)
 
+def returnname(ids):
+    names = []
+    for i in ids:
+        name = [str(i[0])+" "+str(i[1]) for i in db.session.query(Users.firstname, Users.lastname).filter_by(id = i)]
+        names.append(name[0])
+    return names
+
 #done
 @app.route('/viewsetassignments', methods=['GET', 'POST'])
 def viewsetassignments():
     check = check_user()
     if check == 1:
+        form = ReviewAssignment()
+        session["review_assignment"] = 0
+        #get ids of students in class
+        #get those ids and get their names
+        #name = db.session.query(Users.firstname, Users.lastname).filter_by(id = i)
+        #inreg = [i[0] for i in db.session.query(RegPresent.userid).filter_by(regid  = regid)]
+        ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter_by(classID = session['current_classid'])]
+        names = returnname(ids)
+        error = ' '
+        #for i in ids:
+        #    name = [str(i[0])+" "+str(i[1]) for i in db.session.query(Users.firstname, Users.lastname).filter_by(id = i)]
+        #    names.append(name[0])
+        print(names)
+        form.user.choices = names
         assignments = []
         assignment_query = db.session.query(ScheduledAssignments.assignmentID, ScheduledAssignments.eventID, ScheduledAssignments.scheduledDate, ScheduledAssignments.returnDate).filter_by(classID = session["current_classid"])
         for i in assignment_query:
@@ -595,7 +616,24 @@ def viewsetassignments():
             assignments.append(assignment)
         #print(assignments[0][0])
         headings = ('Assignment ID', 'Event ID', 'Set Date', 'Due Date', 'Event Type', 'Event Distance', 'Event Time', 'Handed In')
-    return render_template("admin/schassignment.html", assignments=assignments, headings=headings)
+        if form.validate_on_submit():
+            fullname = (form.user.data).split(" ")
+            id = [i for i in db.session.query(Users.id).filter_by(firstname = fullname[0], lastname = fullname[1]).first()][0]
+            #assignment = db.session.query(ReturnedAssignment.userdstid).filter(ReturnedAssignment.schassid == form.id.data, UserDST.userID == id).first()
+            assignment = db.session.query(ReturnedAssignment.userdstid).select_from(UserDST).join(ReturnedAssignment).join(Users).filter(UserDST.userID == id, ReturnedAssignment.schassid == form.id.data).first()
+            if assignment is None:
+                error = 'The user has not submitted this assignment.'
+            else:
+                global dstid
+                session["review_assignment"] = [i for i in assignment][0]
+                dstid = [i for i in assignment][0]
+                #print("d", dstid)
+                return redirect(url_for('reviewdata'))
+            #ReturnedAssignments and Users
+            #select_from(UserDST).join(ReturnedAssignment).join(Users)
+            #assignment = list(db.session.query(EventTypes.type, Events.eventDistance, ScheduledAssignments.returnDate).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
+
+    return render_template("admin/schassignment.html", assignments=assignments, headings=headings, form=form, error = error)
 
 #not done
 dstid = 0
@@ -660,12 +698,12 @@ def editdata():
 @app.route('/reviewdata', methods=['GET', 'POST'])
 def reviewdata():
     global dstid
+    print("s", dstid)
     check = check_user()
     if check == 0:
-        #print(dstid)
-        labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=11).all()]
-        values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=11).all()]
-        values2 = [2,2,2,2,2,2,2,2,2,2]
+        labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=dstid).all()]
+        values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=dstid).all()]
+        #values2 = [2,2,2,2,2,2,2,2,2,2]
         speeds = []
         for i in range(0,len(labels)):
             speed = 0
@@ -673,7 +711,27 @@ def reviewdata():
             speeds.append(speed)
         return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds)
     elif check == 1:
-        return render_template("reviewdata.html", user=check)
+        labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=dstid).all()]
+        values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=dstid).all()]
+        values2 = [2,2,2,2,2,2,2,2,2,2]
+        speeds = []
+        for i in range(0,len(labels)):
+            speed = 0
+            speed = getspeed(labels[i], values[i], speed)
+            speeds.append(speed)
+        dst_details = UserDST.query.filter_by(userDSTID = dstid).first()
+        userid = [dst_details.userID]
+        details = []
+        details.append((returnname(userid))[0])
+        event = [i for i in db.session.query(EventTypes.type, Events.eventDistance, Events.eventTime).select_from(EventTypes).join(Events).filter(Events.eventID == dst_details.eventID).first()]
+        details.append(event[0])
+        details.append(event[1])
+        details.append(dst_details.userDistance)
+        details.append(event[2])
+        details.append(dst_details.userTime)
+        details.append(dst_details.userSpeed)
+        return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds, details=details)
+
 event = ' '
 #filtering through events
 @app.route('/chooseeventdata', methods=['GET', 'POST'])
@@ -744,11 +802,10 @@ def alldata():
     elif check == 1:
         return render_template("alldata.html", user=check)
 
-#not done
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
-    check = check_user()
-    if check == 0:
+#@app.route('/profile', methods=['GET', 'POST'])
+#def profile():
+#    check = check_user()
+#    if check == 0:
         #image_file = url_for('static', filename='pics/' + current_user.photo)
         #if form.submit.data:
             #print(0)
@@ -774,10 +831,10 @@ def profile():
         #    form.email.data = current_user.email
         #    form.about.data = current_user.about
         return render_template("profile.html", user=check)
-    return render_template("profile.html")
+#    return render_template("profile.html")
 
-@app.route('/editprofile', methods=['GET', 'POST'])
-def editprofile():
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
     #check = check_user()
     form = Profile()
     form.fname.data = current_user.firstname
@@ -1066,6 +1123,7 @@ def viewregister():
         session['regid'] = form.regID.data
         return redirect(url_for('reviewregister'))
     return render_template("admin/viewregister.html", headings=headings, user=check, data=classregs, form=form)
+#done
 #viewing the names in a register
 @app.route('/reviewregister', methods=['GET', 'POST'])
 def reviewregister():

@@ -231,6 +231,11 @@ class EditData(FlaskForm):
     review = SubmitField('Review')
     edit = SubmitField('Edit')
 
+class ReviewAssignment(FlaskForm):
+    id = IntegerField('ID', validators=[DataRequired()])
+    user = SelectField('Name', choices=[], validators=[DataRequired()])
+    submit = SubmitField('Check')
+
 class UserCheckEventData(FlaskForm):
     eventtype = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
     eventdist = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])

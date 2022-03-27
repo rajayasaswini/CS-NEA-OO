@@ -16,11 +16,11 @@
   </head>
   <body>
     <div class="go-back">
-      <a href="{{ url_for('data') }}">Go Back</a>
+      <a href="{{ url_for('data') }}">Go back to Data</a>
     </div>
     {% extends "charts/chart_layout.html" %}
     {% block content %}
-
+    <p>Distance-time graph</p>
     <div class="col-xs-10 col-sm-6 col-md-6">
         <div class="card card-style mb-2">
             <div class="card-body">
@@ -30,7 +30,7 @@
             </div>
         </div>
     </div>
-
+    <p>Speed-time graph</p>
     <div class="col-xs-10 col-sm-6 col-md-6">
         <div class="card card-style mb-2">
             <div class="card-body">
@@ -45,6 +45,20 @@
     {% include "charts/dt-dist-time.html" %}
     {% include "charts/dt-speed-time.html" %}
     {% endblock %}
+
+    <div class="details">
+      {{% if user == 1 %}}
+        <p>Name: {{ details[0] }}</p>
+      {{% endif %}}
+      <p>Event Type = {{ details[1] }}</p>
+      <p>Event Distance = {{ details[2] }}</p>
+      <p>Total Distance = {{ details[3] }}</p>
+      <p>Event Time = {{ details[4] }}</p>
+      <p>Total Time = {{ details[5] }}</p>
+      <p>Avg Speed = {{ details[6] }}</p>
+    </div>
+
     {% endblock %}
+
   </body>
 </html>
