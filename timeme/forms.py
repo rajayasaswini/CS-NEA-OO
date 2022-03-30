@@ -114,6 +114,16 @@ class AdminEnterData(FlaskForm):
     userInterval = FieldList(FormField(Intervals), label="Intervals")
     addInterval = SubmitField(label='Add Interval')
 
+class AdminEditData(FlaskForm):
+    user = SelectField('Name', choices=[], validators=[DataRequired()])
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True,validators=[DataRequired()])
+    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
+    userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
+    userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
+    submit = SubmitField('Submit')
+    userInterval = FieldList(FormField(Intervals), label="Intervals")
+    addInterval = SubmitField(label='Add Interval')
+
 class AdminEnterDist(FlaskForm):
     user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
@@ -122,6 +132,10 @@ class AdminEnterDist(FlaskForm):
     submit = SubmitField('Submit')
     userInterval = FieldList(FormField(Intervals), label="Intervals")
     addInterval = SubmitField(label='Add Interval')
+
+class ChooseStudent(FlaskForm):
+    user = SelectField('Name', choices=[], validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 class SubmitAssignment(FlaskForm):
     eventType = SelectField('Event Type', choices=[], validators=[DataRequired()])
@@ -226,7 +240,7 @@ class SelectAssignment(FlaskForm):
     assignmentname = SelectField('Assignment Name', choices=[], validators=[DataRequired()])
     submit = SubmitField('Enter data')
 
-class EditData(FlaskForm):
+class ChooseDSTID(FlaskForm):
     id = IntegerField('ID', validators=[DataRequired()])
     review = SubmitField('Review')
     edit = SubmitField('Edit')
@@ -238,7 +252,7 @@ class ReviewAssignment(FlaskForm):
 
 class UserCheckEventData(FlaskForm):
     eventtype = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
-    eventdist = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
+    eventdist = SelectField('Event Distance', choices=[], validators=[DataRequired()])
     submit = SubmitField('Check')
 
 class AdminCheckEventData(FlaskForm):

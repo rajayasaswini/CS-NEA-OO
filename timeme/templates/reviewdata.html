@@ -46,17 +46,15 @@
     {% include "charts/dt-speed-time.html" %}
     {% endblock %}
 
-    <div class="details">
-      {{% if user == 1 %}}
+      <div class="details">
         <p>Name: {{ details[0] }}</p>
-      {{% endif %}}
-      <p>Event Type = {{ details[1] }}</p>
-      <p>Event Distance = {{ details[2] }}</p>
-      <p>Total Distance = {{ details[3] }}</p>
-      <p>Event Time = {{ details[4] }}</p>
-      <p>Total Time = {{ details[5] }}</p>
-      <p>Avg Speed = {{ details[6] }}</p>
-    </div>
+        <p>Event Type = {{ details[1] }}</p>
+        <p>Event Distance = {{ details[2] }}</p>
+        <p>Total Distance = {{ details[3] }}</p>
+        <p>Event Time = {{ details[4] }}</p>
+        <p>Total Time = {{ details[5] }}</p>
+        <p>Avg Speed = {{ details[6] }}</p>
+      </div>
 
     {% endblock %}
 

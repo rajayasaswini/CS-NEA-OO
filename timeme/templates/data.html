@@ -15,6 +15,9 @@
     <title>View Data</title>
   </head>
   <body>
+    {% if user == 1 %}
+      <h2>You are viewing {{ student }}'s entries:</h2>
+    {% endif %}
     <div class="">
       <div class="view-table">
         <table>
@@ -34,7 +37,11 @@
           {% endfor %}
         </table>
       </div>
+      <button class="nav-button">
+        <strong><a href="{{ url_for('chooseeventdata') }}">Review Event</a></strong>
+      </button>
     </div>
+
     <div class="form-group">
       <form class="" action="" method="post">
         <div class="form-group">

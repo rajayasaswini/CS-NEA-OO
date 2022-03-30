@@ -83,22 +83,20 @@
 					{% endif %}
 				</div>
 
-        <br>
-
         <div class="form-group">
-					{{ form.userTimeS.label(id="left")}}
+          {{ form.userTime.label(id="left")}}
 
-					{% if form.userTimeS.errors %}
-							{{ form.userTimeS(class="form-control form-control-lg is-invalid") }}
-							<div class="invalid-feedback">
-									{% for error in form.userTimeS.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-							</div>
-					{% else %}
-							{{ form.userTimeS(class="form-control form-control-lg") }}
-					{% endif %}
-				</div>
+          {% if form.userTime.errors %}
+              {{ form.userTime(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.userTime.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.userTime(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
 
         <div class="form-group">
           {{form.addInterval}}
