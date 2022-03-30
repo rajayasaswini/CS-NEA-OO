@@ -760,38 +760,48 @@ def reviewdata():
     global dstid
     print("s", dstid)
     check = check_user()
+    details = []
+    dst_details = UserDST.query.filter_by(userDSTID = dstid).first()
+    event = [i for i in db.session.query(EventTypes.type, Events.eventDistance, Events.eventTime).select_from(EventTypes).join(Events).filter(Events.eventID == dst_details.eventID).first()]
+    labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=dstid).all()]
+    values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=dstid).all()]
+    speeds = []
+    for i in range(0,len(labels)):
+        speed = 0
+        speed = getspeed(labels[i], values[i], speed)
+        speeds.append(speed)
     if check == 0:
-        labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=dstid).all()]
-        values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=dstid).all()]
+        #labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=dstid).all()]
+        #values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=dstid).all()]
         #values2 = [2,2,2,2,2,2,2,2,2,2]
-        speeds = []
-        for i in range(0,len(labels)):
-            speed = 0
-            speed = getspeed(labels[i], values[i], speed)
-            speeds.append(speed)
-        details = ['', '', '','', '', '','']
-        return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds, details=details)
+        #speeds = []
+        #for i in range(0,len(labels)):
+        #    speed = 0
+        #    speed = getspeed(labels[i], values[i], speed)
+        #    speeds.append(speed)
+        details.append(' ')
+        #return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds, details=details)
     elif check == 1:
-        labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=dstid).all()]
-        values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=dstid).all()]
-        values2 = [2,2,2,2,2,2,2,2,2,2]
-        speeds = []
-        for i in range(0,len(labels)):
-            speed = 0
-            speed = getspeed(labels[i], values[i], speed)
-            speeds.append(speed)
-        dst_details = UserDST.query.filter_by(userDSTID = dstid).first()
+        #labels = [i[0] for i in db.session.query(Intervals.time).filter_by(userdstid=dstid).all()]
+        #values = [i[0] for i in db.session.query(Intervals.dist).filter_by(userdstid=dstid).all()]
+        #values2 = [2,2,2,2,2,2,2,2,2,2]
+        #speeds = []
+        #for i in range(0,len(labels)):
+        #    speed = 0
+        #    speed = getspeed(labels[i], values[i], speed)
+        #    speeds.append(speed)
+        #dst_details = UserDST.query.filter_by(userDSTID = dstid).first()
         userid = [dst_details.userID]
         details = []
         details.append((returnname(userid))[0])
-        event = [i for i in db.session.query(EventTypes.type, Events.eventDistance, Events.eventTime).select_from(EventTypes).join(Events).filter(Events.eventID == dst_details.eventID).first()]
-        details.append(event[0])
-        details.append(event[1])
-        details.append(dst_details.userDistance)
-        details.append(event[2])
-        details.append(dst_details.userTime)
-        details.append(dst_details.userSpeed)
-        return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds, details=details)
+        #event = [i for i in db.session.query(EventTypes.type, Events.eventDistance, Events.eventTime).select_from(EventTypes).join(Events).filter(Events.eventID == dst_details.eventID).first()]
+    details.append(event[0])
+    details.append(event[1])
+    details.append(dst_details.userDistance)
+    details.append(event[2])
+    details.append(dst_details.userTime)
+    details.append(dst_details.userSpeed)
+    return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds, details=details)
 
 event = ' '
 #filtering through events
