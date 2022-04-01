@@ -120,6 +120,7 @@
 
         <br>
 
+        {% if assign != 0 %}
         <div class="form-group">
           {{form.addInterval}}
           <div class="userIntervals">
@@ -132,6 +133,7 @@
             {% endfor %}
           </div>
         </div>
+        {% endif %}
 
         <div class="form-group">
             {{ form.submit(class="login-button") }}

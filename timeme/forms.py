@@ -116,13 +116,13 @@ class AdminEnterData(FlaskForm):
 
 class AdminEditData(FlaskForm):
     user = SelectField('Name', choices=[], validators=[DataRequired()])
-    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True,validators=[DataRequired()])
+    eventType = SelectField('Event Type', choices=[], validators=[DataRequired()])
     eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
+    eventTime = SelectField('Event Time', choices=[], validators=[DataRequired()])
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
+    userDistance = IntegerField('Distance', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
-    userInterval = FieldList(FormField(Intervals), label="Intervals")
-    addInterval = SubmitField(label='Add Interval')
 
 class AdminEnterDist(FlaskForm):
     user = SelectField('Name', choices=[], validators=[DataRequired()])

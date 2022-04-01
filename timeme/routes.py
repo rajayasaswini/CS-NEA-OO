@@ -536,7 +536,7 @@ def submitassignment():
             #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=assignmentlist[1]).first().eventID)
             session["current_assignmentid"] = form.assignmentID.data
             return redirect(url_for('enterassignment'))
-        return render_template('user/assignments.html', headings=headings, assignments=assignment, form=form)
+        return render_template('user/assignments.html', headings=headings, assignments=assignment, form=form, assign=1)
     else:
         return redirect(url_for('login'))
 #done
@@ -704,7 +704,7 @@ def data():
             i.append(' ')
         else:
             i.append(assignmentID[0])
-    print(userdst)
+    #print(userdst)
     if form.review.data:
         dstid = form.id.data
         return redirect(url_for('reviewdata'))
@@ -727,66 +727,110 @@ def choosestudent():
             return redirect(url_for('data')) ###########
         return render_template("admin/choosestudent.html", form=form)
 
-#only done for user
+#done
 @app.route('/editdata', methods=['GET', 'POST'])
 def editdata():
     check = check_user()
     global dstid
-    print(dstid)
+    #print(dstid)
     eventtype = []
     eventdist = []
     id = dstid
     speed = 0
-    eventID = db.session.query(UserDST.eventID).filter_by(userDSTID=id).first()
-    print("eventID", eventID)
-    eventdetails = list(db.session.query(Events.eventTypeID, Events.eventDistance).first())
-    print("eventdetails", eventdetails)
-    type = [str(i) for i in db.session.query(EventTypes.type).filter_by(id=eventdetails[0]).first()]
-    print("type", type)
-    distance = [str(eventdetails[1])]
-    print("distance", distance)
+    eventID = [i for i in db.session.query(UserDST.eventID).filter_by(userDSTID=id).first()][0]
+    event = [i for i in db.session.query(EventTypes.type, Events.eventDistance, Events.eventTime).select_from(EventTypes).join(Events).filter(Events.eventID == eventID).first()]
+    timeMS = []
+    for time in [event[2]]:
+        min = time//60
+        sec = time - (min*60)
+        if len(str(sec)) == 1:
+            sec = "0"+str(sec)
+        elif len(str(sec)) == 2:
+            sec = str(sec)
+        digtime = str(min) + ":" + sec
+        timeMS.append(digtime)
+    #print("eventID", eventID)
+    #eventdetails = list(db.session.query(Events.eventTypeID, Events.eventDistance, Events.eventTime).filter(Events.eventID==eventID).first())
+    #print("eventdetails", eventdetails)
+    #type = [str(i) for i in db.session.query(EventTypes.type).filter_by(id=eventdetails[0]).first()]
+    #print("type", type)
+    #distance = [eventdetails[1]]
+    #print("distance", distance)
     time = list(db.session.query(UserDST.userTime).filter_by(userDSTID=dstid).first())[0]
     usertimeM = time//60
     usertimeS = time - usertimeM*60
-    dstdetails = UserDST.query.filter(UserDST.userDSTID==dstid)
+    dstdetails = UserDST.query.filter_by(userDSTID=id).first()
     if check == 0:
-        form = UserEnterData()
-        form.eventType.data = type[0]
-        form.eventDistance.data = distance[0]
+        form = SubmitAssignment()
+        form.eventType.choices = [event[0]]
+        form.eventDistance.choices = [event[1]]
         form.userTimeM.data = usertimeM
         form.userTimeS.data = usertimeS
+        form.userDistance.data = dstdetails.userDistance
+        form.eventTime.choices = timeMS
+
+        #form.eventType.choices = type
+        #form.eventDistance.choices = distance
+        #form.userTimeM.data = usertimeM
+        #form.userTimeS.data = usertimeS
+        #form.eventTime.choices = [eventdetails[2]]
+        #form.userDistance.data = distance[0]
         if form.validate_on_submit():
             speed = 0
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
             updatedtime = form.userTimeM.data*60 + form.userTimeS.data
             speed = getspeed(updatedtime, form.eventDistance.data, speed)
-            dstdetails.update({
-                "eventID": eventid,
-                "userDistance": int(str(form.eventDistance.data)),
-                "userTime": updatedtime,
-                "userSpeed": speed
+            dstdetails = UserDST.query.filter_by(userDSTID=id).update({
+                UserDST.eventID : eventid,
+                UserDST.userDistance : int(str(form.eventDistance.data)),
+                UserDST.userTime : updatedtime,
+                UserDST.userSpeed : speed
             })
+            #dstdetails.eventID = eventID
+            #dstdetails.userDistance = int(str(form.eventDistance.data))
+            #dstdetails.userTime = updatedtime
+            #dstdetails.userSpeed = speed
+            #dstdetails.update({
+            #    UserDST.eventID : eventid,
+            #    UserDST.userDistance : int(str(form.eventDistance.data)),
+            #    UserDST.userTime : updatedtime,
+            #    UserDST.userSpeed : speed
+            #})
             db.session.commit()
             return redirect(url_for('data'))
-        return render_template("user/userenterdata.html", form=form, timeM=usertimeM, timeS=usertimeS)
+        return render_template("user/submitassignment.html", form=form, timeM=usertimeM, timeS=usertimeS, assign=0)
     elif check == 1:
-        form = AdminEnterData()
+        form = AdminEditData()
+        dstdetails = UserDST.query.filter(UserDST.userDSTID==dstid).first()
         classuserids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter(ClassesUsers.classID==session["current_classid"]).all()]
         form.user.choices = returnname(classuserids)
-        form.eventType.choices = type
-        form.eventDistance.choices = distance
+        #form.eventType.choices = type
+        #form.eventDistance.choices = distance
         #form.eventType.data = type
         #form.eventDistance.data = distance
+        #form.userTimeM.data = usertimeM
+        #form.userTimeS.data = usertimeS
+
+        form.eventType.choices = [event[0]]
+        form.eventDistance.choices = [event[1]]
         form.userTimeM.data = usertimeM
         form.userTimeS.data = usertimeS
+        form.userDistance.data = dstdetails.userDistance
+        form.eventTime.choices = timeMS
+
         if form.validate_on_submit():
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
-            updatedtime = form.userTimeM.data*60 + form.userTimeS.data
+            updatedtime = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
             speed = getspeed(updatedtime, form.eventDistance.data, speed)
             name = (form.user.data).split(' ')
             userID =  [i for i in db.session.query(Users.id).filter(Users.firstname==name[0], Users.lastname==name[1]).first()][0]
+            dstdetails.userID = userID
+            dstdetails.eventID = eventID
+            dstdetails.userDistance = int(str(form.eventDistance.data))
+            dstdetails.userTime = updatedtime
+            dstdetails.userSpeed = speed
             dstdetails.update({
                 "userID": userID,
                 "eventID": eventid,
@@ -796,7 +840,7 @@ def editdata():
             })
             db.session.commit()
             return redirect(url_for('data'))
-        return render_template("admin/adminenterdata.html", form=form, usertimeM=usertimeM, usertimeS=usertimeS)
+        return render_template("admin/admineditdata.html", form=form, usertimeM=usertimeM, usertimeS=usertimeS)
 
 
 @app.route('/reviewdata', methods=['GET', 'POST'])
