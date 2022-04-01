@@ -21,9 +21,11 @@
           </tr>
           {% for row in assignments %}
             <tr>
-              <td>{{ row.type }}</td>
-              <td>{{ row.eventDistance }}</td>
-              <td>{{ row.returnDate }}</td>
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }}</td>
+              <td>{{ row[2] }}</td>
+              <td>{{ row[3] }}</td>
+              <td>{{ row[4] }}</td>
             </tr>
           {% endfor %}
         </table>
@@ -34,17 +36,17 @@
       {{ form.hidden_tag() }}
 
       <div class="form-group">
-        {{ form.assignmentname.label(id="left")}}
+        {{ form.assignmentID.label(id="left")}}
 
-        {% if form.assignmentname.errors %}
-            {{ form.assignmentname(class="form-control form-control-lg is-invalid") }}
+        {% if form.assignmentID.errors %}
+            {{ form.assignmentID(class="form-control form-control-lg is-invalid") }}
             <div class="invalid-feedback">
-                {% for error in form.assignmentname.errors %}
+                {% for error in form.assignmentID.errors %}
                     <span>{{ error }}</span>
                 {% endfor %}
             </div>
         {% else %}
-            {{ form.assignmentname(class="form-control form-control-lg") }}
+            {{ form.assignmentID(class="form-control form-control-lg") }}
         {% endif %}
       </div>
 

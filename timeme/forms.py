@@ -140,9 +140,14 @@ class ChooseStudent(FlaskForm):
 class SubmitAssignment(FlaskForm):
     eventType = SelectField('Event Type', choices=[], validators=[DataRequired()])
     eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
+    eventTime = SelectField('Event Time', choices=[], validators=[DataRequired()])
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
+    userDistance = IntegerField('Distance', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
+    userInterval = FieldList(FormField(Intervals), label="Intervals")
+    addInterval = SubmitField(label='Add Interval')
+
 
 class CreateEvent(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
@@ -237,7 +242,7 @@ def assignmentquery():
         return (type, event, assign)
 
 class SelectAssignment(FlaskForm):
-    assignmentname = SelectField('Assignment Name', choices=[], validators=[DataRequired()])
+    assignmentID = IntegerField('Assignment Name', validators=[DataRequired()])
     submit = SubmitField('Enter data')
 
 class ChooseDSTID(FlaskForm):
