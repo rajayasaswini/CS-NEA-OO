@@ -105,9 +105,9 @@ class UserEnterDist(FlaskForm):
     addInterval = SubmitField(label='Add Interval')
 
 class AdminEnterData(FlaskForm):
-    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
-    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True,validators=[DataRequired()])
-    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
+    user = SelectField('Name', choices=[], validators=[DataRequired()])
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
+    eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
@@ -117,7 +117,7 @@ class AdminEnterData(FlaskForm):
 class AdminEditData(FlaskForm):
     user = SelectField('Name', choices=[], validators=[DataRequired()])
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True,validators=[DataRequired()])
-    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True, validators=[DataRequired()])
+    eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
     userTimeM = IntegerField('Minutes', validators=[validators.InputRequired()])
     userTimeS = IntegerField('Seconds', validators=[validators.InputRequired()])
     submit = SubmitField('Submit')
@@ -125,7 +125,7 @@ class AdminEditData(FlaskForm):
     addInterval = SubmitField(label='Add Interval')
 
 class AdminEnterDist(FlaskForm):
-    user = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+    user = SelectField('Name', choices=[], validators=[DataRequired()])
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, validators=[DataRequired()])
     userTime = SelectField('Minutes', choices=[], validators=[validators.InputRequired()])
     eventDistance = IntegerField('Event Distance', validators=[DataRequired()])
@@ -285,15 +285,16 @@ class UserEmail(FlaskForm):
     user = FieldList(FormField(AddEmail), label="Email")
     addUser = SubmitField(label='Add User')
 
+names = ['Lo La']
 
 class ChooseEvent(FlaskForm):
-    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True)
-    eventDistance = QuerySelectField('Event Distance', query_factory=event_query, allow_blank=True)
+    eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
+    eventDistance = SelectField('Event Distance', choices=[], validators=[DataRequired()])
     submit = SubmitField('Continue')
 
 class SelectUser(Form):
+    users = SelectField('Name', choices=[], validators=[DataRequired()])
     time = StringField('Time', validators=[validators.InputRequired()])
-    users = QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
 
 #class TimerTime(Form):
 #class RegSelectUser(Form):

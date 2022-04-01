@@ -1,0 +1,66 @@
+{% if user == 1 %}
+  {% include "html/adminheader.html" %}
+{% elif user == 0 %}
+  {% include "html/studentheader.html" %}
+{% endif %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../static/enterdata.css">
+    <title>Choose Event</title>
+  </head>
+  <body>
+    <div class="enterdata">
+      <div class="enterdata-logo">
+        <p>Choose Event</p>
+      </div>
+      <form class ="form" method="post" action="">
+				{{ form.hidden_tag() }}
+
+        <div class="form-group">
+					{{ form.eventType.label(id="left")}}
+
+					{% if form.eventType.errors %}
+							{{ form.eventType(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.eventType.errors %}
+											<span>{{ error }}</span>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.eventType(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+        <br>
+
+        <div class="form-group">
+					{{ form.eventDistance.label(id="left")}}
+
+					{% if form.eventDistance.errors %}
+							{{ form.eventDistance(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.eventDistance.errors %}
+											<span>{{ error }}</span><p>m</p>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.eventDistance(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+        <br>
+
+        <div class="form-group">
+						{{ form.submit(class="login-button") }}
+				</div>
+      </form>
+    </div>
+  </body>
+</html>

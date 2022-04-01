@@ -236,6 +236,12 @@ def intervals(userid, intervaldata, userdstid):
                 pass
     db.session.commit()
 #done
+
+def get_student_names():
+    ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter_by(classID = session['current_classid'])]
+    names = returnname(ids)
+    return names
+
 @app.route('/enterdata', methods=['GET', 'POST'])
 def enterdata():
     userSpeed = 0
@@ -244,6 +250,7 @@ def enterdata():
     if check == 0:
         form = UserEnterData()
         assign = 0
+        form.eventDistance.choices = [i[0] for i in db.session.query(Events.eventDistance).filter(Events.eventDistance!=0)]
         if form.addInterval.data:
             form.userInterval.append_entry()
             return render_template("user/userenterdata.html", form=form)
@@ -260,9 +267,10 @@ def enterdata():
             dstid = int(UserDST.query.filter_by(userID=current_user.id).all()[-1].userDSTID)
             intervals(current_user.id, form.userInterval.data, dstid)
         return render_template("user/userenterdata.html", form=form)
-
     elif check == 1:
         form = AdminEnterData()
+        form.eventDistance.choices = [i[0] for i in db.session.query(Events.eventDistance).filter(Events.eventDistance!=0)]
+        form.user.choices = get_student_names()
         if form.addInterval.data:
             form.userInterval.append_entry()
             return render_template("user/userenterdata.html", form=form)
@@ -344,9 +352,6 @@ def enterdist():
         return render_template("user/userenterdist.html", form=form)
     elif check == 1:
         form = AdminEnterDist()
-        if form.addInterval.data:
-            form.userInterval.append_entry()
-            return render_template("admin/adminenterdata.html", form=form)
         times = [i[0] for i in db.session.query(Events.eventTime).filter(Events.eventTime!=0).all()]
         timeMS = []
         for time in times:
@@ -359,6 +364,10 @@ def enterdist():
             digtime = str(min) + ":" + sec
             timeMS.append(digtime)
         form.userTime.choices = timeMS
+        form.user.choices = get_student_names()
+        if form.addInterval.data:
+            form.userInterval.append_entry()
+            return render_template("admin/adminenterdist.html", form=form)
         if form.validate_on_submit():
             name = str(form.user.data)
             name = name.split(' ')
@@ -391,7 +400,7 @@ def enterdist():
             db.session.commit()
             dstid = int(UserDST.query.filter_by(userID=userid).all()[-1].userDSTID)
             intervals(current_user.id, form.userInterval.data, dstid)
-        return render_template("admin/adminenterdata.html", form=form)
+        return render_template("admin/adminenterdist.html", form=form)
     else:
         return redirect(url_for('login'))
 #done
@@ -596,14 +605,14 @@ def viewsetassignments():
         #get those ids and get their names
         #name = db.session.query(Users.firstname, Users.lastname).filter_by(id = i)
         #inreg = [i[0] for i in db.session.query(RegPresent.userid).filter_by(regid  = regid)]
-        ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter_by(classID = session['current_classid'])]
-        names = returnname(ids)
+        #ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter_by(classID = session['current_classid'])]
+        #names = get_student_names()
         error = ' '
         #for i in ids:
         #    name = [str(i[0])+" "+str(i[1]) for i in db.session.query(Users.firstname, Users.lastname).filter_by(id = i)]
         #    names.append(name[0])
         print(names)
-        form.user.choices = names
+        form.user.choices = get_student_names()
         assignments = []
         assignment_query = db.session.query(ScheduledAssignments.assignmentID, ScheduledAssignments.eventID, ScheduledAssignments.scheduledDate, ScheduledAssignments.returnDate).filter_by(classID = session["current_classid"])
         for i in assignment_query:
@@ -639,7 +648,11 @@ def viewsetassignments():
             #ReturnedAssignments and Users
             #select_from(UserDST).join(ReturnedAssignment).join(Users)
             #assignment = list(db.session.query(EventTypes.type, Events.eventDistance, ScheduledAssignments.returnDate).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
-    return render_template("admin/schassignment.html", assignments=assignments, headings=headings, form=form, error = error)
+        return render_template("admin/schassignment.html", assignments=assignments, headings=headings, form=form, error = error)
+    elif check == 0:
+        return render_template("user/reviewassignment.html", assignments=assignments, headings=headings, form=form, error = error)
+    #return render_template("admin/schassignment.html", assignments=assignments, headings=headings, form=form, error = error)
+
 
 #not done
 dstid = 0
@@ -682,15 +695,14 @@ def data():
 def choosestudent():
     check = check_user()
     if check == 1:
-        session["review_student_name"] = ''
+        session["review_student_name"] = None
         #global studentname
         form = ChooseStudent()
         ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter_by(classID = session['current_classid'])]
         form.user.choices = returnname(ids)
         if form.validate_on_submit:
             session["review_student_name"] = form.user.data
-            print("what is your name?", session["review_student_name"])
-            return redirect(url_for('data'))
+            return redirect(url_for('data')) ###########
         return render_template("admin/choosestudent.html", form=form)
 
 #only done for user
@@ -698,23 +710,29 @@ def choosestudent():
 def editdata():
     check = check_user()
     global dstid
+    print(dstid)
     eventtype = []
     eventdist = []
     id = dstid
     speed = 0
     eventID = db.session.query(UserDST.eventID).filter_by(userDSTID=id).first()
+    print("eventID", eventID)
     eventdetails = list(db.session.query(Events.eventTypeID, Events.eventDistance).first())
-    eventtype = db.session.query(EventTypes.type).filter_by(id=eventdetails[0]).first()
-    type = [str(i) for i in eventtype]
+    print("eventdetails", eventdetails)
+    type = [str(i) for i in db.session.query(EventTypes.type).filter_by(id=eventdetails[0]).first()]
+    print("type", type)
     distance = [str(eventdetails[1])]
+    print("distance", distance)
     time = list(db.session.query(UserDST.userTime).filter_by(userDSTID=dstid).first())[0]
     usertimeM = time//60
     usertimeS = time - usertimeM*60
     dstdetails = UserDST.query.filter(UserDST.userDSTID==dstid)
     if check == 0:
         form = UserEnterData()
-        form.eventType.choices = type
-        form.eventDistance.choices = distance
+        form.eventType.data = type[0]
+        form.eventDistance.data = distance[0]
+        form.userTimeM.data = usertimeM
+        form.userTimeS.data = usertimeS
         if form.validate_on_submit():
             speed = 0
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
@@ -729,13 +747,17 @@ def editdata():
             })
             db.session.commit()
             return redirect(url_for('data'))
-        return render_template("user/usereditdata.html", form=form, timeM=usertimeM, timeS=usertimeS)
+        return render_template("user/userenterdata.html", form=form, timeM=usertimeM, timeS=usertimeS)
     elif check == 1:
-        form = AdminEditData()
-        form.eventType.choices = type
-        form.eventDistance.choices = distance
+        form = AdminEnterData()
         classuserids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter(ClassesUsers.classID==session["current_classid"]).all()]
         form.user.choices = returnname(classuserids)
+        form.eventType.choices = type
+        form.eventDistance.choices = distance
+        #form.eventType.data = type
+        #form.eventDistance.data = distance
+        form.userTimeM.data = usertimeM
+        form.userTimeS.data = usertimeS
         if form.validate_on_submit():
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
@@ -752,7 +774,7 @@ def editdata():
             })
             db.session.commit()
             return redirect(url_for('data'))
-        return render_template("admin/admineditdata.html", form=form, timeM=usertimeM, timeS=usertimeS)
+        return render_template("admin/adminenterdata.html", form=form, usertimeM=usertimeM, usertimeS=usertimeS)
 
 
 @app.route('/reviewdata', methods=['GET', 'POST'])
@@ -1003,19 +1025,24 @@ def return_event():
 @app.route('/chooseevent', methods=['GET', 'POST'])
 def chooseevent():
     check = check_user()
+    form = ChooseEvent()
+    form.eventDistance.choices = [i[0] for i in db.session.query(Events.eventDistance).filter(Events.eventDistance!=0)]
     if check == 1:
-        form = ChooseEvent()
         if form.validate_on_submit():
             if form.submit.data:
                 update_event(form.eventType.data, form.eventDistance.data)
                 return_event()
-                if len(session["present"]) >= 0:
-                    return redirect(url_for('timer'))
-                elif len(session["present"]) == 0:
-                    return redirect(url_for('timer'))
-        return render_template("admin/chooseevent.html", form=form)
-    else:
-        return redirect(url_for('login'))
+                #if len(session["present"]) >= 0:
+                return redirect(url_for('timer'))
+        return render_template("chooseevent.html", form=form, user=check)
+    if check == 0:
+        if form.validate_on_submit():
+            if form.submit.data:
+                update_event(form.eventType.data, form.eventDistance.data)
+                return_event()
+                return redirect(url_for('timer'))
+        return render_template("chooseevent.html", form=form, user=check)
+
 
 starttime = "00:00:00"
 def update_starttime():
@@ -1115,8 +1142,11 @@ def timer():
     if check == 1:
         form = Timer()
         date = (str(datetime.today()).split(' '))[0]
+        ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter(ClassesUsers.classID==session['current_classid'])]
+        names = returnname(ids)
         type = event[0]
         distance = event[1]
+        form.users.choices = names
         if form.start.data:
             update_starttime()
             pass
@@ -1131,18 +1161,16 @@ def timer():
             form.users.append_entry(
                 {
                     "time": time,
-                    "users": QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+                    "users": SelectField('Name', choices=names, validators=[DataRequired()])
                 }
             )
-            return render_template("admin/timer.html", form=form, starttime=starttime, user=check)
+            return render_template("timer.html", form=form, starttime=starttime, user=check)
         elif form.reset.data:
             reset_starttime()
-
         if form.submit.data:
-            flash(f'Data submitted','success')
             users = form.users.data
             addtime(users)
-        return render_template("admin/timer.html", form=form, date=date, type=type, distance=distance, user=check)
+        return render_template("timer.html", form=form, date=date, type=type, distance=distance, user=check)
     if check == 0:
         form = Timer()
         date = (str(datetime.today()).split(' '))[0]
@@ -1153,7 +1181,8 @@ def timer():
             pass
         elif form.store.data:
             starttime = return_starttime()
-
+            name = [str(current_user.firstname) + ' ' + (current_user.lastname)]
+            print(name)
             if starttime != "00:00:00":
                 time = str(datetime.now() - starttime).split('.')[0]
             else:
@@ -1162,18 +1191,16 @@ def timer():
             form.users.append_entry(
                 {
                     "time": time,
-                    "users": QuerySelectField('Name', query_factory=user_query, allow_blank=True, validators=[DataRequired()])
+                    "users": SelectField('Name', choices=name, validators=[DataRequired()])
                 }
             )
-            return render_template("admin/timer.html", form=form, starttime=starttime, user=check)
+            return render_template("timer.html", form=form, starttime=starttime, user=check)
         elif form.reset.data:
             reset_starttime()
-
         if form.submit.data:
-            flash(f'Data submitted','success')
             users = form.users.data
             addtime(users)
-        return render_template("admin/timer.html", form=form, date=date, type=type, distance=distance, user=check)
+        return render_template("timer.html", form=form, date=date, type=type, distance=distance, user=check)
 
 present = []
 

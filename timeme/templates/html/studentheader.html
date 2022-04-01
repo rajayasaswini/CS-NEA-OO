@@ -19,6 +19,7 @@
       </button>
       <div class="dropdown-content">
         <a href="{{ url_for('submitassignment') }}">ASSIGNMENTS</a>
+        <a href="{{ url_for('viewsetassignments') }}">REVIEW ASSIGNMENTS</a>
         <a href="{{ url_for('data') }}">DATA</a>
         <!--<a href="{{ url_for('chooseeventdata') }}">ALL GRAPHS</a>-->
       </div>
@@ -29,7 +30,7 @@
       </button>
       <div class="dropdown-content">
         <a href="{{ url_for('enterdatachoice') }}">ENTER DATA</a>
-        <a href="{{ url_for('timer') }}">TIMER</a>
+        <a href="{{ url_for('chooseevent') }}">TIMER</a>
       </div>
     </div>
     <div class="dropdown" id="right">
