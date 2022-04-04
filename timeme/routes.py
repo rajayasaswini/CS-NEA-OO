@@ -35,6 +35,7 @@ def index():
             return redirect(url_for('udash'))
     return render_template("index.html")
 #done
+
 @app.route('/aregister', methods=['GET', 'POST'])
 def aregister():
     check = check_user()
@@ -46,9 +47,10 @@ def aregister():
     if form.validate_on_submit():
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = Users(email=form.email.data, firstname=form.firstname.data, birthday=form.bday.data, lastname=form.lastname.data, password=hashed_pass, isAdmin=1)
+        login_user(user)
         db.session.add(user)
         db.session.commit()
-        flash(f'Login now','success')
+        #flash(f'Login now','success')
         return redirect(url_for('login'))
     return render_template("admin/aregister.html", title="Register", form=form)
 #done
@@ -67,7 +69,7 @@ def uregister():
             db.session.add(user)
             db.session.commit()
             login_user(user)
-            flash(f'Login now','success')
+            #flash(f'Login now','success')
             return redirect(url_for('entercode'))
         return render_template("user/uregister.html", title="Register", form=form)
 #done
