@@ -255,7 +255,8 @@ class ReviewAssignment(FlaskForm):
 
 class UserCheckEventData(FlaskForm):
     eventtype = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])
-    eventdist = SelectField('Event Distance', choices=[], validators=[DataRequired()])
+    eventdist = SelectField('Event Distance', choices=[])
+    eventtime = SelectField('Event Time', choices=[])
     submit = SubmitField('Check')
 
 class AdminCheckEventData(FlaskForm):
@@ -288,7 +289,7 @@ class UserEmail(FlaskForm):
     user = FieldList(FormField(AddEmail), label="Email")
     addUser = SubmitField(label='Add User')
 
-names = ['Lo La']
+names = ['Lo Walter', 'Bob Smith']
 
 class ChooseEvent(FlaskForm):
     eventType = QuerySelectField('Event Type', query_factory=eventtype_query, allow_blank=True, validators=[DataRequired()])

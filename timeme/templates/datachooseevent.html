@@ -50,13 +50,29 @@
 				</div>
 
         <br>
+        <div class="form-group">
+					{{ form.eventtime.label(id="left")}}
+
+					{% if form.eventtime.errors %}
+							{{ form.eventtime(class="form-control form-control-lg is-invalid") }}
+							<div class="invalid-feedback">
+									{% for error in form.eventtime.errors %}
+											<span>{{ error }}</span><p>m</p>
+									{% endfor %}
+							</div>
+					{% else %}
+							{{ form.eventtime(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+        <br>
 
         <div class="error">
           {{ error }}
         </div>
 
         <br>
-        
+
         <div class="form-group">
 						{{ form.submit(class="login-button") }}
 				</div>
