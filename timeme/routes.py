@@ -1040,12 +1040,16 @@ def alldata():
     new_val = days[-1] + 2
     intercept = reg.intercept_
     slope = reg.coef_
+    print(slope)
     final_y = slope*days[-1] + intercept
     trendy = []
     for i in days:
         trend = []
+        #y=mx+c
         trend.append(slope*i + intercept)
+        print("trend", trend)
         trendy.append(trend[0][0])
+        print("trend[0][0]", trend[0][0])
     recentdate = (list([i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=userID, eventID=eventid).all()][-1]))[0]
     predicted_date = recentdate + timedelta(days=2)
     pd = str(predicted_date.day)+'-'+str(predicted_date.month)+'-'+str(predicted_date.year)
@@ -1060,8 +1064,9 @@ def alldata():
         else:
             pdy_list.append(None)
     pdy_list = json.dumps(pdy_list)
+    #print("trendy", trendy)
     #return render_template("alldata.html", user=check, labels=date, values=time, values2=trendy, pdy=pdy_list)
-    return render_template("alldata.html", user=check, labels=date, values=time, values2=trendy, pdy=pdy_list)
+    return render_template("alldata.html", user=check, labels=date, values=time, pdy=pdy_list)
 
 #@app.route('/profile', methods=['GET', 'POST'])
 #def profile():
