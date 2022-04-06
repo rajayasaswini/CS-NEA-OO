@@ -525,6 +525,7 @@ def createtimedassignment():
 @app.route('/submitassignment', methods=['GET', 'POST'])
 def submitassignment():
     check = check_user()
+    error = ' '
     if check == 0:
         assign = []
         form = SelectAssignment()
@@ -548,8 +549,13 @@ def submitassignment():
             #typeid = int(EventTypes.query.filter_by(type=assignmentlist[0]).first().id)
             #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=assignmentlist[1]).first().eventID)
             session["current_assignmentid"] = form.assignmentID.data
-            return redirect(url_for('enterassignment'))
-        return render_template('user/assignments.html', headings=headings, assignments=assignment, form=form, assign=1)
+            in_db = db.session.query(ReturnedAssignment.rassid).select_from(ReturnedAssignment).join(UserDST).join(ScheduledAssignments).filter(UserDST.userID==current_user.id, ReturnedAssignment.schassid==form.assignmentID.data).first()
+            print(in_db)
+            if in_db is None:
+                return redirect(url_for('enterassignment'))
+            else:
+                error = "You have already submitted this assignment."
+        return render_template('user/assignments.html', headings=headings, assignments=assignment, form=form, assign=1, error=error)
     else:
         return redirect(url_for('login'))
 #done
@@ -628,6 +634,7 @@ def viewsetassignments():
     check = check_user()
     if check == 1:
         form = ReviewAssignment()
+        assignments = []
         session["review_assignment"] = 0
         #get ids of students in class
         #get those ids and get their names
@@ -902,7 +909,10 @@ def reviewdata():
     details.append(event[2])
     details.append(dst_details.userTime)
     details.append(dst_details.userSpeed)
-    return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds, details=details)
+    no_intervals = False
+    if len(labels) == 0 and len(values)==0:
+        no_intervals = True
+    return render_template("reviewdata.html", user=check, labels=labels, values=values, speed=speeds, details=details, no_intervals=no_intervals)
 
 review_event = ' '
 #filtering through events
@@ -1218,7 +1228,7 @@ def timer_reset():
     seconds = 0
     return """<h1>00:00:00</h1>"""
 
-#!!!
+#done
 def addtime(users):
     event = return_event().split(" ")
     type = event[0]
@@ -1228,8 +1238,9 @@ def addtime(users):
     check = check_user()
     for i in range(0,len(users)):
         userlist = [j[1] for j in user[i].items()]
-        times = userlist[0].split(':')
-        name = userlist[1]
+        print(userlist[0])
+        times = userlist[1].split(':')
+        name = userlist[0]
         #print(name)
         time = int(times[0])*3600 + int(times[1])*60 + int(times[2])
         userSpeed = 0
@@ -1278,6 +1289,7 @@ def addtime(users):
 def timer():
     check = check_user()
     event = return_event().split(" ")
+    user_query = Users.query.filter(Users.isAdmin!=1)
     if check == 1:
         form = Timer()
         date = (str(datetime.today()).split(' '))[0]
@@ -1300,7 +1312,7 @@ def timer():
             form.users.append_entry(
                 {
                     "time": time,
-                    "users": SelectField('Name', choices=['Lo Walter', 'Bob Smith'], validators=[DataRequired()])
+                    "users": QuerySelectField('Name', query_factory=user_query, validators=[DataRequired()])
                 }
             )
             return render_template("timer.html", form=form, starttime=starttime, user=check, date=date, type=type, distance=distance,)
@@ -1330,7 +1342,7 @@ def timer():
             form.users.append_entry(
                 {
                     "time": time,
-                    "users": SelectField('Name', choices=[str(current_user.firstname) + ' ' + (current_user.lastname)], validators=[DataRequired()])
+                    "users": QuerySelectField('Name', query_factory=user_query, validators=[DataRequired()])
                 }
             )
             return render_template("timer.html", form=form, starttime=starttime, user=check)
@@ -1339,6 +1351,7 @@ def timer():
         if form.submit.data:
             users = form.users.data
             addtime(users)
+            return redirect(url_for('adash'))
         return render_template("timer.html", form=form, date=date, type=type, distance=distance, user=check)
 
 present = []

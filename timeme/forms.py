@@ -75,7 +75,7 @@ def eventtype_query():
     return EventTypes.query
 
 def user_query():
-    return Users.query
+    return Users.query.filter(Users.isAdmin!=1)
 
 class Intervals(Form):
     intervalDist = IntegerField('Distance from start', validators=[validators.Optional()])
@@ -297,7 +297,7 @@ class ChooseEvent(FlaskForm):
     submit = SubmitField('Continue')
 
 class SelectUser(Form):
-    users = SelectField('Name', choices=[], validators=[DataRequired()])
+    users = QuerySelectField('Name', query_factory=user_query)
     time = StringField('Time', validators=[validators.InputRequired()])
 
 #class TimerTime(Form):

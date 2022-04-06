@@ -20,6 +20,7 @@
     </div>
     {% extends "charts/chart_layout.html" %}
     {% block content %}
+    {% if no_intervals == False %}
     <p>Distance-time graph</p>
     <div class="col-xs-10 col-sm-6 col-md-6">
         <div class="card card-style mb-2">
@@ -45,8 +46,10 @@
     {% include "charts/dt-dist-time.html" %}
     {% include "charts/dt-speed-time.html" %}
     {% endblock %}
+    {% endif %}
 
-      <div class="details">
+
+      <div class="details" id="left">
         <p>Name: {{ details[0] }}</p>
         <p>Event Type = {{ details[1] }}</p>
         <p>Event Distance = {{ details[2] }}</p>
