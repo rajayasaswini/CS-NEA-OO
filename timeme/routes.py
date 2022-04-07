@@ -379,36 +379,36 @@ def enterdist():
             form.userInterval.append_entry()
             return render_template("admin/adminenterdist.html", form=form)
         if form.validate_on_submit():
-            name = str(form.user.data)
-            name = name.split(' ')
+            name = [str(form.user.data)]
+            userid = (returnid(name))[0]
             fname = ''
             lname = ''
-            if len(name) == 2:
-                fname,lname = name[0], name[1]
-            elif len(name) > 2:
-                lname = name[len(name)-1]
-                name.remove(lname)
-                count = 0
-                for i in name:
-                    if count == 0:
-                        fname += i + ' '
-                        count += 1
-                    else:
-                        fname += i
-                count = 0
-            userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+            #if len(name) == 2:
+                #fname,lname = name[0], name[1]
+            #elif len(name) > 2:
+            #    lname = name[len(name)-1]
+            #    name.remove(lname)
+            #    count = 0
+            #    for i in name:
+            #        if count == 0:
+            #            fname += i + ' '
+            #            count += 1
+            #        else:
+            #            fname += i
+            #    count = 0
+            #userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             userSpeed = 0
             time = form.userTime.data
             times = [int(i) for i in time.split(":")]
             timeinS = times[0]*60 + times[1]
             userSpeed = getspeed(timeinS, str(form.eventDistance.data), userSpeed)
-            dist = str(form.eventDistance.data)
+            dist = int(str(form.eventDistance.data))
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventTime=timeinS).first().eventID)
             if eventid == None:
                 error = 'That event does not exist'
                 return redirect(url_for('enterdist'))
-            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=timeinS , userSpeed=userSpeed, isAssignment=0)
+            userdst = UserDST(userID=userid, eventID=eventid, userDistance=dist, userTime=timeinS , userSpeed=userSpeed, isAssignment=0)
             db.session.add(userdst)
             db.session.commit()
             dstid = int(UserDST.query.filter_by(userID=userid).all()[-1].userDSTID)
@@ -801,7 +801,8 @@ def editdata():
             eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
             updatedtime = form.userTimeM.data*60 + form.userTimeS.data
             speed = getspeed(updatedtime, form.eventDistance.data, speed)
-            dstdetails = UserDST.query.filter_by(userDSTID=id).update({
+            userdstid = UserDST.query.filter_by(userDSTID=id)
+            dstdetails = userdstid.update({
                 UserDST.eventID : eventid,
                 UserDST.userDistance : int(str(form.eventDistance.data)),
                 UserDST.userTime : updatedtime,
@@ -965,9 +966,9 @@ def chooseeventdata():
             update_event(form.eventtype.data, form.eventdist.data)
             #review_event = str(type) + ' ' + str(dist)
             #print(review_event)
-        elif form.eventdist.data == 0 and form.eventtime.data != 0:
+        elif int(form.eventdist.data) == 0 and str(form.eventtime.data) != '0':
             print(1)
-            update_event(form.eventtype.data, form.eventdist.data)
+            update_event(form.eventtype.data, form.eventtime.data)
             #review_event = str(type) + ' ' + str(time)
             #print(review_event)
             #assignment = list(db.session.query(EventTypes.type, Events.eventDistance, ScheduledAssignments.returnDate).select_from(EventTypes).join(Events).join(ScheduledAssignments).all())
@@ -988,7 +989,9 @@ error = ''
 def alldata():
     #global review_event
     current_event = return_event()
+    values = []
     print("ughughugh", current_event)
+    is_time = 0
     global error
     check = check_user()
     userID = 0
@@ -996,7 +999,7 @@ def alldata():
         userID = current_user.id
     elif check == 1:
         name = [str(session["review_student_name"])]
-        #print(name)
+        print("NAME",name)
         userID = (returnid(name))[0]
         #return render_template("alldata.html", user=check)
     event = current_event
@@ -1008,16 +1011,23 @@ def alldata():
     typeid = [int(i) for i in typeid][0]
     if ':' not in eventdetails[1]:
         eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(eventdetails[1])).first().eventID)
+        print(eventid)
+        is_time = False
     else:
         time = eventdetails[1]
         times = [int(i) for i in time.split(":")]
         timeinS = times[0]*60 + times[1]
         eventid = int(Events.query.filter_by(eventTypeID=typeid, eventTime=timeinS).first().eventID)
+        print(eventid)
+        is_time = True
     if eventid is None:
         error = 'There is no such event'
         return redirect(url_for('chooseeventdata'))
     #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=str(eventdetails[1])).first().eventID)
-    time = [i[0] for i in db.session.query(UserDST.userTime).filter_by(userID=userID, eventID=eventid).all()]
+    if is_time == False:
+        values = [i[0] for i in db.session.query(UserDST.userTime).filter_by(userID=userID, eventID=eventid).all()]
+    elif is_time == True:
+        values = [i[0] for i in db.session.query(UserDST.userDistance).filter_by(userID=userID, eventID=eventid).all()]
     firstdate = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=userID, eventID=eventid).first()]
     days = []
     date = [str(i[0].day)+'-'+str(i[0].month)+'-'+str(i[0].year) for i in db.session.query(UserDST.dstDateTime).filter_by(userID=userID, eventID=eventid).all()]
@@ -1036,7 +1046,7 @@ def alldata():
         n.append(i)
         x_array.append(n)
     x = np.array(x_array)
-    reg = LinearRegression().fit(x, time)
+    reg = LinearRegression().fit(x, values)
     new_val = days[-1] + 2
     intercept = reg.intercept_
     slope = reg.coef_
@@ -1066,7 +1076,7 @@ def alldata():
     pdy_list = json.dumps(pdy_list)
     #print("trendy", trendy)
     #return render_template("alldata.html", user=check, labels=date, values=time, values2=trendy, pdy=pdy_list)
-    return render_template("alldata.html", user=check, labels=date, values=time, pdy=pdy_list)
+    return render_template("alldata.html", user=check, labels=date, values=values, pdy=pdy_list)
 
 #@app.route('/profile', methods=['GET', 'POST'])
 #def profile():
@@ -1180,22 +1190,30 @@ def return_event():
 def chooseevent():
     check = check_user()
     form = ChooseEvent()
+    error = ' '
     form.eventDistance.choices = [i[0] for i in db.session.query(Events.eventDistance).filter(Events.eventDistance!=0)]
     if check == 1:
         if form.validate_on_submit():
             if form.submit.data:
-                update_event(form.eventType.data, form.eventDistance.data)
-                return_event()
+                #typeid = db.session.query
+                eventid = db.session.query(Events.eventID).select_from(Events).join(EventTypes).filter(Events.eventDistance==int(form.eventDistance.data), EventTypes.type==str(form.eventType.data)).first()
+                print(eventid)
+                if eventid != None:
+                    update_event(form.eventType.data, form.eventDistance.data)
+                    return_event()
+                    return redirect(url_for('timer'))
+                elif eventid is None:
+                    error = 'There is no such event'
+                    return render_template("chooseevent.html", form=form, user=check, error=error)
                 #if len(session["present"]) >= 0:
-                return redirect(url_for('timer'))
-        return render_template("chooseevent.html", form=form, user=check)
+        return render_template("chooseevent.html", form=form, user=check, error=error)
     if check == 0:
         if form.validate_on_submit():
             if form.submit.data:
                 update_event(form.eventType.data, form.eventDistance.data)
                 return_event()
                 return redirect(url_for('timer'))
-        return render_template("chooseevent.html", form=form, user=check)
+        return render_template("chooseevent.html", form=form, user=check, error=error)
 
 
 starttime = "00:00:00"
@@ -1235,6 +1253,7 @@ def timer_reset():
 
 #done
 def addtime(users):
+    check = check_user()
     event = return_event().split(" ")
     type = event[0]
     dist = event[1]
@@ -1245,20 +1264,24 @@ def addtime(users):
         userlist = [j[1] for j in user[i].items()]
         print(userlist[0])
         times = userlist[1].split(':')
-        name = userlist[0]
-        #print(name)
+        name = (str(userlist[0]).split(' '))
+        if '' in name:
+            name = name.remove('')
+        print(name)
         time = int(times[0])*3600 + int(times[1])*60 + int(times[2])
         userSpeed = 0
         userSpeed = getspeed(time, str(dist), userSpeed)
         typeid = int(EventTypes.query.filter_by(type=str(type)).first().id)
         eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(dist)).first().eventID)
-        if check == 0:
-            userdst = UserDST(userID=current_user.id, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
-            db.session.add(userdst)
-        elif check == 1:
-            #userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
-            userdst = UserDST(userID=3, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
-            db.session.add(userdst)
+        #if check == 0:
+        #userid = [i for i in db.session.query(Users.id).filter(Users.firstname==name[0], Users.lastname==name[1]).first()][0]
+        #userdst = UserDST(userID=userid, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
+        #db.session.add(userdst)
+        #elif check == 1:
+        userid = [i for i in db.session.query(Users.id).filter(Users.firstname==name[0], Users.lastname==name[1]).first()][0]
+        #userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
+        userdst = UserDST(userID=userid, eventID=eventid, userDistance=dist, userTime=time , userSpeed=userSpeed, isAssignment=0)
+        db.session.add(userdst)
         db.session.commit()
 
 
@@ -1290,12 +1313,12 @@ def addtime(users):
     #            db.session.add(userdst)
     #db.session.commit()
 
-@app.route('/timer', methods=['GET', 'POST'])
+@app.route('/stopwatch', methods=['GET', 'POST'])
 def timer():
     check = check_user()
     event = return_event().split(" ")
     user_query = Users.query.filter(Users.isAdmin!=1)
-    if check == 1:
+    if check == 1 or check == 0:
         form = Timer()
         date = (str(datetime.today()).split(' '))[0]
         ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter(ClassesUsers.classID==session['current_classid'])]
@@ -1327,7 +1350,7 @@ def timer():
             users = form.users.data
             addtime(users)
         return render_template("timer.html", form=form, date=date, type=type, distance=distance, user=check)
-    if check == 0:
+    if check == 2:
         form = Timer()
         date = (str(datetime.today()).split(' '))[0]
         type = event[0]
