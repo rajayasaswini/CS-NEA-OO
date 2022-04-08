@@ -4,7 +4,6 @@ from sqlalchemy.sql import text
 from sqlalchemy import *
 from sqlalchemy.orm import relationship, backref
 from timeme import db, login_man, app
-#login.manager
 from flask_login import UserMixin
 import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Ser
@@ -50,7 +49,6 @@ class Classes(db.Model):
     classes_admin = db.relationship('Users', lazy=True, foreign_keys=[classAdminID])
 
     def __repr__(self):
-        #return f"['{self.className}', '{self.classCode}]"
         return '{}'.format(str(self.className))
 
 class ClassesUsers(db.Model):
@@ -69,7 +67,6 @@ class EventTypes(db.Model):
     def __repr__(self):
         return '{}'.format(str(self.type))
 
-
 class Events(db.Model):
     __tablename__ = "events"
     eventID = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -77,38 +74,6 @@ class Events(db.Model):
     eventDistance = db.Column(db.Integer, nullable=True)
     eventTime = db.Column(db.Integer, nullable=True)
     eventT_r = db.relationship('EventTypes', lazy=True, foreign_keys=[eventTypeID])
-
-
-    #def __repr__(self):
-    #    return '{}'.format(str(self.eventDistance))
-
-#class Logs(db.Model):
-#    __tablename__ = "logs"
-#    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
-#    logID = db.Column(db.Integer, primary_key=True, nullable=False)
-#    logContent = db.Column(db.String)
-#    logDateTime = db.Column(db.DateTime, nullable=False)
-#    log_user = db.relationship('Users', lazy=True, foreign_keys=[userID])
-
-
-#class Photos(db.Model):
-#    __tablename__ = "postphotos"
-#    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
-#    postID = db.Column(db.Integer, db.ForeignKey("posts.postID"))
-#    postPhotoID = db.Column(db.Integer, primary_key=True, nullable=False)
-#    postPhoto = db.Column(db.String(20), default='default.jpg')
-#    postDateTime = db.Column(db.DateTime, nullable=False)
-#    photos_user = db.relationship('Users', lazy=True, foreign_keys=[userID])
-#    photo_post = db.relationship('Posts', lazy=True, foreign_keys=[postID])
-
-#class Posts(db.Model):
-#    __tablename__ = "posts"
-#    userID = db.Column(db.Integer, db.ForeignKey("users.id"))
-#    postID = db.Column(db.Integer, primary_key=True)
-#    postContent = db.Column(db.String(255))
-#    isPosted = db.Column(db.Integer)
-#    postDateTime = db.Column(db.DateTime, nullable=False)
-#    user_post = db.relationship('Users', lazy=True, foreign_keys=[userID])
 
 class ScheduledAssignments(db.Model):
     __tablename__ = "scheduledassignments"
@@ -123,7 +88,6 @@ class ScheduledAssignments(db.Model):
     def __repr__(self):
         date = self.returnDate
         eventID = self.eventID
-        #eventTypeID = Events.query(Events.eventTypeID, Events.eventDistance).filter_by(eventID = eventID)
         return "['{}-{}-{}']".format(str(date.year), str(date.month), str(date.day))
 
 class ReturnedAssignment(db.Model):
@@ -133,6 +97,7 @@ class ReturnedAssignment(db.Model):
     userdstid = db.Column(db.Integer, db.ForeignKey("userdst.userDSTID"))
     isLate = db.Column(db.Integer)
     rass_dst = db.relationship('UserDST', lazy=True, foreign_keys=[userdstid])
+    rass_schass = db.relationship('ScheduledAssignments', lazy=True, foreign_keys=[schassid])
 
 class UserDST(db.Model):
     __tablename__ = "userdst"
@@ -158,9 +123,8 @@ class RegPresent(db.Model):
     __tablename__ = "regpresent"
     regid = db.Column(db.Integer, db.ForeignKey("registers.regid"))
     registerid = db.Column(db.Integer, primary_key=True)
-    userid = db.Column(db.Integer, db.ForeignKey("classusers.cuid"))
-    isPresent = db.Column(db.Integer)
-    user_reg = db.relationship('ClassesUsers', lazy=True, foreign_keys=[userid])
+    userid = db.Column(db.Integer, db.ForeignKey("users.id"))
+    user_reg = db.relationship('Users', lazy=True, foreign_keys=[userid])
     reg_reg = db.relationship('Registers', lazy=True, foreign_keys=[regid])
 
 class Intervals(db.Model):
