@@ -1,6 +1,8 @@
-/app.py
 /__pycache__
 /timeme/__pycache__
+/python/__pycache__
 /env
 /timeme/TimeMe.db
 /timeme/__init__.py
+/app.py
+/.vscode
