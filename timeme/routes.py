@@ -214,7 +214,7 @@ def entercode():
         db.session.add(classc)
         db.session.commit()
         return redirect(url_for('udash'))
-    return render_template("entercode.html", title="Enter Code", form=form)
+    return render_template("user/entercode.html", title="Enter Code", form=form)
 
 from python.getspeed import *
 #done
