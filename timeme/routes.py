@@ -904,12 +904,13 @@ def alldata():
 def profile():
     form = Profile()
     if form.validate_on_submit():
-        user = Users.query.filter_by(id==current_user.id)
+        user = Users.query.filter_by(id=current_user.id).first()
         user.firstname = form.fname.data
         user.lastname = form.lname.data
         user.email = form.email.data
         user.about = form.about.data
         db.session.commit()
+        print(user.about)
         return redirect(url_for('profile'))
     elif request.method == 'GET':
         form.fname.data = current_user.firstname
@@ -939,7 +940,7 @@ def reset_request():
         flash('An email has been sent to your email address.', 'info')
         return redirect(url_for('login'))
     return render_template('requestrp.html', form=form)
-#not done
+#done
 @app.route('/resetpass/<token>', methods=['GET', 'POST'])
 def reset_token(token):
     check = check_user()
@@ -951,9 +952,7 @@ def reset_token(token):
     if user is None:
         flash('Invalid token', 'warning')
         return redirect(url_for('reset_request'))
-    print('I did not do it you dumbass!!!')
     if form.validate_on_submit():
-        print('I did it you dumbass!!!')
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user.password = hashed_pass
         db.session.commit()
