@@ -14,7 +14,6 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from datetime import timedelta
 
-test = 'abc'
 #done
 def check_user():
     if current_user.is_authenticated:
@@ -282,19 +281,7 @@ def enterdata():
             name = name.split(' ')
             fname = ''
             lname = ''
-            if len(name) == 2:
-                fname,lname = name[0], name[1]
-            elif len(name) > 2:
-                lname = name[len(name)-1]
-                name.remove(lname)
-                count = 0
-                for i in name:
-                    if count == 0:
-                        fname += i + ' '
-                        count += 1
-                    else:
-                        fname += i
-                count = 0
+            fname,lname = name[0], name[1]
             userid = int(Users.query.filter_by(firstname=fname, lastname=lname).first().id)
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
             time = int(form.userTimeM.data)*60 + int(form.userTimeS.data)
@@ -828,38 +815,68 @@ def alldata():
     values = []
     is_time = 0
     global error
+    #checks if a user is a teacher or student
     check = check_user()
+    #sets userID to 0
     userID = 0
+    #if the user is a student
     if check == 0:
+        #the userID is set to the current user's id
         userID = current_user.id
+    #if the user is a teacher
     elif check == 1:
+        #the userID is set to the ID of the student that the teacher is reviewing
         name = [str(session["review_student_name"])]
         userID = (returnid(name))[0]
-    event = current_event
-    eventdetails = event.split(' ')
+    #stores the event that is being reviewed
+    #event = current_event
+    #splitting the details of the event that is being reviewed
+    eventdetails = current_event.split(' ')
+    #the eventid is set to 0
     eventid = 0
+    #the typeid of the event type is queried
     typeid = db.session.query(EventTypes.id).filter_by(type=str(eventdetails[0])).first()
+    #stores the integer value of typeid.
     typeid = [int(i) for i in typeid][0]
+    #we check if there is a colon in the second object in the array to check if it is
+    #time-based event or distance-based event
     if ':' not in eventdetails[1]:
+        #the eventID of a distance-based event is queried
         eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(eventdetails[1])).first().eventID)
+        #the event is not a time-based event
         is_time = False
+    #the event is a time-based event
     else:
+        #the time in MM:SS is extracted
         time = eventdetails[1]
+        #and then it is split into minutes and seconds
         times = [int(i) for i in time.split(":")]
+        #this stores the time in seconds
         timeinS = times[0]*60 + times[1]
+        #the eventID of the event is queried
         eventid = int(Events.query.filter_by(eventTypeID=typeid, eventTime=timeinS).first().eventID)
+        #the event is a time-based event
         is_time = True
+    #if there is no such event, the user is redirected back to 'chooseventdata'
+    #to choose an event again
     if eventid is None:
         error = 'There is no such event'
         return redirect(url_for('chooseeventdata'))
+    #if the event is a distance-based event, then we query all the stored times for an event from the table UserDST
     if is_time == False:
         values = [i[0] for i in db.session.query(UserDST.userTime).filter_by(userID=userID, eventID=eventid).all()]
+    #if the event is a time-based event, then we query all the stored distances for an event from the table UserDST
     elif is_time == True:
         values = [i[0] for i in db.session.query(UserDST.userDistance).filter_by(userID=userID, eventID=eventid).all()]
+    #the first date that a user ran the event
     firstdate = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=userID, eventID=eventid).first()]
+    #new array initialised
     days = []
+    #creating date objects in an array
     date = [str(i[0].day)+'-'+str(i[0].month)+'-'+str(i[0].year) for i in db.session.query(UserDST.dstDateTime).filter_by(userID=userID, eventID=eventid).all()]
+    #stores all the dates and times that a person ran an event
     dates = [i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=userID, eventID=eventid).all()]
+    #removing the timestamp from the datetime objects and
     for i in dates:
         date_object = ([j for j in i][0]).date()
         day = str(date_object - (firstdate[0]).date())
@@ -867,36 +884,53 @@ def alldata():
             day = 0
         else:
             day = int((day.split())[0])
+        #object appended to the list so the list can be used later for the regression models
         days.append(day)
+    #new list initialised
     x_array = []
+    #the days
     for i in days:
         n = []
         n.append(i)
         x_array.append(n)
+    #changes the x_array to a format that can be used in the LinearRegression function
     x = np.array(x_array)
+    #reg stores the details of the progress
     reg = LinearRegression().fit(x, values)
     new_val = days[-1] + 2
+    #y-intercept
     intercept = reg.intercept_
+    #the slope of a graph
     slope = reg.coef_
+    #the final date that is available for the
     final_y = slope*days[-1] + intercept
-    trendy = []
-    for i in days:
-        trend = []
-        trend.append(slope*i + intercept)
-        trendy.append(trend[0][0])
+    #trendy = []
+    #for i in days:
+    #   trend = []
+    #    trend.append(slope*i + intercept)
+    #    trendy.append(trend[0][0])
+    #the most recent date that a user entered an entry for an event
     recentdate = (list([i for i in db.session.query(UserDST.dstDateTime).filter_by(userID=userID, eventID=eventid).all()][-1]))[0]
+    #the prediction is for when the user does the event again 2 days from the last date
     predicted_date = recentdate + timedelta(days=2)
+    #making the predicted_date into a datetime format
     pd = str(predicted_date.day)+'-'+str(predicted_date.month)+'-'+str(predicted_date.year)
+    #appending to the list filled with dates
     date.append(pd)
-    pd1 = "16-12-2021"
+    #predicting the y-value of the prediction
     pdy = reg.predict(np.array([[new_val]]))
+    #list to store the predicted y-value
     pdy_list = []
+    #stores None in the list until the predicted date comes up
+    #at which point the predicted y-value is appended into the list
     for i in range(0, len(date)):
         if i == len(date)-1:
             pdy_list.append(pdy[0])
         else:
             pdy_list.append(None)
+    #making the list into a javascript-friendly format
     pdy_list = json.dumps(pdy_list)
+    #renders the page
     return render_template("alldata.html", user=check, labels=date, values=values, pdy=pdy_list)
 
 #done
@@ -974,26 +1008,17 @@ def chooseevent():
     form = ChooseEvent()
     error = ' '
     form.eventDistance.choices = [i[0] for i in db.session.query(Events.eventDistance).filter(Events.eventDistance!=0)]
-    if check == 1:
-        if form.validate_on_submit():
-            if form.submit.data:
-                eventid = db.session.query(Events.eventID).select_from(Events).join(EventTypes).filter(Events.eventDistance==int(form.eventDistance.data), EventTypes.type==str(form.eventType.data)).first()
-                if eventid != None:
-                    update_event(form.eventType.data, form.eventDistance.data)
-                    return_event()
-                    return redirect(url_for('stopwatch'))
-                elif eventid is None:
-                    error = 'There is no such event'
-                    return render_template("chooseevent.html", form=form, user=check, error=error)
-        return render_template("chooseevent.html", form=form, user=check, error=error)
-    if check == 0:
-        if form.validate_on_submit():
-            if form.submit.data:
+    if form.validate_on_submit():
+        if form.submit.data:
+            eventid = db.session.query(Events.eventID).select_from(Events).join(EventTypes).filter(Events.eventDistance==int(form.eventDistance.data), EventTypes.type==str(form.eventType.data)).first()
+            if eventid != None:
                 update_event(form.eventType.data, form.eventDistance.data)
                 return_event()
                 return redirect(url_for('stopwatch'))
-        return render_template("chooseevent.html", form=form, user=check, error=error)
-
+            elif eventid is None:
+                error = 'There is no such event'
+                return render_template("chooseevent.html", form=form, user=check, error=error)
+    return render_template("chooseevent.html", form=form, user=check, error=error)
 
 starttime = "00:00:00"
 def update_starttime():
@@ -1090,13 +1115,15 @@ def stopwatch():
     if form.submit.data:
         users = form.users.data
         addtime(users)
+        if check == 0:
+            return redirect(url_for('udash'))
+        elif check == 1:
+            return redirect(url_for('adash'))
     return render_template("stopwatch.html", form=form, date=date, type=type, distance=distance, user=check)
-
-present = []
 
 @app.route('/register', methods=['GET', 'POST'])
 def takeregister():
-    global present
+    present = []
     form = UserReg()
     if form.addUser.data:
         form.user.append_entry()

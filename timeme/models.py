@@ -8,6 +8,7 @@ from flask_login import UserMixin
 import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Ser
 
+#function to allow a user to login
 @login_man.user_loader
 def getuser(user_id):
     return Users.query.get(int(user_id))
@@ -23,11 +24,11 @@ class Users(db.Model, UserMixin):
     birthday = db.Column(db.Date, nullable = False)
     photo = db.Column(db.String(20), default='default.jpg')
     isAdmin = db.Column(db.Integer, nullable=False)
-
+    #getting a token for a user to reset their password
     def get_token(self, expire_s = 1800):
         s = Ser(app.config['SECRET_KEY'], expire_s)
         return s.dumps({'users_id':self.id}).decode('utf-8')
-
+    #verify token for resetting password
     @staticmethod
     def verify_token(token):
         s = Ser(app.config['SECRET_KEY'])
@@ -36,7 +37,7 @@ class Users(db.Model, UserMixin):
         except:
             return None
         return Users.query.get(user_id)
-
+    #when anything is queried from the table, it appears in this form
     def __repr__(self):
         return '{} {}'.format(str(self.firstname), str(self.lastname))
 
