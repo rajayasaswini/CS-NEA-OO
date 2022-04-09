@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="../../static/enterdata.css">
 
     <title>Stopwatch</title>
-    <!-- <link rel="stylesheet" href="../../static/timer.css">    <title>Timer</title> -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   </head>
   <body>
@@ -29,20 +28,16 @@
         <p>Stopwatch</p>
       </div>
       {% if form.data.start == True %}
-        {% set url = url_for('timer_start') %}
-        <!-- <h1><div id="timer"></div></h1> -->
+        {% set url = url_for('stopwatch_start') %}
       {% elif form.data.store == True and starttime != "00:00:00" %}
-        {% set url = url_for('timer_start') %}
+        {% set url = url_for('stopwatch_start') %}
       {% elif form.data.store == True and starttime == "00:00:00" %}
-        {% set url = url_for('timer_reset') %}
+        {% set url = url_for('stopwatch_reset') %}
       {% elif form.data.reset == True %}
-        {% set url = url_for('timer_reset') %}
-        <!-- <h1><div id="timer_reset">00:00:00</div></h1> -->
-        <!-- <h1><div id="timer"></div></h1> -->
+        {% set url = url_for('stopwatch_reset') %}
       {% endif %}
       <iframe src="{{url}}" style="height: 70px; width:100%;border: 0;"></iframe>
 
-      <!-- <div id="timer">{#{ url_for('time_feed') }#}</div> -->
 
       <form class ="form" method="post" action="">
         <div class="form-group">

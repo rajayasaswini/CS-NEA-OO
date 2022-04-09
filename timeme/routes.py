@@ -787,7 +787,7 @@ def chooseeventdata():
     global review_event
     global error
     check = check_user()
-    form = UserCheckEventData()
+    form = CheckEventData()
     eventdist = [i[0] for i in db.session.query(Events.eventDistance).filter(Events.eventDistance!=0)]
     form.eventdist.choices = [0] + eventdist
     times = [i[0] for i in db.session.query(Events.eventTime).filter(Events.eventTime!=0)]
@@ -899,30 +899,29 @@ def alldata():
     pdy_list = json.dumps(pdy_list)
     return render_template("alldata.html", user=check, labels=date, values=values, pdy=pdy_list)
 
-
+#done
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     form = Profile()
-    form.fname.data = current_user.firstname
-    form.lname.data = current_user.lastname
-    form.email.data = current_user.email
-    form.about.data = current_user.about
     if form.validate_on_submit():
-        user = Users.query.filter(Users.id==current_user.id)
-        user.update({
-            "firstname": form.fname.data,
-            "lastname": form.lname.data,
-            "email": form.email.data,
-            "about": form.about.data
-        })
+        user = Users.query.filter_by(id==current_user.id)
+        user.firstname = form.fname.data
+        user.lastname = form.lname.data
+        user.email = form.email.data
+        user.about = form.about.data
         db.session.commit()
         return redirect(url_for('profile'))
+    elif request.method == 'GET':
+        form.fname.data = current_user.firstname
+        form.lname.data = current_user.lastname
+        form.email.data = current_user.email
+        form.about.data = current_user.about
     return render_template("editprofile.html", form=form)
 
 #done
 def send_rp_email(user):
     token = user.get_token()
-    mess = Message('Password Reset Request', sender="raja8450@dubaicollege.org", recipients=[user.email])
+    mess = Message('Password Reset Request', sender="timemeapp@gmail.com", recipients=[user.email])
     mess.body = f'''This email has been sent since you want to reset your password.
 If you did not request to reset your password, please ignore this email.
 {url_for('reset_token', token=token, _external=True)}'''
@@ -944,22 +943,19 @@ def reset_request():
 @app.route('/resetpass/<token>', methods=['GET', 'POST'])
 def reset_token(token):
     check = check_user()
-    if check == 1:
-        return redirect(url_for('adash'))
-    elif check == 0:
-        return redirect(url_for('udash'))
+    form = ResetPass()
+    if current_user.is_authenticated:
+        if check == 1:
+            return redirect(url_for('index'))
     user = Users.verify_token(token)
     if user is None:
         flash('Invalid token', 'warning')
         return redirect(url_for('reset_request'))
-    form = ResetPass()
+    print('I did not do it you dumbass!!!')
     if form.validate_on_submit():
+        print('I did it you dumbass!!!')
         hashed_pass = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user.password = hashed_pass
-        user = Users.query.filter(Users.id == current_user.id)
-        user.update({
-            "password": hashed_pass
-        })
         db.session.commit()
         return redirect(url_for('login'))
     return render_template('resetpass.html', form=form)
@@ -972,7 +968,7 @@ def update_event(type, param):
 
 def return_event():
     return current_event
-#choose event before timer
+#choose event before stopwatch
 @app.route('/chooseevent', methods=['GET', 'POST'])
 def chooseevent():
     check = check_user()
@@ -986,7 +982,7 @@ def chooseevent():
                 if eventid != None:
                     update_event(form.eventType.data, form.eventDistance.data)
                     return_event()
-                    return redirect(url_for('timer'))
+                    return redirect(url_for('stopwatch'))
                 elif eventid is None:
                     error = 'There is no such event'
                     return render_template("chooseevent.html", form=form, user=check, error=error)
@@ -996,7 +992,7 @@ def chooseevent():
             if form.submit.data:
                 update_event(form.eventType.data, form.eventDistance.data)
                 return_event()
-                return redirect(url_for('timer'))
+                return redirect(url_for('stopwatch'))
         return render_template("chooseevent.html", form=form, user=check, error=error)
 
 
@@ -1020,17 +1016,17 @@ def get_current_time():
     remaining_seconds = seconds%60
     minutes = seconds//60
     hours = seconds//3600
-    timer_format = "{:02}:{:02}:{:02}".format(hours, minutes, remaining_seconds)
-    return timer_format
+    stopwatch_format = "{:02}:{:02}:{:02}".format(hours, minutes, remaining_seconds)
+    return stopwatch_format
 
-@app.route('/timer_start', methods=['GET', 'POST'])
-def timer_start():
+@app.route('/stopwatch_start', methods=['GET', 'POST'])
+def stopwatch_start():
     seconds = 0
     return """<h1>
     <meta http-equiv="refresh" content="1" />{}</h1>""".format(get_current_time())
 
-@app.route('/timer_reset', methods=['GET', 'POST'])
-def timer_reset():
+@app.route('/stopwatch_reset', methods=['GET', 'POST'])
+def stopwatch_reset():
     global seconds
     seconds = 0
     return """<h1>00:00:00</h1>"""
@@ -1061,72 +1057,41 @@ def addtime(users):
 
 #done
 @app.route('/stopwatch', methods=['GET', 'POST'])
-def timer():
+def stopwatch():
     check = check_user()
     event = return_event().split(" ")
     user_query = Users.query.filter(Users.isAdmin!=1)
-    if check == 1 or check == 0:
-        form = Timer()
-        date = (str(datetime.today()).split(' '))[0]
-        ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter(ClassesUsers.classID==session['current_classid'])]
-        names = returnname(ids)
-        type = event[0]
-        distance = event[1]
-        form.users.choices = names
-        if form.start.data:
-            update_starttime()
-            pass
-        elif form.store.data:
-            starttime = return_starttime()
+    form = Stopwatch()
+    date = (str(datetime.today()).split(' '))[0]
+    ids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter(ClassesUsers.classID==session['current_classid'])]
+    names = returnname(ids)
+    type = event[0]
+    distance = event[1]
+    form.users.choices = names
+    if form.start.data:
+        update_starttime()
+        pass
+    elif form.store.data:
+        starttime = return_starttime()
 
-            if starttime != "00:00:00":
-                time = str(datetime.now() - starttime).split('.')[0]
-            else:
-                time = starttime
+        if starttime != "00:00:00":
+            time = str(datetime.now() - starttime).split('.')[0]
+        else:
+            time = starttime
 
-            form.users.append_entry(
-                {
-                    "time": time,
-                    "users": QuerySelectField('Name', query_factory=user_query, validators=[DataRequired()])
-                }
-            )
-            return render_template("timer.html", form=form, starttime=starttime, user=check, date=date, type=type, distance=distance,)
-        elif form.reset.data:
-            reset_starttime()
-        if form.submit.data:
-            users = form.users.data
-            addtime(users)
-        return render_template("timer.html", form=form, date=date, type=type, distance=distance, user=check)
-    if check == 2:
-        form = Timer()
-        date = (str(datetime.today()).split(' '))[0]
-        type = event[0]
-        distance = event[1]
-        if form.start.data:
-            update_starttime()
-            pass
-        elif form.store.data:
-            starttime = return_starttime()
-            name = [str(current_user.firstname) + ' ' + (current_user.lastname)]
-            if starttime != "00:00:00":
-                time = str(datetime.now() - starttime).split('.')[0]
-            else:
-                time = starttime
-
-            form.users.append_entry(
-                {
-                    "time": time,
-                    "users": QuerySelectField('Name', query_factory=user_query, validators=[DataRequired()])
-                }
-            )
-            return render_template("timer.html", form=form, starttime=starttime, user=check)
-        elif form.reset.data:
-            reset_starttime()
-        if form.submit.data:
-            users = form.users.data
-            addtime(users)
-            return redirect(url_for('adash'))
-        return render_template("timer.html", form=form, date=date, type=type, distance=distance, user=check)
+        form.users.append_entry(
+            {
+                "time": time,
+                "users": QuerySelectField('Name', query_factory=user_query, validators=[DataRequired()])
+            }
+        )
+        return render_template("stopwatch.html", form=form, starttime=starttime, user=check, date=date, type=type, distance=distance,)
+    elif form.reset.data:
+        reset_starttime()
+    if form.submit.data:
+        users = form.users.data
+        addtime(users)
+    return render_template("stopwatch.html", form=form, date=date, type=type, distance=distance, user=check)
 
 present = []
 
