@@ -33,10 +33,6 @@ def index():
         return redirect(url_for('udash'))
     return render_template("index.html")
 #done
-@app.route('/help', methods=['GET', 'POST'])
-def help():
-    logout_user()
-    return redirect(url_for('index'))
 @app.route('/aregister', methods=['GET', 'POST'])
 def aregister():
     check = check_user()
@@ -617,7 +613,7 @@ def viewsetassignments():
 
 
 dstid = 0
-studentname = ''
+#studentname = ''
 
 @app.route('/data', methods=['GET', 'POST'])
 def data():
@@ -692,7 +688,7 @@ def editdata():
         if form.validate_on_submit():
             speed = 0
             typeid = int(EventTypes.query.filter_by(type=str(form.eventType.data)).first().id)
-            eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
+            #eventid = int(Events.query.filter_by(eventTypeID=typeid, eventDistance=int(str(form.eventDistance.data))).first().eventID)
             updatedtime = form.userTimeM.data*60 + form.userTimeS.data
             speed = getspeed(updatedtime, form.eventDistance.data, speed)
             userdstid = UserDST.query.filter_by(userDSTID=id).first()
@@ -709,7 +705,6 @@ def editdata():
         return render_template("user/submitassignment.html", form=form, timeM=usertimeM, timeS=usertimeS, assign=0)
     elif check == 1:
         form = AdminEditData()
-        dstdetails = UserDST.query.filter(UserDST.userDSTID==dstid).first()
         classuserids = [i[0] for i in db.session.query(ClassesUsers.usersID).filter(ClassesUsers.classID==session["current_classid"]).all()]
         form.user.choices = returnname(classuserids)
         form.eventType.choices = [event[0]]

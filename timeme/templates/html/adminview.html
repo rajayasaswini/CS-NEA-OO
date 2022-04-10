@@ -13,6 +13,15 @@
       <div class="nav-logo">
         <strong>TimeMe</strong>
       </div>
+      <div class="dropdown">
+        <button class="dropbtn">Data
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="{{ url_for('createevent') }}">CREATE EVENT</a>
+          <a href="{{ url_for('createET') }}">CREATE EVENT TYPE</a>
+        </div>
+      </div>
       <div class="dropdown" id="right">
         <button class="dropbtn">SETTINGS</button>
         <div class="dropdown-content">
